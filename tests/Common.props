@@ -1,0 +1,29 @@
+<Project>
+    <PropertyGroup>
+        <OutputPath>../../build/</OutputPath>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Nullable>disable</Nullable>
+
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <WarningsAsErrors />
+
+        <NoWarn>$(NoWarn);1701;1702</NoWarn>
+
+        <!-- Suppress warning about "Return" being reservered. That is our namespace and assembly name.-->
+        <NoWarn>$(NoWarn);CA1716</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DebugType>embedded</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="nunit" Version="3.12.0" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    </ItemGroup>
+</Project>

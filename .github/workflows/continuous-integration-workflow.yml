@@ -1,0 +1,56 @@
+name: Continuous integration
+on: push
+
+jobs:
+    build:
+        name: Build and test ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [windows-2019, ubuntu-16.04]
+                include:
+                    - os: windows-2019
+                      script_name: .\build.cmd
+                    - os: ubuntu-16.04
+                      script_name: ./build.sh
+        steps:
+            - name: checkout
+              uses: actions/checkout@v1
+              with:
+                  fetch-depth: 1
+
+            - name: Download and install node.js
+              uses: actions/setup-node@v1
+              with:
+                  node-version: '10.x'
+
+            - name: Install .NET 2.x SDK for Cake (temporary)
+              uses: actions/setup-dotnet@v1
+              with:
+                  dotnet-version: '2.2.103'
+
+            - name: Install .NET 3.x SDK for build
+              uses: actions/setup-dotnet@v1
+              with:
+                  dotnet-version: '3.0.100'
+
+            - name: Output important software versions (node)
+              run: node --version
+
+            - name: Output important software versions (yarn)
+              run: yarn --version
+
+            - name: Output important software versions (dotnet)
+              run: dotnet --version
+
+            - name: Build - restore nuget packages
+              run: ${{ matrix.script_name }} --target=restore-nuget-packages --verbosity=verbose
+
+            - name: Build - restore node packages
+              run: ${{ matrix.script_name }} --target=restore-node-packages --verbosity=verbose
+
+            - name: Build - test
+              env:
+                  MOZ_HEADLESS: 1
+                  CIRCLECI: 1
+              run: ${{ matrix.script_name }} --target=test --verbosity=verbose

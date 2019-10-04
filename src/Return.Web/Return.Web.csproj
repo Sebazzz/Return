@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <KeepOutputPath>True</KeepOutputPath>
+  </PropertyGroup>
+  <Import Project="../Common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Return.Common\Return.Common.csproj" />
+    <ProjectReference Include="..\Return.Infrastructure\Return.Infrastructure.csproj" />
+    <ProjectReference Include="..\Return.Persistence\Return.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

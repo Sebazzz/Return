@@ -1,0 +1,24 @@
+version: 2.0.0.{build}
+image: Visual Studio 2019
+dotnet_csproj:
+    patch: true
+    file: '**\*.csproj'
+    version: '{version}'
+    package_version: '{version}'
+    assembly_version: '{version}'
+    file_version: '{version}'
+    informational_version: '{version}'
+install:
+    - ps: Install-Product node LTS x64
+    - choco install firefox
+    - choco install googlechrome
+cache: '%LOCALAPPDATA%\Yarn'
+build_script:
+    - cmd: build.cmd --target=Publish --verbosity=verbose
+    - cmd: build.cmd --target=Generate-Webpack-Statistics  --verbosity=verbose
+after_build:
+    - ps: Get-ChildItem ./build/publish/* -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+    - ps: Get-ChildItem ./build/ -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+test_script:
+    - cmd: build.cmd --target=Test
+deploy: off
