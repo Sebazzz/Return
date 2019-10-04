@@ -15,18 +15,17 @@ namespace Return.Persistence {
 
     public abstract class DesignTimeDbContextFactoryBase<TContext> :
         IDesignTimeDbContextFactory<TContext> where TContext : DbContext {
-        private const string ConnectionStringName = "NorthwindDatabase";
+        private const string ConnectionStringName = "DbConnection";
         private const string AspNetCoreEnvironment = "ASPNETCORE_ENVIRONMENT";
 
         public TContext CreateDbContext(string[] args) {
-            string basePath = Directory.GetCurrentDirectory() + String.Format(Culture.Invariant, "{0}..{0}WebUI", Path.DirectorySeparatorChar);
+            string basePath = Directory.GetCurrentDirectory() + String.Format(Culture.Invariant, "{0}..{0}Return.Web", Path.DirectorySeparatorChar);
             return this.Create(basePath, Environment.GetEnvironmentVariable(AspNetCoreEnvironment));
         }
 
         protected abstract TContext CreateNewInstance(DbContextOptions<TContext> options);
 
         private TContext Create(string basePath, string? environmentName) {
-
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json")
