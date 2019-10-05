@@ -5,9 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospective.Commands.CreateRetrospective
-{
-   public class CreateRetrospectiveCommand
-    {
+namespace Return.Application.Retrospective.Commands.CreateRetrospective {
+    public class CreateRetrospectiveCommand {
     }
 }

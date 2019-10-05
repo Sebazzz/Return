@@ -5,8 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.App.Commands.SeedBaseData
-{
+namespace Return.Application.App.Commands.SeedBaseData {
     using System.Threading;
     using System.Threading.Tasks;
     using Common.Abstractions;
@@ -16,15 +15,12 @@ namespace Return.Application.App.Commands.SeedBaseData
     internal sealed class BaseDataSeeder {
         private readonly IReturnDbContext _returnDbContext;
 
-        public BaseDataSeeder(IReturnDbContext returnDbContext)
-        {
+        public BaseDataSeeder(IReturnDbContext returnDbContext) {
             this._returnDbContext = returnDbContext;
         }
 
-        public async Task SeedAllAsync(CancellationToken cancellationToken)
-        {
-            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken).ConfigureAwait(false))
-            {
+        public async Task SeedAllAsync(CancellationToken cancellationToken) {
+            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken).ConfigureAwait(false)) {
                 return;
             }
 
