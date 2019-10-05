@@ -16,7 +16,7 @@
         <NoWarn>$(NoWarn);CA1716</NoWarn>
 
         <!-- Unit testing users different conventions -->
-        <NoWarn>$(NoWarn);CA1707;IDE0055</NoWarn>
+        <NoWarn>$(NoWarn);CA1707;IDE0055;CA1303</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

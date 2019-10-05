@@ -18,6 +18,7 @@ namespace Return.Persistence {
         }
 
         public DbSet<NoteLane> NoteLanes { get; set; }
+        public DbSet<Retrospective> Retrospectives { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));

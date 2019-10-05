@@ -7,9 +7,9 @@
 
 namespace Return.Domain.Tests.Unit.ValueObjects {
     using System.Collections.Generic;
+    using Domain.Services;
     using Domain.ValueObjects;
     using NUnit.Framework;
-    using Services;
 
     [TestFixture]
     public sealed class RetroIdentifierTests {

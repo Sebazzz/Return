@@ -24,9 +24,6 @@ namespace Return.Domain.Entities {
         /// <summary>
         /// Identifier (random string) of the retrospective
         /// </summary>
-        /// <remarks>
-        /// Note: I would actually like to use <see cref="RetroIdentifier"/> for this, but EF does not allow an owned type to act as PK.
-        /// </remarks>
         public RetroIdentifier UrlId => this._urlId ??= RetroIdentifierService.CreateNewInternal();
 
         /// <summary>

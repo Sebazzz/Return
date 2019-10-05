@@ -6,6 +6,13 @@
 // ******************************************************************************
 
 namespace Return.Application.Retrospective.Commands.CreateRetrospective {
-    public class CreateRetrospectiveCommand {
+    using MediatR;
+
+    public class CreateRetrospectiveCommand : IRequest<CreateRetrospectiveCommandResponse> {
+#nullable disable
+        public string Title { get; set; }
+
+#nullable enable
+        public string? Passphrase { get; set; }
     }
 }
