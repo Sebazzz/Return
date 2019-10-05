@@ -9,9 +9,13 @@ namespace Return.Application.Common.Abstractions
 {
     using System.Threading;
     using System.Threading.Tasks;
+    using Domain.Entities;
+    using Microsoft.EntityFrameworkCore;
 
     public interface IReturnDbContext
     {
+        DbSet<NoteLane> NoteLanes { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

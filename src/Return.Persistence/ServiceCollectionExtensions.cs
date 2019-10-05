@@ -6,6 +6,7 @@
 // ******************************************************************************
 
 namespace Return.Persistence {
+    using Application.Common.Abstractions;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Configuration;
@@ -15,7 +16,7 @@ namespace Return.Persistence {
             services.AddDbContext<ReturnDbContext>(optionsAction: options =>
                 options.UseSqlServer(configuration.GetConnectionString("DbConnection")));
 
-            services.AddScoped(implementationFactory: provider => provider.GetService<ReturnDbContext>());
+            services.AddScoped<IReturnDbContext>(implementationFactory: provider => provider.GetService<ReturnDbContext>());
 
             return services;
         }

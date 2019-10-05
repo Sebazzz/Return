@@ -19,7 +19,8 @@ var buildDir = Directory("./build") + Directory(configuration);
 var publishDir = Directory("./build/publish");
 var assemblyInfoFile = Directory($"./src/{baseName}/Properties") + File("AssemblyInfo.cs");
 var nodeEnv = configuration == "Release" ? "production" : "development";
-var mainProjectPath = Directory("./src/Return");
+var persistenceProjectPath = Directory("./src/Return.Persistence");
+var mainProjectPath = Directory("./src/Return.Web");
 
 int p = (int) Environment.OSVersion.Platform;
 bool isUnix = (p == 4) || (p == 6) || (p == 128);
@@ -119,17 +120,17 @@ Task("Generate-MigrationScript")
 		
 		// Work around the fact that Cake is not applying the working directory to the dotnet core executable
 		try {
-			System.Environment.CurrentDirectory = MakeAbsolute(mainProjectPath).ToString();
+			System.Environment.CurrentDirectory = MakeAbsolute(persistenceProjectPath).ToString();
 			
 			DotNetCoreTool(
-				"App.csproj", 
+				"Return.Persistence.csproj", 
 				"ef", 
 				new ProcessArgumentBuilder()
 					.Append("migrations")
 					.Append("script")
 					.Append("-o ../../build/publish/MigrationScript.sql"), 
 				new DotNetCoreToolSettings  {
-					WorkingDirectory = mainProjectPath, 
+					WorkingDirectory = persistenceProjectPath, 
 					DiagnosticOutput = true
 				});
 		} finally {

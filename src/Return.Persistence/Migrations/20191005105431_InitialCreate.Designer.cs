@@ -10,7 +10,7 @@ using Return.Persistence;
 namespace Return.Persistence.Migrations
 {
     [DbContext(typeof(ReturnDbContext))]
-    [Migration("20191005100353_InitialCreate")]
+    [Migration("20191005105431_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -68,7 +68,7 @@ namespace Return.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteLane");
+                    b.ToTable("NoteLanes");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Participant", b =>
@@ -169,8 +169,7 @@ namespace Return.Persistence.Migrations
 
                             b1.Property<string>("StringId")
                                 .IsRequired()
-                                .HasColumnType("char(32)")
-                                .IsFixedLength(true)
+                                .HasColumnType("varchar(32)")
                                 .HasMaxLength(32)
                                 .IsUnicode(false);
 

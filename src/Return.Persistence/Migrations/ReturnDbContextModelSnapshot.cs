@@ -66,7 +66,7 @@ namespace Return.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteLane");
+                    b.ToTable("NoteLanes");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Participant", b =>
@@ -167,8 +167,7 @@ namespace Return.Persistence.Migrations
 
                             b1.Property<string>("StringId")
                                 .IsRequired()
-                                .HasColumnType("char(32)")
-                                .IsFixedLength(true)
+                                .HasColumnType("varchar(32)")
                                 .HasMaxLength(32)
                                 .IsUnicode(false);
 

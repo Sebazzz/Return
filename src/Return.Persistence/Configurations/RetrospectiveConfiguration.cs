@@ -19,7 +19,7 @@ namespace Return.Persistence.Configurations {
             builder.HasKey(e => e.Id);
             builder.OwnsOne(e => e.UrlId,
                 e => {
-                    e.Property(x => x.StringId).HasMaxLength(32).IsFixedLength().IsUnicode(false);
+                    e.Property(x => x.StringId).HasMaxLength(32).IsUnicode(false);
                     e.HasIndex(x => x.StringId).IsUnique();
                 });
 

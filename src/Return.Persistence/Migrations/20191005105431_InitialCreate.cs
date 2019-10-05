@@ -8,7 +8,7 @@ namespace Return.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "NoteLane",
+                name: "NoteLanes",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false),
@@ -16,7 +16,7 @@ namespace Return.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NoteLane", x => x.Id);
+                    table.PrimaryKey("PK_NoteLanes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,7 +41,7 @@ namespace Return.Persistence.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UrlId_StringId = table.Column<string>(unicode: false, fixedLength: true, maxLength: 32, nullable: true),
+                    UrlId_StringId = table.Column<string>(unicode: false, maxLength: 32, nullable: true),
                     HashedPassphrase = table.Column<string>(nullable: true),
                     Title = table.Column<string>(maxLength: 256, nullable: false),
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false)
@@ -67,9 +67,9 @@ namespace Return.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Note", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Note_NoteLane_LaneId",
+                        name: "FK_Note_NoteLanes_LaneId",
                         column: x => x.LaneId,
-                        principalTable: "NoteLane",
+                        principalTable: "NoteLanes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -115,7 +115,7 @@ namespace Return.Persistence.Migrations
                 name: "Note");
 
             migrationBuilder.DropTable(
-                name: "NoteLane");
+                name: "NoteLanes");
 
             migrationBuilder.DropTable(
                 name: "Participant");

@@ -14,6 +14,9 @@
 
         <!-- Suppress warning about "Return" being reservered. That is our namespace and assembly name.-->
         <NoWarn>$(NoWarn);CA1716</NoWarn>
+
+        <!-- Unit testing users different conventions -->
+        <NoWarn>$(NoWarn);CA1707;IDE0055</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>
