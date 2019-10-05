@@ -35,9 +35,8 @@ namespace Return.Persistence.Migrations
                     b.Property<int?>("ParticipantId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RetrospectiveId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(32)");
+                    b.Property<int>("RetrospectiveId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
@@ -89,17 +88,21 @@ namespace Return.Persistence.Migrations
 
             modelBuilder.Entity("Return.Domain.Entities.Retrospective", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nchar(32)")
-                        .IsFixedLength(true)
-                        .HasMaxLength(32);
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTimeOffset>("CreationTimestamp")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("HashedPassphrase")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
 
                     b.HasKey("Id");
 
@@ -150,6 +153,35 @@ namespace Return.Persistence.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("ParticipantId");
+                        });
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.Retrospective", b =>
+                {
+                    b.OwnsOne("Return.Domain.ValueObjects.RetroIdentifier", "UrlId", b1 =>
+                        {
+                            b1.Property<int>("RetrospectiveId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<string>("StringId")
+                                .IsRequired()
+                                .HasColumnType("char(32)")
+                                .IsFixedLength(true)
+                                .HasMaxLength(32)
+                                .IsUnicode(false);
+
+                            b1.HasKey("RetrospectiveId");
+
+                            b1.HasIndex("StringId")
+                                .IsUnique()
+                                .HasFilter("[UrlId_StringId] IS NOT NULL");
+
+                            b1.ToTable("Retrospective");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RetrospectiveId");
                         });
                 });
 #pragma warning restore 612, 618

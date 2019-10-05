@@ -17,7 +17,13 @@ namespace Return.Persistence.Configurations {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.HasKey(e => e.Id);
-            builder.Property(e => e.Id).IsRequired().IsFixedLength().HasMaxLength(32);
+            builder.OwnsOne(e => e.UrlId,
+                e => {
+                    e.Property(x => x.StringId).HasMaxLength(32).IsFixedLength().IsUnicode(false);
+                    e.HasIndex(x => x.StringId).IsUnique();
+                });
+
+            builder.Property(e => e.Title).HasMaxLength(256);
 
             builder.UsePropertyAccessMode(PropertyAccessMode.PreferField);
         }

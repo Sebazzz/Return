@@ -17,7 +17,9 @@ namespace Return.Domain.Entities {
     /// </summary>
     public class Retrospective {
         private ICollection<Note>? _notes;
-        private string? _id;
+        private RetroIdentifier? _urlId;
+
+        public int Id { get; set; }
 
         /// <summary>
         /// Identifier (random string) of the retrospective
@@ -25,7 +27,12 @@ namespace Return.Domain.Entities {
         /// <remarks>
         /// Note: I would actually like to use <see cref="RetroIdentifier"/> for this, but EF does not allow an owned type to act as PK.
         /// </remarks>
-        public string Id => this._id ??= RetroIdentifierService.CreateNewInternal().StringId;
+        public RetroIdentifier UrlId => this._urlId ??= RetroIdentifierService.CreateNewInternal();
+
+        /// <summary>
+        /// Gets the optional hashed passphrase necessary to access the retrospective lobby
+        /// </summary>
+        public string? HashedPassphrase { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Title { get; set; }

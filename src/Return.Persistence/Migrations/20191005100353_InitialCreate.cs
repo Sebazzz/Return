@@ -39,8 +39,11 @@ namespace Return.Persistence.Migrations
                 name: "Retrospective",
                 columns: table => new
                 {
-                    Id = table.Column<string>(fixedLength: true, maxLength: 32, nullable: false),
-                    Title = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UrlId_StringId = table.Column<string>(unicode: false, fixedLength: true, maxLength: 32, nullable: true),
+                    HashedPassphrase = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(maxLength: 256, nullable: false),
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
@@ -54,7 +57,7 @@ namespace Return.Persistence.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RetrospectiveId = table.Column<string>(nullable: false),
+                    RetrospectiveId = table.Column<int>(nullable: false),
                     Text = table.Column<string>(maxLength: 2048, nullable: false),
                     LaneId = table.Column<int>(nullable: false),
                     ParticipantId = table.Column<int>(nullable: true),
@@ -97,6 +100,13 @@ namespace Return.Persistence.Migrations
                 name: "IX_Note_RetrospectiveId",
                 table: "Note",
                 column: "RetrospectiveId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Retrospective_UrlId_StringId",
+                table: "Retrospective",
+                column: "UrlId_StringId",
+                unique: true,
+                filter: "[UrlId_StringId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
