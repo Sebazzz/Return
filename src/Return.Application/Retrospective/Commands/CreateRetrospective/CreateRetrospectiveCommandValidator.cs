@@ -13,6 +13,7 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
         public CreateRetrospectiveCommandValidator() {
             this.RuleFor(x => x.Title).NotEmpty().MaximumLength(256);
             this.RuleFor(x => x.Passphrase).MaximumLength(512);
+            this.RuleFor(x => x.ManagerPassphrase).NotEmpty().MaximumLength(512);
         }
     }
 }

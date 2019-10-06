@@ -24,7 +24,8 @@ namespace Return.Persistence.Configurations {
                 });
 
             builder.Property(e => e.Title).HasMaxLength(256);
-            builder.Property(e => e.HashedPassphrase).HasMaxLength(64).IsFixedLength();
+            builder.Property(e => e.HashedPassphrase).HasMaxLength(64).IsUnicode(false).IsUnicode(false).IsFixedLength();
+            builder.Property(e => e.ManagerHashedPassphrase).IsRequired().HasMaxLength(64).IsUnicode(false).IsFixedLength();
 
             builder.UsePropertyAccessMode(PropertyAccessMode.PreferField);
         }

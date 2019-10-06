@@ -26,12 +26,14 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
             var systemClock = Substitute.For<ISystemClock>();
             var handler = new CreateRetrospectiveCommandHandler(this._context, passphraseService, systemClock);
 
-            passphraseService.CreateHashedPassphrase(Arg.Any<string>()).Returns("myhash");
+            passphraseService.CreateHashedPassphrase("anything").Returns("myhash");
+            passphraseService.CreateHashedPassphrase("manager password").Returns("managerhash");
 
             systemClock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
 
             var request = new CreateRetrospectiveCommand {
                 Passphrase = "anything",
+                ManagerPassphrase = "manager password",
                 Title = "Hello"
             };
 
@@ -41,6 +43,7 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
             // Then
             Assert.That(result.Identifier.StringId, Is.Not.Null);
             Assert.That(this._context.Retrospectives.Any(), Is.True);
+            Assert.That(this._context.Retrospectives.First().ManagerHashedPassphrase, Is.EqualTo("managerhash"));
             Assert.That(this._context.Retrospectives.First().CreationTimestamp, Is.EqualTo(DateTimeOffset.UnixEpoch));
         }
     }

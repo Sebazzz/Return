@@ -30,13 +30,17 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
         public async Task<CreateRetrospectiveCommandResponse> Handle(CreateRetrospectiveCommand request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
+            string? HashOptionalPassphrase(string? plainText)
+            {
+                return !String.IsNullOrEmpty(plainText)? this._passphraseService.CreateHashedPassphrase(plainText): null;
+            }
+
             using var qrCodeGenerator = new QRCodeGenerator();
             var retrospective = new Retrospective {
                 CreationTimestamp = this._systemClock.CurrentTimeOffset,
                 Title = request.Title,
-                HashedPassphrase = !String.IsNullOrEmpty(request.Passphrase)
-                    ? this._passphraseService.CreateHashedPassphrase(request.Passphrase)
-                    : null
+                HashedPassphrase = HashOptionalPassphrase(request.Passphrase),
+                ManagerHashedPassphrase = HashOptionalPassphrase(request.ManagerPassphrase) ?? throw new InvalidOperationException("No manager passphrase given"),
             };
 
             this._returnDbContext.Retrospectives.Add(retrospective);

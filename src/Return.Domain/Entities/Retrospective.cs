@@ -31,8 +31,14 @@ namespace Return.Domain.Entities {
         /// </summary>
         public string? HashedPassphrase { get; set; }
 
+
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public string Title { get; set; }
+
+        /// <summary>
+        /// Gets the passphrase used for the manager to log into the retrospective lobby
+        /// </summary>
+        public string ManagerHashedPassphrase { get; set; }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         public ICollection<Note> Notes => this._notes ??= new Collection<Note>();
