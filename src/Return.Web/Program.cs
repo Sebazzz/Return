@@ -10,14 +10,17 @@ namespace Return.Web {
     using System.Threading;
     using System.Threading.Tasks;
     using Application.App.Commands.SeedBaseData;
+    using Application.Common.Abstractions;
     using MediatR;
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
     using Persistence;
+    using Services;
 
     public static class Program {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
@@ -28,6 +31,9 @@ namespace Return.Web {
                 IServiceProvider services = scope.ServiceProvider;
 
                 try {
+                    var currentParticipantService = (CurrentParticipantService) services.GetRequiredService<ICurrentParticipantService>();
+                    currentParticipantService.SetHttpContext(new DefaultHttpContext());
+
                     var returnDbContext = services.GetRequiredService<ReturnDbContext>();
                     returnDbContext.Database.Migrate();
 
@@ -35,7 +41,7 @@ namespace Return.Web {
                     await mediator.Send(new SeedBaseDataCommand(), CancellationToken.None).ConfigureAwait(false);
                 }
                 catch (Exception ex) {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
+                    ILogger logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(Program));
                     logger.LogError(ex, "An error occurred while migrating or initializing the database.");
                 }
             }

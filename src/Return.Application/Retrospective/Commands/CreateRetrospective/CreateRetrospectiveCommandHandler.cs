@@ -14,14 +14,17 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
     using Domain.Services;
     using MediatR;
     using QRCoder;
+    using Return.Common;
 
     public sealed class CreateRetrospectiveCommandHandler : IRequestHandler<CreateRetrospectiveCommand, CreateRetrospectiveCommandResponse> {
         private readonly IReturnDbContext _returnDbContext;
+        private readonly ISystemClock _systemClock;
         private readonly IPassphraseService _passphraseService;
 
-        public CreateRetrospectiveCommandHandler(IReturnDbContext returnDbContext, IPassphraseService passphraseService) {
+        public CreateRetrospectiveCommandHandler(IReturnDbContext returnDbContext, IPassphraseService passphraseService, ISystemClock systemClock) {
             this._returnDbContext = returnDbContext;
             this._passphraseService = passphraseService;
+            this._systemClock = systemClock;
         }
 
         public async Task<CreateRetrospectiveCommandResponse> Handle(CreateRetrospectiveCommand request, CancellationToken cancellationToken) {
@@ -29,7 +32,7 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
 
             using var qrCodeGenerator = new QRCodeGenerator();
             var retrospective = new Retrospective {
-                CreationTimestamp = DateTimeOffset.Now,
+                CreationTimestamp = this._systemClock.CurrentTimeOffset,
                 Title = request.Title,
                 HashedPassphrase = !String.IsNullOrEmpty(request.Passphrase)
                     ? this._passphraseService.CreateHashedPassphrase(request.Passphrase)

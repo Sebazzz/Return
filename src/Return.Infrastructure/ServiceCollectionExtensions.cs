@@ -2,18 +2,15 @@
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
 //  File:           : ServiceCollectionExtensions.cs
-//  Project         : Return.Application
+//  Project         : Return.Infrastructure
 // ******************************************************************************
 
-namespace Return.Domain {
-    using Domain.Services;
+namespace Return.Infrastructure {
+    using Common;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class ServiceCollectionExtensions {
-        public static IServiceCollection AddDomain(this IServiceCollection services) {
-            services.AddTransient<IPassphraseService, PassphraseService>();
-
-            return services;
-        }
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services) =>
+            services.AddSingleton<ISystemClock, MachineSystemClock>();
     }
 }
