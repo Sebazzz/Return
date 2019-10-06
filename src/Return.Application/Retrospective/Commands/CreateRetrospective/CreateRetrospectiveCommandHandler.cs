@@ -30,9 +30,8 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
         public async Task<CreateRetrospectiveCommandResponse> Handle(CreateRetrospectiveCommand request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            string? HashOptionalPassphrase(string? plainText)
-            {
-                return !String.IsNullOrEmpty(plainText)? this._passphraseService.CreateHashedPassphrase(plainText): null;
+            string? HashOptionalPassphrase(string? plainText) {
+                return !String.IsNullOrEmpty(plainText) ? this._passphraseService.CreateHashedPassphrase(plainText) : null;
             }
 
             using var qrCodeGenerator = new QRCodeGenerator();

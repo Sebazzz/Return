@@ -275,7 +275,7 @@ void WindowsPublishTask(string taskId, string versionId, string description) {
 		.IsDependentOn("Publish-Common")
 		.Does(() => PublishSelfContained(versionId, $"{versionId}/app"));
 
-	var output = publishDir + File($"financial-app-{versionId}.zip");
+	var output = publishDir + File($"return-web-{versionId}.zip");
 	Task(taskName)
 		.IsDependentOn(internalTaskName)
 		.Description($"Publish for {description}, output to {output}")

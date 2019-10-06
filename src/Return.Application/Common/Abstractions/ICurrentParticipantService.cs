@@ -5,12 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Abstractions
-{
-    public interface ICurrentParticipantService
-    {
+namespace Return.Application.Common.Abstractions {
+    public interface ICurrentParticipantService {
         int GetParticipantId();
 
-       bool IsManager();
+        bool IsManager();
     }
 }

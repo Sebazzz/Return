@@ -40,8 +40,7 @@ namespace Return.Web.Services {
             return participantId;
         }
 
-        public bool IsManager()
-        {
+        public bool IsManager() {
             if (this._httpContext == null) {
                 throw new InvalidOperationException("HttpContext not set");
             }

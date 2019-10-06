@@ -7,16 +7,13 @@
 
 namespace Return.Persistence {
     using Application.Common.Abstractions;
-    using Microsoft.EntityFrameworkCore;
+    using Common;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Configuration;
 
     public static class ServiceCollectionExtensions {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration) {
-            services.AddDbContext<ReturnDbContext>(optionsAction: options =>
-                options.UseSqlServer(configuration.GetConnectionString("DbConnection")));
-
-            services.AddScoped<IReturnDbContext>(implementationFactory: provider => provider.GetService<ReturnDbContext>());
+        public static IServiceCollection AddPersistence(this IServiceCollection services) {
+            services.AddDbContext<ReturnDbContext>();
+            services.ChainInterfaceImplementation<IReturnDbContext, ReturnDbContext>();
 
             return services;
         }
