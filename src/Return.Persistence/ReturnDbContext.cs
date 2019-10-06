@@ -18,18 +18,20 @@ namespace Return.Persistence {
         public ReturnDbContext(DbContextOptions options) : base(options) {
         }
 
-        public ReturnDbContext(IDatabaseOptions databaseOptions)
-        {
+        public ReturnDbContext(IDatabaseOptions databaseOptions) {
             this._databaseOptions = databaseOptions;
         }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (this._databaseOptions != null)
-            {
-                optionsBuilder.UseSqlServer(this._databaseOptions.CreateConnectionString());
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            if (this._databaseOptions != null) {
+                optionsBuilder.UseSqlServer(this._databaseOptions.CreateConnectionString(), sql => sql.EnableRetryOnFailure());
             }
+
+#if DEBUG
+            optionsBuilder.EnableDetailedErrors();
+            optionsBuilder.EnableSensitiveDataLogging();
+#endif
         }
 
         public DbSet<NoteLane> NoteLanes { get; set; }

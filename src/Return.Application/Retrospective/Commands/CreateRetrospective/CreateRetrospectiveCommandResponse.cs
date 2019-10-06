@@ -12,10 +12,12 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
     public sealed class CreateRetrospectiveCommandResponse {
         public RetroIdentifier Identifier { get; }
         public QrCode QrCode { get; }
+        public string Location { get; }
 
-        public CreateRetrospectiveCommandResponse(RetroIdentifier identifier, QrCode qrCode) {
+        public CreateRetrospectiveCommandResponse(RetroIdentifier identifier, QrCode qrCode, string location) {
             this.Identifier = identifier;
             this.QrCode = qrCode;
+            this.Location = location;
         }
     }
 
@@ -30,7 +32,7 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
         public string ToBase64() {
             using var base64QrCode = new Base64QRCode(this._qrCodeData);
 
-            return base64QrCode.GetGraphic(30);
+            return "data:image/png;base64," + base64QrCode.GetGraphic(10);
         }
     }
 }

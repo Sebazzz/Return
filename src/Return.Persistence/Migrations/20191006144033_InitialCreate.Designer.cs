@@ -10,7 +10,7 @@ using Return.Persistence;
 namespace Return.Persistence.Migrations
 {
     [DbContext(typeof(ReturnDbContext))]
-    [Migration("20191006101831_InitialCreate")]
+    [Migration("20191006144033_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

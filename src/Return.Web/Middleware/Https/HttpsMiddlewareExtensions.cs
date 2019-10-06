@@ -5,8 +5,7 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Middleware.Https
-{
+namespace Return.Web.Middleware.Https {
     using System;
     using Configuration;
     using Microsoft.AspNetCore.Builder;
@@ -15,29 +14,22 @@ namespace Return.Web.Middleware.Https
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
 
-    public static class ApplicationBuilderExtensions
-    {
-        public static IApplicationBuilder UseHttps(this IApplicationBuilder app, IHostEnvironment hostEnvironment)
-        {
+    public static class ApplicationBuilderExtensions {
+        public static IApplicationBuilder UseHttps(this IApplicationBuilder app, IHostEnvironment hostEnvironment) {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
             var httpsOptions = app.ApplicationServices.GetService<IOptions<HttpsServerOptions>>();
 
-            if (httpsOptions != null && httpsOptions.Value != null)
-            {
-                if (httpsOptions.Value.EnableRedirect)
-                {
+            if (httpsOptions != null && httpsOptions.Value != null) {
+                if (httpsOptions.Value.EnableRedirect) {
                     app.UseHttpsRedirection();
                 }
 
-                if (!hostEnvironment.IsDevelopment())
-                {
-                    if (httpsOptions.Value.UseStrongHttps)
-                    {
+                if (!hostEnvironment.IsDevelopment()) {
+                    if (httpsOptions.Value.UseStrongHttps) {
                         app.UseHsts();
 
-                        app.Use((ctx, next) =>
-                        {
+                        app.Use((ctx, next) => {
                             ctx.Response.Headers.Append("Content-Security-Policy", "upgrade-insecure-requests");
                             return next.Invoke();
                         });

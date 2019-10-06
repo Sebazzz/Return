@@ -5,10 +5,8 @@
 //  Project         : Return.Persistence
 // ******************************************************************************
 
-namespace Return.Persistence
-{
-    public interface IDatabaseOptions
-    {
+namespace Return.Persistence {
+    public interface IDatabaseOptions {
         string CreateConnectionString();
     }
 }

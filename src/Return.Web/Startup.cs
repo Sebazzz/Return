@@ -8,10 +8,15 @@ namespace Return.Web {
     using System;
     using Application;
     using Application.Common.Abstractions;
+    using Application.Services;
     using Configuration;
+    using Domain;
+    using FluentValidation;
+    using FluentValidation.AspNetCore;
     using Infrastructure;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Middleware;
     using Middleware.Https;
     using Persistence;
     using Services;
@@ -30,16 +35,24 @@ namespace Return.Web {
             services.AddInfrastructure();
             services.AddPersistence();
             services.AddApplication();
+            services.AddDomain();
 
             services.AddScoped<ICurrentParticipantService, CurrentParticipantService>();
+            services.AddSingleton<ISiteUrlDetectionService, SiteUrlDetectionService>();
+
+            services.AddSingleton<IUrlGenerator, WebUrlGenerator>();
 
             // ... Config
             services.Configure<DatabaseOptions>(this.Configuration.GetSection("database"));
             services.AddTransient<IDatabaseOptions>(sp => sp.GetRequiredService<IOptions<DatabaseOptions>>().Value);
 
+            services.Configure<HttpsServerOptions>(this.Configuration.GetSection("server").GetSection("https"));
+            services.Configure<ServerOptions>(this.Configuration.GetSection("server"));
+
             // Framework
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory) {
@@ -55,6 +68,7 @@ namespace Return.Web {
             }
 
             // Set-up application pipeline
+            app.UseMiddleware<SiteUrlDetectionMiddleware>();
             app.UseCurrentParticipantService();
 
             if (env.IsDevelopment()) {

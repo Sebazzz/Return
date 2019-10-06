@@ -5,10 +5,8 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Configuration
-{
-    public sealed class HttpsServerOptions
-    {
+namespace Return.Web.Configuration {
+    public sealed class HttpsServerOptions {
         public string? CertificatePath { get; set; }
         public string? CertificatePassword { get; set; }
 

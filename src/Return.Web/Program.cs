@@ -38,7 +38,7 @@ namespace Return.Web {
 
                 try {
                     var currentParticipantService = (CurrentParticipantService)services.GetRequiredService<ICurrentParticipantService>();
-                    currentParticipantService.SetHttpContext(new DefaultHttpContext());
+                    currentParticipantService.SetNoHttpContext();
 
                     var returnDbContext = services.GetRequiredService<ReturnDbContext>();
                     returnDbContext.Database.Migrate();

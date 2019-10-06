@@ -5,14 +5,12 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Configuration
-{
+namespace Return.Web.Configuration {
     using System;
     using Microsoft.Data.SqlClient;
     using Persistence;
 
-    public class DatabaseOptions : IDatabaseOptions
-    {
+    public class DatabaseOptions : IDatabaseOptions {
         private string? _cachedConnectionString;
 
         public string? Server { get; set; }
@@ -25,10 +23,8 @@ namespace Return.Web.Configuration
 
         public string? ConnectionString { get; set; }
 
-        public string CreateConnectionString()
-        {
-            if (this._cachedConnectionString != null)
-            {
+        public string CreateConnectionString() {
+            if (this._cachedConnectionString != null) {
                 return this._cachedConnectionString;
             }
 
@@ -45,14 +41,11 @@ namespace Return.Web.Configuration
             if (!String.IsNullOrEmpty(value: this.Database)) connStringBuilder.InitialCatalog = this.Database;
 
             // Copy current connection string, overriding options here
-            if (!String.IsNullOrEmpty(value: this.ConnectionString))
-            {
+            if (!String.IsNullOrEmpty(value: this.ConnectionString)) {
                 var srcConnStringBuilder = new SqlConnectionStringBuilder(connectionString: this.ConnectionString);
                 foreach (string? key in srcConnStringBuilder.Keys ??
-                                       throw new InvalidOperationException(message: "Invalid connection string"))
-                {
-                    if (key != null)
-                    {
+                                       throw new InvalidOperationException(message: "Invalid connection string")) {
+                    if (key != null) {
                         connStringBuilder[keyword: key] = srcConnStringBuilder[keyword: key];
                     }
                 }

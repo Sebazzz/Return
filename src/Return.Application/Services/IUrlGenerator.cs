@@ -1,16 +1,15 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : ICurrentParticipantService.cs
+//  File:           : IUrlGenerator.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Abstractions {
-    using System.Threading.Tasks;
+namespace Return.Application.Services {
+    using System;
+    using Domain.ValueObjects;
 
-    public interface ICurrentParticipantService {
-        Task<int> GetParticipantId();
-
-        Task<bool> IsManager();
+    public interface IUrlGenerator {
+        Uri GenerateUrlToRetrospectiveLobby(RetroIdentifier urlId);
     }
 }

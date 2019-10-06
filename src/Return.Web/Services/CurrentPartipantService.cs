@@ -7,11 +7,12 @@
 
 namespace Return.Web.Services {
     using System;
-    using System.Drawing;
+    using System.Diagnostics.CodeAnalysis;
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
     using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Components.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -21,14 +22,21 @@ namespace Return.Web.Services {
         private const string ManagerClaimContent = "Manager";
         private HttpContext? _httpContext;
 
+        private readonly AuthenticationStateProvider _authenticationStateProvider;
+        private bool _hasNoHttpContext;
+
+        public CurrentParticipantService(AuthenticationStateProvider authenticationStateProvider) {
+            this._authenticationStateProvider = authenticationStateProvider;
+        }
+
         internal void SetHttpContext(HttpContext httpContext) => this._httpContext = httpContext;
 
-        public int GetParticipantId() {
-            if (this._httpContext == null) {
-                throw new InvalidOperationException("HttpContext not set");
-            }
+        internal void SetNoHttpContext() => this._hasNoHttpContext = true;
 
-            string? rawParticipantId = this._httpContext.User.FindFirstValue(ParticipantClaimType);
+        public async Task<int> GetParticipantId() {
+            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
+
+            string? rawParticipantId = user.FindFirstValue(ParticipantClaimType);
             if (String.IsNullOrEmpty(rawParticipantId)) {
                 return default;
             }
@@ -40,20 +48,37 @@ namespace Return.Web.Services {
             return participantId;
         }
 
-        public bool IsManager() {
-            if (this._httpContext == null) {
-                throw new InvalidOperationException("HttpContext not set");
-            }
+        public async Task<bool> IsManager() {
+            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
 
-            string? rawParticipantId = this._httpContext.User.FindFirstValue(ManagerClaimType);
+            string? rawParticipantId = user.FindFirstValue(ManagerClaimType);
             if (String.IsNullOrEmpty(rawParticipantId)) {
                 return default;
             }
 
             return String.Equals(rawParticipantId, ManagerClaimContent, StringComparison.Ordinal);
         }
+
+        private async ValueTask<ClaimsPrincipal> GetUser() {
+            if (this._hasNoHttpContext) {
+                return new ClaimsPrincipal();
+            }
+
+            AuthenticationState authState = await this._authenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
+
+            if (authState != null) {
+                return authState.User;
+            }
+
+            if (this._httpContext == null) {
+                throw new InvalidOperationException("HttpContext not set");
+            }
+
+            return this._httpContext.User;
+        }
     }
 
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class CurrentParticipantServiceHttpContextSetterMiddleware {
         private readonly RequestDelegate _next;
 

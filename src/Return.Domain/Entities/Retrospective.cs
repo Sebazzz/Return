@@ -9,6 +9,7 @@ namespace Return.Domain.Entities {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using Services;
     using ValueObjects;
 
@@ -24,7 +25,11 @@ namespace Return.Domain.Entities {
         /// <summary>
         /// Identifier (random string) of the retrospective
         /// </summary>
-        public RetroIdentifier UrlId => this._urlId ??= RetroIdentifierService.CreateNewInternal();
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        public RetroIdentifier UrlId {
+            get => this._urlId ??= RetroIdentifierService.CreateNewInternal();
+            set => this._urlId = value;
+        }
 
         /// <summary>
         /// Gets the optional hashed passphrase necessary to access the retrospective lobby

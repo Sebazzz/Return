@@ -20,7 +20,7 @@
         "css-deploy": "yarn css-build && yarn css-postcss",
         "css-build": "node-sass _scss/main.scss obj/css/main.css",
         "css-postcss": "postcss --use autoprefixer --output wwwroot/build/css/main.css obj/css/main.css",
-        "css-watch": "yarn css-build -- --watch",
+        "css-watch": "yarn css-build --watch",
         "build": "yarn css-deploy",
         "pre-commit": "../../pre-commit",
         "test": "echo 0",

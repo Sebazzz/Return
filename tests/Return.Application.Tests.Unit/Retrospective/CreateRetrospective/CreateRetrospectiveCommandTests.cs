@@ -12,9 +12,12 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
     using System.Threading.Tasks;
     using Application.Retrospective.Commands.CreateRetrospective;
     using Domain.Services;
+    using Domain.ValueObjects;
+    using Microsoft.Extensions.Logging.Abstractions;
     using NSubstitute;
     using NUnit.Framework;
     using Return.Common;
+    using Services;
     using Support;
 
     [TestFixture]
@@ -24,10 +27,13 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
             // Given
             var passphraseService = Substitute.For<IPassphraseService>();
             var systemClock = Substitute.For<ISystemClock>();
-            var handler = new CreateRetrospectiveCommandHandler(this._context, passphraseService, systemClock);
+            var urlGenerator = Substitute.For<IUrlGenerator>();
+            var handler = new CreateRetrospectiveCommandHandler(this.Context, passphraseService, systemClock, urlGenerator, new NullLogger<CreateRetrospectiveCommandHandler>());
 
             passphraseService.CreateHashedPassphrase("anything").Returns("myhash");
             passphraseService.CreateHashedPassphrase("manager password").Returns("managerhash");
+
+            urlGenerator.GenerateUrlToRetrospectiveLobby(Arg.Any<RetroIdentifier>()).Returns(new Uri("https://example.com/retro/1"));
 
             systemClock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
 
@@ -42,9 +48,9 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
 
             // Then
             Assert.That(result.Identifier.StringId, Is.Not.Null);
-            Assert.That(this._context.Retrospectives.Any(), Is.True);
-            Assert.That(this._context.Retrospectives.First().ManagerHashedPassphrase, Is.EqualTo("managerhash"));
-            Assert.That(this._context.Retrospectives.First().CreationTimestamp, Is.EqualTo(DateTimeOffset.UnixEpoch));
+            Assert.That(this.Context.Retrospectives.Any(), Is.True);
+            Assert.That(this.Context.Retrospectives.First().ManagerHashedPassphrase, Is.EqualTo("managerhash"));
+            Assert.That(this.Context.Retrospectives.First().CreationTimestamp, Is.EqualTo(DateTimeOffset.UnixEpoch));
         }
     }
 }

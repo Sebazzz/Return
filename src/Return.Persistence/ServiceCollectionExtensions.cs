@@ -12,7 +12,9 @@ namespace Return.Persistence {
 
     public static class ServiceCollectionExtensions {
         public static IServiceCollection AddPersistence(this IServiceCollection services) {
-            services.AddDbContext<ReturnDbContext>();
+            services.AddEntityFrameworkSqlServer();
+
+            services.AddScoped(svc => new ReturnDbContext(svc.GetRequiredService<IDatabaseOptions>()));
             services.ChainInterfaceImplementation<IReturnDbContext, ReturnDbContext>();
 
             return services;

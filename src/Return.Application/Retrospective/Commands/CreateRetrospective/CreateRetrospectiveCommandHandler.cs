@@ -13,18 +13,24 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
     using Domain.Entities;
     using Domain.Services;
     using MediatR;
+    using Microsoft.Extensions.Logging;
     using QRCoder;
     using Return.Common;
+    using Services;
 
     public sealed class CreateRetrospectiveCommandHandler : IRequestHandler<CreateRetrospectiveCommand, CreateRetrospectiveCommandResponse> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly ISystemClock _systemClock;
+        private readonly IUrlGenerator _urlGenerator;
         private readonly IPassphraseService _passphraseService;
+        private readonly ILogger<CreateRetrospectiveCommandHandler> _logger;
 
-        public CreateRetrospectiveCommandHandler(IReturnDbContext returnDbContext, IPassphraseService passphraseService, ISystemClock systemClock) {
+        public CreateRetrospectiveCommandHandler(IReturnDbContext returnDbContext, IPassphraseService passphraseService, ISystemClock systemClock, IUrlGenerator urlGenerator, ILogger<CreateRetrospectiveCommandHandler> logger) {
             this._returnDbContext = returnDbContext;
             this._passphraseService = passphraseService;
             this._systemClock = systemClock;
+            this._urlGenerator = urlGenerator;
+            this._logger = logger;
         }
 
         public async Task<CreateRetrospectiveCommandResponse> Handle(CreateRetrospectiveCommand request, CancellationToken cancellationToken) {
@@ -42,13 +48,20 @@ namespace Return.Application.Retrospective.Commands.CreateRetrospective {
                 ManagerHashedPassphrase = HashOptionalPassphrase(request.ManagerPassphrase) ?? throw new InvalidOperationException("No manager passphrase given"),
             };
 
+            this._logger.LogInformation($"Creating new retrospective with id {retrospective.UrlId}");
+
+            string retroLocation = this._urlGenerator.GenerateUrlToRetrospectiveLobby(retrospective.UrlId).ToString();
+            var payload = new PayloadGenerator.Url(retroLocation);
+            var result = new CreateRetrospectiveCommandResponse(
+                retrospective.UrlId,
+                new QrCode(qrCodeGenerator.CreateQrCode(payload.ToString(), QRCodeGenerator.ECCLevel.L)),
+                retroLocation);
+
             this._returnDbContext.Retrospectives.Add(retrospective);
 
             await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-            return new CreateRetrospectiveCommandResponse(
-                retrospective.UrlId,
-                new QrCode(qrCodeGenerator.CreateQrCode(request.Passphrase, QRCodeGenerator.ECCLevel.L)));
+            return result;
         }
     }
 }

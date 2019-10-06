@@ -15,7 +15,6 @@ namespace Return.Persistence {
 
     public abstract class DesignTimeDbContextFactoryBase<TContext> :
         IDesignTimeDbContextFactory<TContext> where TContext : DbContext {
-        private const string ConnectionStringName = "DbConnection";
         private const string AspNetCoreEnvironment = "ASPNETCORE_ENVIRONMENT";
 
         public TContext CreateDbContext(string[] args) {
@@ -34,14 +33,15 @@ namespace Return.Persistence {
                 .AddEnvironmentVariables()
                 .Build();
 
-            string connectionString = configuration.GetConnectionString(ConnectionStringName);
+            var databaseOptions = (IDatabaseOptions)configuration.GetSection("Database").Get(Type.GetType("Return.Web.Configuration.DatabaseOptions, Return.Web", true));
+            string connectionString = databaseOptions.CreateConnectionString();
 
             return this.Create(connectionString);
         }
 
         private TContext Create(string connectionString) {
             if (String.IsNullOrEmpty(connectionString)) {
-                throw new ArgumentException($"Connection string '{ConnectionStringName}' is null or empty.", nameof(connectionString));
+                throw new ArgumentException($"Connection string is null or empty.", nameof(connectionString));
             }
 
             Console.WriteLine($"DesignTimeDbContextFactoryBase.Create(string): Connection string: '{connectionString}'.");
