@@ -1,0 +1,8 @@
+<div class="notification is-danger">
+    <strong>I'm sorry!</strong> @(Text ?? "An error has occurred. Please try again later")
+</div>
+
+@code {
+    [Parameter]
+    public string? Text { get; set; }
+}

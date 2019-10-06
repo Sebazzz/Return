@@ -69,9 +69,7 @@ else
 
     if (ShowErrorMessage)
     {
-        <div class="notification is-danger">
-            <strong>I'm sorry!</strong> Something went wrong creating the retrospective. Please try again.
-        </div>
+        <ErrorMessage Text="Something went wrong creating the retrospective. Please try again."/>
     }
 
     <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
@@ -91,6 +89,7 @@ else
             <div class="control">
                 <InputText id="retro-manager-passphrase" class="input" type="text" @bind-Value="@Model.ManagerPassphrase" placeholder="" />
             </div>
+
             <ValidationMessage For="() => Model.ManagerPassphrase"></ValidationMessage>
             <p class="help">This is the password you need to start and control the progress of the retrospective.</p>
         </div>
