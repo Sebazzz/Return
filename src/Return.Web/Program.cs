@@ -31,7 +31,7 @@ namespace Return.Web {
                 IServiceProvider services = scope.ServiceProvider;
 
                 try {
-                    var currentParticipantService = (CurrentParticipantService) services.GetRequiredService<ICurrentParticipantService>();
+                    var currentParticipantService = (CurrentParticipantService)services.GetRequiredService<ICurrentParticipantService>();
                     currentParticipantService.SetHttpContext(new DefaultHttpContext());
 
                     var returnDbContext = services.GetRequiredService<ReturnDbContext>();

@@ -1,4 +1,5 @@
 # Return
+
 Retrospective tool built in ASP.NET Core + Blazor
 
 Licensed: GNU GPL v3.0
@@ -15,10 +16,9 @@ Contributions are allowed and encouraged. Please submit an issue to communicate 
 
 Application icon:
 
+-   Icon made by [Freepik](https://www.flaticon.com/free-icon/rethink_69507) from [www.flaticon.com](http://www.flaticon.com/)
+
 Built on:
 
 -   [Fontawesome](http://fontawesome.io/) as _icon framework_;
 -   [ASP.NET Core 3.0](https://dot.net) with [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) for _server side logic and data persistence_;
-
-
-Icon made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](http://www.flaticon.com/).

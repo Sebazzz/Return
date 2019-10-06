@@ -1,15 +1,19 @@
 @inherits Microsoft.AspNetCore.Components.LayoutComponentBase
 
-<div class="sidebar">
+<aside class="menu">
     <NavMenu />
-</div>
+</aside>
 
-<div class="main">
-    <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/en-us/aspnet/" target="_blank">About</a>
-    </div>
-
-    <div class="content px-4">
+<section class="section">
+    <div class="container">
         @Body
     </div>
-</div>
+</section>
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>Return</strong> by <a href="https://damsteen.nl/">Sebastiaan Dammann</a>
+        </p>
+    </div>
+</footer>

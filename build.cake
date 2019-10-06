@@ -190,7 +190,7 @@ void PublishSelfContained(string platform, string folder) {
     DotNetCorePublish($"./src/Return.Web/Return.Web.csproj", settings);
 }
 
-Task("Run-Webpack")
+Task("Run-FrontendBuild")
 	.IsDependentOn("Restore-Node-Packages")
 	.IsDependentOn("Set-NodeEnvironment")
 	.Does(() => {
@@ -258,26 +258,11 @@ Task("Run-Precommit-Tasks")
 	}
 });
 
-Task("Generate-Webpack-Statistics")
-	.IsDependentOn("Restore-Node-Packages")
-	.IsDependentOn("Set-NodeEnvironment")
-	.Does(() => {
-		Information("Setting WEBPACK_ENABLE_VISUALIZER to {0}", "true");
-		
-		System.Environment.SetEnvironmentVariable("WEBPACK_ENABLE_VISUALIZER", "true");
-		
-		var exitCode = StartProjectDirProcess(@"yarn run webpack-stats");
-		
-		if (exitCode != 0) {
-			throw new CakeException($"'yarn run webpack-stats' returned exit code {exitCode} (0x{exitCode:x2})");
-		}
-	});
-
 Task("Publish-Common")
 	.Description("Internal task - do not use")
     .IsDependentOn("Rebuild")
     .IsDependentOn("Generate-MigrationScript")
-	.IsDependentOn("Run-Webpack");
+	.IsDependentOn("Run-FrontendBuild");
 
 var windowsAllPublishTask = Task("Publish-Windows");
 
@@ -334,32 +319,13 @@ UbuntuPublishTask("18.04-x64", "ubuntu.18.04-x64", "Ubuntu 18.04 64-bit");
 Task("Publish")
     .IsDependentOn("Publish-Windows")
     .IsDependentOn("Publish-Ubuntu");
-	
-Task("Set-HeadlessEnvironment")
-	.Does(() => {
-		Information("Setting MOZ_HEADLESS to 1");
-		
-		System.Environment.SetEnvironmentVariable("MOZ_HEADLESS", "1");
-	});
-
-Task("Test-JS")
-    .IsDependentOn("Run-Webpack")
-	.IsDependentOn("Set-HeadlessEnvironment")
-    .Description("Test javascript front-end code")
-    .Does(() => {
-		var exitCode = StartProjectDirProcess("yarn run test");
-		
-		if (exitCode != 0) {
-			throw new CakeException($"'yarn run test' returned exit code {exitCode} (0x{exitCode:x2})");
-		}
-	});
 
 Task("Test-CS")
 	.IsDependentOn("Restore-NuGet-Packages")
     .Description("Test backend-end compiled code")
 	.Does(() => {
-		void RunTests(string part) {
-			DotNetCoreTest($"./tests/Return.{part}.Tests.Unit/Return.{part}.Tests.Unit.csproj");
+		void RunTests(string part, string suffix = "Unit") {
+			DotNetCoreTest($"./tests/Return.{part}.Tests.Unit/Return.{part}.Tests.{suffix}.csproj");
 		}
 	
 		
@@ -370,7 +336,6 @@ Task("Test-CS")
 
 Task("Test")
     .IsDependentOn("Test-CS")
-	.IsDependentOn("Test-JS")
     .Description("Run all tests");
 
 //////////////////////////////////////////////////////////////////////
