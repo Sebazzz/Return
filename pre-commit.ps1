@@ -22,17 +22,19 @@ if ($LASTEXITCODE -ne 0) {
 
 # Run dotnet-format
 $CSharpFiles = $(git.exe status --porcelain=1 | ForEach-Object { $_.SubString(3) } | Where-Object { $_ -ilike "*.cs" }) -join ","
-
+Push-Location $PSScriptRoot
 if ([String]::IsNullOrEmpty($CSharpFiles) -ne $true) {
     dotnet-format.exe --files $CSharpFiles
 
     if ($LASTEXITCODE -ne 0) {
+		Pop-Location
         Exit $LASTEXITCODE
     }
 	
-	foreach ($CSharpFile in $CSharpFiles) {
+	foreach ($CSharpFile in $CSharpFiles.Split(' ')) {
 		git add $CSharpFile
 	}
 }
+Pop-Location
 
 Exit 0
