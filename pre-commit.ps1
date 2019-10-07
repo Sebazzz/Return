@@ -30,7 +30,7 @@ if ([String]::IsNullOrEmpty($CSharpFiles) -ne $true) {
         Exit $LASTEXITCODE
     }
 	
-	foreach ($CSharpFile in $CSharpfile) {
+	foreach ($CSharpFile in $CSharpFiles) {
 		git add $CSharpFile
 	}
 }
