@@ -10,7 +10,7 @@ using Return.Persistence;
 namespace Return.Persistence.Migrations
 {
     [DbContext(typeof(ReturnDbContext))]
-    [Migration("20191006144033_InitialCreate")]
+    [Migration("20191007084208_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,6 +31,9 @@ namespace Return.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreationTimestamp")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int?>("GroupId")
+                        .HasColumnType("int");
+
                     b.Property<int>("LaneId")
                         .HasColumnType("int");
 
@@ -47,6 +50,8 @@ namespace Return.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("LaneId");
 
                     b.HasIndex("ParticipantId");
@@ -54,6 +59,33 @@ namespace Return.Persistence.Migrations
                     b.HasIndex("RetrospectiveId");
 
                     b.ToTable("Note");
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.NoteGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("LaneId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RetrospectiveId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(256)")
+                        .HasMaxLength(256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaneId");
+
+                    b.HasIndex("RetrospectiveId");
+
+                    b.ToTable("NoteGroup");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.NoteLane", b =>
@@ -68,7 +100,32 @@ namespace Return.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteLanes");
+                    b.ToTable("NoteLane");
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.NoteVote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("NoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParticipantId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VoteCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.HasIndex("ParticipantId");
+
+                    b.ToTable("NoteVote");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Participant", b =>
@@ -78,14 +135,39 @@ namespace Return.Persistence.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("IsManager")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
+                    b.Property<int>("RetrospectiveId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("RetrospectiveId");
+
                     b.ToTable("Participant");
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.PredefinedParticipantColor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PredefinedParticipantColor");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Retrospective", b =>
@@ -97,6 +179,9 @@ namespace Return.Persistence.Migrations
 
                     b.Property<DateTimeOffset>("CreationTimestamp")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("CurrentStage")
+                        .HasColumnType("int");
 
                     b.Property<string>("HashedPassphrase")
                         .HasColumnType("char(64)")
@@ -118,11 +203,16 @@ namespace Return.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Retrospectives");
+                    b.ToTable("Retrospective");
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Note", b =>
                 {
+                    b.HasOne("Return.Domain.Entities.NoteGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Return.Domain.Entities.NoteLane", "Lane")
                         .WithMany()
                         .HasForeignKey("LaneId")
@@ -137,12 +227,48 @@ namespace Return.Persistence.Migrations
                     b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
                         .WithMany("Notes")
                         .HasForeignKey("RetrospectiveId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.NoteGroup", b =>
+                {
+                    b.HasOne("Return.Domain.Entities.NoteLane", "Lane")
+                        .WithMany()
+                        .HasForeignKey("LaneId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
+                        .WithMany("NoteGroup")
+                        .HasForeignKey("RetrospectiveId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Return.Domain.Entities.NoteVote", b =>
+                {
+                    b.HasOne("Return.Domain.Entities.Note", "Note")
+                        .WithMany()
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Return.Domain.Entities.Participant", "Participant")
+                        .WithMany()
+                        .HasForeignKey("ParticipantId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
             modelBuilder.Entity("Return.Domain.Entities.Participant", b =>
                 {
+                    b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
+                        .WithMany("Participants")
+                        .HasForeignKey("RetrospectiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.OwnsOne("Return.Domain.ValueObjects.ParticipantColor", "Color", b1 =>
                         {
                             b1.Property<int>("ParticipantId")
@@ -168,8 +294,53 @@ namespace Return.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Return.Domain.Entities.PredefinedParticipantColor", b =>
+                {
+                    b.OwnsOne("Return.Domain.ValueObjects.ParticipantColor", "Color", b1 =>
+                        {
+                            b1.Property<int>("PredefinedParticipantColorId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<byte>("B")
+                                .HasColumnType("tinyint");
+
+                            b1.Property<byte>("G")
+                                .HasColumnType("tinyint");
+
+                            b1.Property<byte>("R")
+                                .HasColumnType("tinyint");
+
+                            b1.HasKey("PredefinedParticipantColorId");
+
+                            b1.ToTable("PredefinedParticipantColor");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PredefinedParticipantColorId");
+                        });
+                });
+
             modelBuilder.Entity("Return.Domain.Entities.Retrospective", b =>
                 {
+                    b.OwnsOne("Return.Domain.Entities.RetrospectiveOptions", "Options", b1 =>
+                        {
+                            b1.Property<int>("RetrospectiveId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<int>("MaximumNumberOfVotes")
+                                .HasColumnType("int");
+
+                            b1.HasKey("RetrospectiveId");
+
+                            b1.ToTable("Retrospective");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RetrospectiveId");
+                        });
+
                     b.OwnsOne("Return.Domain.ValueObjects.RetroIdentifier", "UrlId", b1 =>
                         {
                             b1.Property<int>("RetrospectiveId")
@@ -189,7 +360,7 @@ namespace Return.Persistence.Migrations
                                 .IsUnique()
                                 .HasFilter("[UrlId_StringId] IS NOT NULL");
 
-                            b1.ToTable("Retrospectives");
+                            b1.ToTable("Retrospective");
 
                             b1.WithOwner()
                                 .HasForeignKey("RetrospectiveId");

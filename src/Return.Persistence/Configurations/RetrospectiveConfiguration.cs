@@ -27,6 +27,19 @@ namespace Return.Persistence.Configurations {
             builder.Property(e => e.Title).HasMaxLength(256);
             builder.Property(e => e.HashedPassphrase).HasMaxLength(64).IsUnicode(false).IsRequired(false).IsFixedLength();
             builder.Property(e => e.ManagerHashedPassphrase).IsRequired().HasMaxLength(64).IsUnicode(false).IsFixedLength();
+
+            builder.HasMany(e => e.Participants).
+                WithOne(e => e.Retrospective).
+                IsRequired().
+                OnDelete(DeleteBehavior.Cascade);
+
+            builder.OwnsOne(e => e.Options,
+                e =>
+                {
+                    e.WithOwner();
+                });
+
+            builder.UsePropertyAccessMode(PropertyAccessMode.PreferField);
         }
     }
 }

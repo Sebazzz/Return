@@ -1,8 +1,7 @@
 @page "/create-retro"
-@using MediatR
+@inherits MediatorComponent
 @using Microsoft.Extensions.Logging
 @using Return.Application.Retrospective.Commands.CreateRetrospective
-@inject IMediator Mediator
 @inject ILogger<CreateRetrospective> Logger
 
 @if (ShowCompletionMessage)

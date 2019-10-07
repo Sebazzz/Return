@@ -16,13 +16,15 @@ namespace Return.Persistence.Configurations {
         public void Configure(EntityTypeBuilder<Note> builder) {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.HasOne(e => e.Retrospective).WithMany(e => e.Notes).IsRequired().OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(e => e.Retrospective).WithMany(e => e.Notes).IsRequired().OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(e => e.Text).IsRequired().HasMaxLength(2048);
 
             builder.HasOne(e => e.Lane).WithMany().IsRequired().OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(e => e.Participant).WithMany().OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(e => e.Group).WithMany().IsRequired(false).OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

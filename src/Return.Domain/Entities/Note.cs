@@ -26,5 +26,8 @@ namespace Return.Domain.Entities {
         public Participant Participant { get; set; }
 
         public DateTimeOffset CreationTimestamp { get; set; }
+
+#nullable enable
+        public NoteGroup? Group { get; set; }
     }
 }

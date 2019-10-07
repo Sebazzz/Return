@@ -1,0 +1,204 @@
+@page "/retrospective/{retroId}/join"
+@inherits MediatorComponent
+@inject ILogger<JoinRetrospective> Logger
+@inject NavigationManager NavigationManager;
+@using System.Threading
+@using Microsoft.Extensions.Logging
+@using Return.Application.PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors
+@using Return.Application.Retrospective.Commands.JoinRetrospective
+@using Return.Application.Retrospective.Queries.GetJoinRetrospectiveInfo
+
+@if (this.RetrospectiveInfo == null)
+{
+    <h1 class="title">Retrospective not found</h1>
+
+    <p class="form-explanation">
+        Sorry, I can't find that retrospective. Please check if the URL is correct.
+    </p>
+}
+else
+{
+    <h1 class="title">Join retrospective: @this.RetrospectiveInfo.Title</h1>
+    <h2 class="subtitle">A safe space to reflect on the past sprint</h2>
+
+    <div class="columns">
+        <div class="column is-three-quarters">
+            <p class="form-explanation">
+                Join the retrospective "@this.RetrospectiveInfo.Title" by filling in the necessary information on the form below.
+            </p>
+
+            @if (this.RetrospectiveInfo.IsFinished)
+            {
+                <Notification Type="Notification.NotificationType.Warning">
+                    This retrospective has already finished. You can log in and view the past results but you won't be able to participate anymore.
+                </Notification>
+            }
+            else if (this.RetrospectiveInfo.IsStarted)
+            {
+                <Notification Type="Notification.NotificationType.Info">
+                    This retrospective has already started. Hurry up!
+                </Notification>
+            }
+
+            @if (ShowErrorMessage)
+            {
+                <ErrorMessage Text="Something went wrong joining the retrospective. Please try again." />
+            }
+
+            <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                <FluentValidation.FluentValidator />
+
+                <div class="field">
+                    <label class="label" for="retro-name">Your name</label>
+                    <div class="control">
+                        <InputText id="retro-name" class="input" type="text" @bind-Value="@Model.Name" placeholder="Enter your name, so we know who you are" />
+                    </div>
+
+                    <ValidationMessage For="() => Model.Name"></ValidationMessage>
+                </div>
+
+                @if (UseOwnColor)
+                {
+                    <div class="field">
+                        <label class="label" for="retro-color">Your custom color</label>
+                        <div class="control">
+                            <InputText id="retro-color" type="color" class="input" @bind-Value="@Model.Color" />
+                        </div>
+
+                        <ValidationMessage For="() => Model.Color"></ValidationMessage>
+                    </div>
+                }
+                else
+                {
+                    <div class="field">
+                        <label class="label">Your color</label>
+                        <div class="control">
+                            <div class="field has-addons">
+                                <div class="select">
+                                    <InputSelect @bind-Value="@Model.Color">
+                                        @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
+                                            <option style="color: #@color.HexString" value="@color.HexString">@color.Name</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <p class="control">
+                                    <button type="button" class="button is-info" @onclick="@ChooseOwnColor">
+                                        Custom color
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <InputCheckbox @bind-Value="@Model.JoiningAsManager" />
+                            I'm the manager of this retrospective
+                        </label>
+                    </div>
+                </div>
+
+                @if (Model.JoiningAsManager)
+                {
+                    <div class="field">
+                        <label class="label" for="retro-manager-passphrase">Manager passphrase</label>
+                        <div class="control">
+                            <InputText id="retro-manager-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
+                        </div>
+
+                        <ValidationMessage For="() => Model.Passphrase"></ValidationMessage>
+                        <p class="help">You should have set this password yourself. If you've lost it, create a new retrospective instead.</p>
+                    </div>
+                }
+                else if (this.RetrospectiveInfo.NeedsParticipantPassphrase)
+                {
+                    <div class="field">
+                        <label class="label" for="retro-manager-passphrase">Passphrase</label>
+                        <div class="control">
+                            <InputText id="retro-manager-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
+                        </div>
+
+                        <ValidationMessage For="() => Model.Passphrase"></ValidationMessage>
+                        <p class="help">You should have got this in the invitation.</p>
+                    </div>
+                }
+
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-link">Continue</button>
+                    </div>
+                </div>
+            </EditForm>
+        </div>
+
+        <div class="column">
+            <RetrospectiveOnlineList RetroId="@this.RetroId" />
+        </div>
+    </div>
+}
+
+
+@code
+{
+#nullable disable
+    [Parameter]
+    public string RetroId { get; set; }
+
+    private JoinRetrospectiveInfo RetrospectiveInfo { get; set; }
+    private IList<AvailableParticipantColorModel> AvailablePredefinedColors { get; set; }
+    private bool ShowErrorMessage { get; set; }
+
+    [Parameter]
+    public JoinRetrospectiveCommand Model { get; set; } = new JoinRetrospectiveCommand();
+
+    [Parameter]
+    public bool UseOwnColor { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.RetrospectiveInfo = await this.Mediator.Send(new GetJoinRetrospectiveInfoCommand { RetroId = this.RetroId }, CancellationToken.None);
+
+        if (this.RetrospectiveInfo != null)
+        {
+            this.AvailablePredefinedColors = await this.Mediator.Send(new GetAvailablePredefinedParticipantColorsRequest(this.RetroId), CancellationToken.None);
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        this.Model.RetroId = this.RetroId;
+    }
+
+    private void ChooseOwnColor()
+    {
+        this.UseOwnColor = true;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        this.ShowErrorMessage = false;
+
+        try
+        {
+            this.Model.Color = this.Model.Color?.TrimStart('#');
+            this.Model.Color = this.Model.Color?.Length != 6 ? "CCCCCC" : this.Model.Color;
+
+            await this.Mediator.Send(this.Model);
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorMessage = true;
+
+            Logger.LogError(ex, $"Error joining retrospective {this.RetroId} with name {this.Model.Name}");
+        }
+
+        this.NavigationManager.NavigateTo("retrospective/" + this.RetroId + "/lobby");
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        this.ShowErrorMessage = false;
+    }
+}

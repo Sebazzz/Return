@@ -18,7 +18,11 @@ namespace Return.Domain.Entities {
     /// </summary>
     public class Retrospective {
         private ICollection<Note>? _notes;
-        private RetroIdentifier? _urlId;
+        private ICollection<NoteGroup>? _noteGroups;
+        private Collection<Participant>? _participants;
+
+        private readonly RetroIdentifier _urlId = RetroIdentifierService.CreateNewInternal();
+        private readonly RetrospectiveOptions _options = new RetrospectiveOptions();
 
         public int Id { get; set; }
 
@@ -26,10 +30,12 @@ namespace Return.Domain.Entities {
         /// Identifier (random string) of the retrospective
         /// </summary>
         [SuppressMessage("ReSharper", "UnusedMember.Global")]
-        public RetroIdentifier UrlId {
-            get => this._urlId ??= RetroIdentifierService.CreateNewInternal();
-            set => this._urlId = value;
-        }
+        public RetroIdentifier UrlId => this._urlId;
+
+        /// <summary>
+        /// Gets or sets the current stage of the retrospective
+        /// </summary>
+        public RetrospectiveStage CurrentStage { get; set; }
 
         /// <summary>
         /// Gets the optional hashed passphrase necessary to access the retrospective lobby
@@ -47,7 +53,16 @@ namespace Return.Domain.Entities {
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         public ICollection<Note> Notes => this._notes ??= new Collection<Note>();
+        public ICollection<Participant> Participants => this._participants ??= new Collection<Participant>();
+        public ICollection<NoteGroup> NoteGroup => this._noteGroups ??= new Collection<NoteGroup>();
 
         public DateTimeOffset CreationTimestamp { get; set; }
+
+        public RetrospectiveOptions Options => this._options;
+    }
+
+    public class RetrospectiveOptions
+    {
+        public int MaximumNumberOfVotes { get; set; } = 5;
     }
 }

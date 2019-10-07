@@ -7,6 +7,7 @@
 
 namespace Return.Domain.ValueObjects {
     using System.Collections.Generic;
+    using System.Drawing;
     using Common;
 
     public class ParticipantColor : ValueObject {
@@ -23,7 +24,10 @@ namespace Return.Domain.ValueObjects {
         public byte G { get; set; }
         public byte B { get; set; }
 
-        public string ToHex() => $"{this.R:00}{this.G:00}{this.B:00}";
+        public static implicit operator ParticipantColor(Color color) => FromColor(color);
+        public static ParticipantColor FromColor(Color color) => new ParticipantColor(color.R, color.G, color.B);
+
+        public string ToHex() => $"{this.R:X2}{this.G:X2}{this.B:X2}";
 
         protected override IEnumerable<object> GetAtomicValues() {
             yield return this.R;

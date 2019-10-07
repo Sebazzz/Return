@@ -14,6 +14,10 @@ namespace Return.Domain.Entities {
 
         public ParticipantColor Color { get; set; }
 
+        public Retrospective Retrospective { get; set; }
+
         public string Name { get; set; }
+
+        public bool IsManager { get; set; }
     }
 }

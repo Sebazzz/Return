@@ -12,8 +12,10 @@ namespace Return.Application.Common.Abstractions {
     using Microsoft.EntityFrameworkCore;
 
     public interface IReturnDbContext {
+        DbSet<PredefinedParticipantColor> PredefinedParticipantColors { get; set; }
         DbSet<NoteLane> NoteLanes { get; set; }
         DbSet<Retrospective> Retrospectives { get; set; }
+        DbSet<Participant> Participants { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }

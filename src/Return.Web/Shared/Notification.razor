@@ -1,0 +1,54 @@
+@if (this.IsHidden == false)
+{
+    <div class="notification @GetCssClass()">
+        <button class="delete" @onclick="HideNotification"></button>
+
+        @ChildContent
+    </div>
+}
+
+@code {
+    #nullable disable
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public NotificationType Type { get; set; } = NotificationType.Primary;
+
+    [Parameter]
+    public bool IsHidden { get; set; }
+
+    private string GetCssClass()
+    {
+        switch (this.Type)
+        {
+            case NotificationType.Primary:
+                return "is-primary";
+            case NotificationType.Link:
+                return "is-link";
+            case NotificationType.Info:
+                return "is-info";
+            case NotificationType.Warning:
+                return "is-warning";
+            case NotificationType.Danger:
+                return "is-danger";
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public void HideNotification()
+    {
+        this.IsHidden = true;
+    }
+
+    public enum NotificationType
+    {
+        Primary,
+        Link,
+        Info,
+        Warning,
+        Danger
+    }
+}

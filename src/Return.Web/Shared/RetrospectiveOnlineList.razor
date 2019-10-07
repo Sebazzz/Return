@@ -1,0 +1,60 @@
+@inherits MediatorComponent
+@using System.Diagnostics
+@using Return.Application.Retrospective.Queries.GetParticipantsInfo
+
+@if (this.Participants == null)
+{
+    return;
+}
+ 
+<article class="message is-dark">
+    <div class="message-header">
+        <p>Who already joined?</p>
+    </div>
+    <div class="message-body">
+        @if (this.Participants.Participants.Count == 0)
+        {
+            <text>No one. You are the first to join this retrospective.</text>
+        } 
+        else if (this.Participants.Participants.Count == 1)
+        {
+            ParticipantInfo participant = this.Participants.Participants[0];
+
+            <text>@RenderParticipant(participant) has already joined the retrospective</text>
+        }
+        else
+        {
+            <text>
+                These people have already joined the retrospective:
+            </text>
+
+            <ul>
+                @foreach (ParticipantInfo participant in this.Participants.Participants)
+                {
+                    <li>
+                        @RenderParticipant(participant)
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</article>
+
+@code {
+#nullable disable
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.Participants = await this.Mediator.Send(new GetParticipantsInfoCommand(this.RetroId));
+        Debug.Assert(this.Participants != null);
+    }
+
+    protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>@<span style="color: #@participantInfo.Color.HexString">@participantInfo.Name</span>;
+
+#nullable disable
+
+    public ParticipantsInfoList Participants { get; set; }
+
+    [Parameter]
+    public string RetroId { get; set; }
+}

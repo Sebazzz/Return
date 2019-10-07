@@ -12,5 +12,8 @@ namespace Return.Application.Common.Abstractions {
         Task<int> GetParticipantId();
 
         Task<bool> IsManager();
+        Task<string> GetName();
+
+        void SetParticipant(int participantId, string name, bool isManager);
     }
 }

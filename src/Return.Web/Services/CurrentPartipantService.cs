@@ -11,6 +11,7 @@ namespace Return.Web.Services {
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
+    using Common;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Components.Authorization;
     using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ namespace Return.Web.Services {
 
     public class CurrentParticipantService : ICurrentParticipantService {
         private const string ParticipantClaimType = ClaimTypes.NameIdentifier;
+        private const string ParticipantNameClaimType = ClaimTypes.Name;
         private const string ManagerClaimType = ClaimTypes.Role;
         private const string ManagerClaimContent = "Manager";
         private HttpContext? _httpContext;
@@ -59,11 +61,43 @@ namespace Return.Web.Services {
             return String.Equals(rawParticipantId, ManagerClaimContent, StringComparison.Ordinal);
         }
 
+        public async Task<string> GetName() {
+            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
+
+            return user.FindFirstValue(ParticipantNameClaimType);
+        }
+
+        public void SetParticipant(int participantId, string name, bool isManager)
+        {
+            var hostEnvProvider = this._authenticationStateProvider as IHostEnvironmentAuthenticationStateProvider;
+
+            if (hostEnvProvider == null)
+            {
+                return;
+            }
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ParticipantClaimType, participantId.ToString(Culture.Invariant), participantId.GetType().FullName));
+            identity.AddClaim(new Claim(ParticipantNameClaimType, name, typeof(string).FullName));
+            if (isManager)
+            {
+                identity.AddClaim(new Claim(ManagerClaimType, ManagerClaimContent, ManagerClaimContent.GetType().FullName));
+            }
+
+            hostEnvProvider.SetAuthenticationState(
+                Task.FromResult(
+                    new AuthenticationState(
+                        new ClaimsPrincipal(identity)
+                    )
+                )
+            );
+        }
+
         private async ValueTask<ClaimsPrincipal> GetUser() {
             if (this._hasNoHttpContext) {
                 return new ClaimsPrincipal();
             }
-
+           
             AuthenticationState authState = await this._authenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
 
             if (authState != null) {
