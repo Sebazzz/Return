@@ -1,17 +1,17 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : JoinRetrospectiveCommandTests.cs
+//  File:           : JoinRetrospectiveCommandHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Commands {
+namespace Return.Application.Tests.Unit.Retrospectives.Commands {
     using System.Drawing;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Notifications;
-    using Retrospectives.Commands.JoinRetrospective;
+    using Application.Retrospectives.Commands.JoinRetrospective;
     using AutoMapper;
     using Common;
     using Common.Abstractions;
@@ -25,7 +25,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
     using Support;
 
     [TestFixture]
-    public sealed class JoinRetrospectiveCommandTests : CommandTestBase {
+    public sealed class JoinRetrospectiveCommandHandlerTests : CommandTestBase {
         [Test]
         public void JoinRetrospectiveCommand_ThrowsException_WhenNotFound() {
             // Given

@@ -1,28 +1,28 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveStatusCommandTests.cs
+//  File:           : GetRetrospectiveStatusQueryHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Queries {
+namespace Return.Application.Tests.Unit.Retrospectives.Queries {
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
-    using Retrospectives.Queries.GetRetrospectiveStatus;
+    using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Common;
     using Domain.Entities;
     using NUnit.Framework;
     using Support;
 
     [TestFixture]
-    public sealed class GetRetrospectiveStatusCommandTests : QueryTestBase {
+    public sealed class GetRetrospectiveStatusQueryHandlerTests : QueryTestBase {
         [Test]
         public void GetRetrospectiveStatusCommand_ThrowsNotFoundException_WhenNotFound() {
             // Given
             const string retroId = "surely-not-found";
-            var query = new GetRetrospectiveStatusCommand(retroId);
-            var handler = new GetRetrospectiveStatusCommandHandler(this.Context, this.Mapper);
+            var query = new GetRetrospectiveStatusQuery(retroId);
+            var handler = new GetRetrospectiveStatusQueryHandler(this.Context, this.Mapper);
 
             // When
             TestDelegate action = () => handler.Handle(query, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -48,8 +48,8 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
-            var query = new GetRetrospectiveStatusCommand(retroId);
-            var handler = new GetRetrospectiveStatusCommandHandler(this.Context, this.Mapper);
+            var query = new GetRetrospectiveStatusQuery(retroId);
+            var handler = new GetRetrospectiveStatusQueryHandler(this.Context, this.Mapper);
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);

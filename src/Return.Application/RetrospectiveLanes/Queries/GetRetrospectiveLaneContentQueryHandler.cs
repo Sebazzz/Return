@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveLaneContentCommandHandler.cs
+//  File:           : GetRetrospectiveLaneContentQueryHandler.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
@@ -18,16 +18,16 @@ namespace Return.Application.RetrospectiveLanes.Queries {
     using MediatR;
     using Microsoft.EntityFrameworkCore;
 
-    public sealed class GetRetrospectiveLaneContentCommandHandler : IRequestHandler<GetRetrospectiveLaneContentCommand, RetrospectiveLaneContent> {
+    public sealed class GetRetrospectiveLaneContentQueryHandler : IRequestHandler<GetRetrospectiveLaneContentQuery, RetrospectiveLaneContent> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly IMapper _mapper;
 
-        public GetRetrospectiveLaneContentCommandHandler(IReturnDbContext returnDbContext, IMapper mapper) {
+        public GetRetrospectiveLaneContentQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
             this._returnDbContext = returnDbContext;
             this._mapper = mapper;
         }
 
-        public async Task<RetrospectiveLaneContent> Handle(GetRetrospectiveLaneContentCommand request, CancellationToken cancellationToken) {
+        public async Task<RetrospectiveLaneContent> Handle(GetRetrospectiveLaneContentQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             var laneId = (KnownNoteLane)request.LaneId;

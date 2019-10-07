@@ -1,28 +1,28 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetParticipantsInfoCommandTests.cs
+//  File:           : GetParticipantsInfoQueryHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Queries {
+namespace Return.Application.Tests.Unit.Retrospectives.Queries {
     using System.Drawing;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Retrospectives.Queries.GetParticipantsInfo;
+    using Application.Retrospectives.Queries.GetParticipantsInfo;
     using Domain.Entities;
     using NUnit.Framework;
     using Support;
 
     [TestFixture]
-    public sealed class GetParticipantsInfoCommandTests : QueryTestBase {
+    public sealed class GetParticipantsInfoQueryHandlerTests : QueryTestBase {
         [Test]
         public async Task GetParticipantsInfoCommand_ReturnsEmptyList_OnRetrospectiveNotFound() {
             // Given
             const string retroId = "surely-not-found";
-            var query = new GetParticipantsInfoCommand(retroId);
-            var handler = new GetParticipantsInfoCommandHandler(this.Context, this.Mapper);
+            var query = new GetParticipantsInfoQuery(retroId);
+            var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
@@ -47,8 +47,8 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
-            var query = new GetParticipantsInfoCommand(retroId);
-            var handler = new GetParticipantsInfoCommandHandler(this.Context, this.Mapper);
+            var query = new GetParticipantsInfoQuery(retroId);
+            var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);

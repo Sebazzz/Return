@@ -1,15 +1,15 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetParticipantsInfoCommand.cs
+//  File:           : GetParticipantsInfoQuery.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
 namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
     using MediatR;
 
-    public sealed class GetParticipantsInfoCommand : IRequest<ParticipantsInfoList> {
-        public GetParticipantsInfoCommand(string retroId) {
+    public sealed class GetParticipantsInfoQuery : IRequest<ParticipantsInfoList> {
+        public GetParticipantsInfoQuery(string retroId) {
             this.RetroId = retroId;
         }
 

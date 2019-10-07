@@ -34,6 +34,6 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusCommand(this.RetroId), CancellationToken.None);
+        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId), CancellationToken.None);
     }
 }

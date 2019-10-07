@@ -1,16 +1,16 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : CreateRetrospectiveCommandTests.cs
+//  File:           : CreateRetrospectiveCommandHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
+namespace Return.Application.Tests.Unit.Retrospectives.Commands {
     using System;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Retrospectives.Commands.CreateRetrospective;
+    using Application.Retrospectives.Commands.CreateRetrospective;
     using Domain.Services;
     using Domain.ValueObjects;
     using Microsoft.Extensions.Logging.Abstractions;
@@ -21,7 +21,7 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
     using Support;
 
     [TestFixture]
-    public sealed class CreateRetrospectiveCommandTests : CommandTestBase {
+    public sealed class CreateRetrospectiveCommandHandlerTests : CommandTestBase {
         [Test]
         public async Task Handle_GivenValidRequest_ShouldSaveRetrospectiveWithHash() {
             // Given

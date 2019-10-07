@@ -1,29 +1,28 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveLaneContentCommandTests.cs
+//  File:           : GetRetrospectiveLaneContentQueryHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.RetrospectiveLane.Queries {
+namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
     using System.Drawing;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using RetrospectiveLanes.Queries;
-    using Common;
+    using Application.RetrospectiveLanes.Queries;
     using Domain.Entities;
     using NUnit.Framework;
     using Support;
 
     [TestFixture]
-    public sealed class GetRetrospectiveLaneContentCommandTests : QueryTestBase {
+    public sealed class GetRetrospectiveLaneContentQueryHandlerTests : QueryTestBase {
         [Test]
         public async Task GetRetrospectiveLaneContentCommand_ReturnsEmpty_RetrospectiveNotFound() {
             // Given
             const string retroId = "surely-not-found";
-            var query = new GetRetrospectiveLaneContentCommand(retroId, (int)KnownNoteLane.Stop);
-            var handler = new GetRetrospectiveLaneContentCommandHandler(this.Context, this.Mapper);
+            var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
+            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper);
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
@@ -67,8 +66,8 @@ namespace Return.Application.Tests.Unit.RetrospectiveLane.Queries {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
-            var query = new GetRetrospectiveLaneContentCommand(retroId, (int)KnownNoteLane.Stop);
-            var handler = new GetRetrospectiveLaneContentCommandHandler(this.Context, this.Mapper);
+            var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
+            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper);
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);

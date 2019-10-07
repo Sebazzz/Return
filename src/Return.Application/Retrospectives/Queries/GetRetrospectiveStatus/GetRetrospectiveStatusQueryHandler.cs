@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveStatusCommandHandler.cs
+//  File:           : GetRetrospectiveStatusQueryHandler.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
@@ -18,16 +18,16 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
     using Microsoft.EntityFrameworkCore;
     using Services;
 
-    public sealed class GetRetrospectiveStatusCommandHandler : IRequestHandler<GetRetrospectiveStatusCommand, RetrospectiveStatus> {
+    public sealed class GetRetrospectiveStatusQueryHandler : IRequestHandler<GetRetrospectiveStatusQuery, RetrospectiveStatus> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly IMapper _mapper;
 
-        public GetRetrospectiveStatusCommandHandler(IReturnDbContext returnDbContext, IMapper mapper) {
+        public GetRetrospectiveStatusQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
             this._returnDbContext = returnDbContext;
             this._mapper = mapper;
         }
 
-        public async Task<RetrospectiveStatus> Handle(GetRetrospectiveStatusCommand request, CancellationToken cancellationToken) {
+        public async Task<RetrospectiveStatus> Handle(GetRetrospectiveStatusQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken).ConfigureAwait(false);

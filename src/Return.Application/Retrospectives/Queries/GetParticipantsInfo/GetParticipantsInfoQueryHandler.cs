@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetParticipantsInfoCommandHandler.cs
+//  File:           : GetParticipantsInfoQueryHandler.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
@@ -16,16 +16,16 @@ namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
     using MediatR;
     using Microsoft.EntityFrameworkCore;
 
-    public sealed class GetParticipantsInfoCommandHandler : IRequestHandler<GetParticipantsInfoCommand, ParticipantsInfoList> {
+    public sealed class GetParticipantsInfoQueryHandler : IRequestHandler<GetParticipantsInfoQuery, ParticipantsInfoList> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly IMapper _mapper;
 
-        public GetParticipantsInfoCommandHandler(IReturnDbContext returnDbContext, IMapper mapper) {
+        public GetParticipantsInfoQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
             this._returnDbContext = returnDbContext;
             this._mapper = mapper;
         }
 
-        public async Task<ParticipantsInfoList> Handle(GetParticipantsInfoCommand request, CancellationToken cancellationToken) {
+        public async Task<ParticipantsInfoList> Handle(GetParticipantsInfoQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             var returnValue = new ParticipantsInfoList();

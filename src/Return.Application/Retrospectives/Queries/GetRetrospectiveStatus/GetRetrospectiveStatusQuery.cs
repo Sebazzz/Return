@@ -1,17 +1,17 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveStatusCommand.cs
+//  File:           : GetRetrospectiveStatusQuery.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
 namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
     using MediatR;
 
-    public sealed class GetRetrospectiveStatusCommand : IRequest<RetrospectiveStatus> {
+    public sealed class GetRetrospectiveStatusQuery : IRequest<RetrospectiveStatus> {
         public string RetroId { get; }
 
-        public GetRetrospectiveStatusCommand(string retroId) {
+        public GetRetrospectiveStatusQuery(string retroId) {
             this.RetroId = retroId;
         }
     }

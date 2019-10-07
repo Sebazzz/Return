@@ -9,10 +9,10 @@ namespace Return.Application.PredefinedParticipantColors.Queries.GetAvailablePre
     using System.Collections.Generic;
     using MediatR;
 
-    public class GetAvailablePredefinedParticipantColorsRequest : IRequest<IList<AvailableParticipantColorModel>> {
+    public class GetAvailablePredefinedParticipantColorsQuery : IRequest<IList<AvailableParticipantColorModel>> {
         public string RetrospectiveId { get; }
 
-        public GetAvailablePredefinedParticipantColorsRequest(string retrospectiveId) {
+        public GetAvailablePredefinedParticipantColorsQuery(string retrospectiveId) {
             this.RetrospectiveId = retrospectiveId;
         }
     }

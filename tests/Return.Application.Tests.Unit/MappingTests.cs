@@ -7,11 +7,11 @@
 
 namespace Return.Application.Tests.Unit {
     using System.Drawing;
-    using Retrospectives.Queries.GetParticipantsInfo;
+    using Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
+    using Application.Retrospectives.Queries.GetParticipantsInfo;
     using Common.Models;
     using Domain.Entities;
     using NUnit.Framework;
-    using PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Support;
 
     [TestFixture]
@@ -24,7 +24,7 @@ namespace Return.Application.Tests.Unit {
         [Test]
         public void ShouldMap_PredefinedParticipantColor_ToAvailableParticipantColor() {
             // Given
-            var entity = new PredefinedParticipantColor("Color A", Color.Tomato);
+            var entity = new Domain.Entities.PredefinedParticipantColor("Color A", Color.Tomato);
 
             // When
             var mapped = this.Mapper.Map<AvailableParticipantColorModel>(entity);

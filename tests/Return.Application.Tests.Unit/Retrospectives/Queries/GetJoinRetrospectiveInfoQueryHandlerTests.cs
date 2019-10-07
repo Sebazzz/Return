@@ -1,28 +1,28 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetJoinRetrospectiveInfoCommandTests.cs
+//  File:           : GetJoinRetrospectiveInfoQueryHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Queries {
+namespace Return.Application.Tests.Unit.Retrospectives.Queries {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Retrospectives.Queries.GetJoinRetrospectiveInfo;
+    using Application.Retrospectives.Queries.GetJoinRetrospectiveInfo;
     using Domain.Entities;
     using Microsoft.Extensions.Logging.Abstractions;
     using NUnit.Framework;
     using Support;
 
     [TestFixture]
-    public sealed class GetJoinRetrospectiveInfoCommandTests : QueryTestBase {
+    public sealed class GetJoinRetrospectiveInfoQueryHandlerTests : QueryTestBase {
         [Test]
         public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsNull_OnRetrospectiveNotFound() {
             // Given
             string retroId = "whatever-whatever";
-            var handler = new GetJoinRetrospectiveInfoCommandHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoCommandHandler>());
-            var command = new GetJoinRetrospectiveInfoCommand { RetroId = retroId };
+            var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
+            var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
             // When
             var result = await handler.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -43,8 +43,8 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
             this.Context.Retrospectives.Add(retrospective);
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
-            var handler = new GetJoinRetrospectiveInfoCommandHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoCommandHandler>());
-            var command = new GetJoinRetrospectiveInfoCommand { RetroId = retroId };
+            var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
+            var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
             // When
             var result = await handler.Handle(command, CancellationToken.None).ConfigureAwait(false);

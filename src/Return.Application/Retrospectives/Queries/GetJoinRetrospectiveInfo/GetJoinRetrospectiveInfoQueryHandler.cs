@@ -9,16 +9,16 @@
     using Microsoft.Extensions.Logging;
     using Services;
 
-    public sealed class GetJoinRetrospectiveInfoCommandHandler : IRequestHandler<GetJoinRetrospectiveInfoCommand, JoinRetrospectiveInfo?> {
+    public sealed class GetJoinRetrospectiveInfoQueryHandler : IRequestHandler<GetJoinRetrospectiveInfoQuery, JoinRetrospectiveInfo?> {
         private readonly IReturnDbContext _dbContext;
-        private readonly ILogger<GetJoinRetrospectiveInfoCommandHandler> _logger;
+        private readonly ILogger<GetJoinRetrospectiveInfoQueryHandler> _logger;
 
-        public GetJoinRetrospectiveInfoCommandHandler(IReturnDbContext dbContext, ILogger<GetJoinRetrospectiveInfoCommandHandler> logger) {
+        public GetJoinRetrospectiveInfoQueryHandler(IReturnDbContext dbContext, ILogger<GetJoinRetrospectiveInfoQueryHandler> logger) {
             this._dbContext = dbContext;
             this._logger = logger;
         }
 
-        public async Task<JoinRetrospectiveInfo?> Handle(GetJoinRetrospectiveInfoCommand request, CancellationToken cancellationToken) {
+        public async Task<JoinRetrospectiveInfo?> Handle(GetJoinRetrospectiveInfoQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             Retrospective retrospective = await this._dbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken).ConfigureAwait(false);
