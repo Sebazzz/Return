@@ -10,21 +10,28 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective {
     using System.Globalization;
     using System.Threading;
     using System.Threading.Tasks;
+    using AutoMapper;
     using Common;
     using Common.Abstractions;
     using Domain.Entities;
     using Domain.ValueObjects;
     using MediatR;
+    using Notifications;
+    using Queries.GetParticipantsInfo;
     using Return.Common;
     using Services;
 
     public sealed class JoinRetrospectiveCommandHandler : IRequestHandler<JoinRetrospectiveCommand> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly ICurrentParticipantService _currentParticipantService;
+        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public JoinRetrospectiveCommandHandler(IReturnDbContext returnDbContext, ICurrentParticipantService currentParticipantService) {
+        public JoinRetrospectiveCommandHandler(IReturnDbContext returnDbContext, ICurrentParticipantService currentParticipantService, IMediator mediator, IMapper mapper) {
             this._returnDbContext = returnDbContext;
             this._currentParticipantService = currentParticipantService;
+            this._mediator = mediator;
+            this._mapper = mapper;
         }
 
         public async Task<Unit> Handle(JoinRetrospectiveCommand request, CancellationToken cancellationToken) {
@@ -50,6 +57,10 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective {
             await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
             this._currentParticipantService.SetParticipant(participant.Id, participant.Name, request.JoiningAsManager);
+
+            await this._mediator.Publish(
+                new RetrospectiveJoinedNotification(this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)
+                .ConfigureAwait(false);
 
             return Unit.Value;
         }

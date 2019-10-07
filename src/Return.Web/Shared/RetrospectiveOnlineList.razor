@@ -1,4 +1,7 @@
-@inherits MediatorComponent
+@implements IRetrospectiveJoinedSubscriber
+@inherits SubscribingComponent<IRetrospectiveJoinedSubscriber>
+@using Return.Application.Notifications.RetrospectiveJoined
+
 @using System.Diagnostics
 @using Return.Application.Retrospective.Queries.GetParticipantsInfo
 
@@ -6,7 +9,7 @@
 {
     return;
 }
- 
+
 <article class="message is-dark">
     <div class="message-header">
         <p>Who already joined?</p>
@@ -15,7 +18,7 @@
         @if (this.Participants.Participants.Count == 0)
         {
             <text>No one. You are the first to join this retrospective.</text>
-        } 
+        }
         else if (this.Participants.Participants.Count == 1)
         {
             ParticipantInfo participant = this.Participants.Participants[0];
@@ -51,10 +54,18 @@
 
     protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>@<span style="color: #@participantInfo.Color.HexString">@participantInfo.Name</span>;
 
-#nullable disable
+    #nullable disable
 
     public ParticipantsInfoList Participants { get; set; }
 
     [Parameter]
     public string RetroId { get; set; }
+
+    public Task OnParticipantJoinedRetrospective(ParticipantInfo participantInfo) => this.InvokeAsync(() =>
+    {
+        this.Participants.Participants.Add(participantInfo);
+        this.Participants.Participants.Sort((a, b) => StringComparer.CurrentCulture.Compare(a.Name, b.Name));
+
+        this.NotificationIsHandled();
+    });
 }

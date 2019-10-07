@@ -76,6 +76,7 @@ else
                             <div class="field has-addons">
                                 <div class="select">
                                     <InputSelect @bind-Value="@Model.Color">
+                                        <option value="">Select an option</option>
                                         @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
                                             <option style="color: #@color.HexString" value="@color.HexString">@color.Name</option>
                                         }

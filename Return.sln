@@ -13,6 +13,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E3D9368D-D98C-4E89-B681-D444BF548688}"
 	ProjectSection(SolutionItems) = preProject
 		tests\Common.props = tests\Common.props
+		tests\CommonAssemblyInfo.cs = tests\CommonAssemblyInfo.cs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Return.Domain", "src\Return.Domain\Return.Domain.csproj", "{18F8D7A0-92CB-4813-9BCC-D36492A95C9D}"

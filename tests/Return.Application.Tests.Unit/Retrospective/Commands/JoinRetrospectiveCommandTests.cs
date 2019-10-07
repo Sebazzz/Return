@@ -10,10 +10,13 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Notifications;
     using Application.Retrospective.Commands.JoinRetrospective;
+    using AutoMapper;
     using Common;
     using Common.Abstractions;
     using Domain.Entities;
+    using MediatR;
     using Microsoft.EntityFrameworkCore;
     using NSubstitute;
     using NSubstitute.ReceivedExtensions;
@@ -29,7 +32,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
             var command = new JoinRetrospectiveCommand {
                 RetroId = "not found"
             };
-            var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>());
+            var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>(), Substitute.For<IMediator>(), Substitute.For<IMapper>());
 
             // When
             TestDelegate action = () => handler.Handle(command, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -60,10 +63,15 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
+            var mediator = Substitute.For<IMediator>();
+            var mapper = Substitute.For<IMapper>();
+
             var currentParticipantService = Substitute.For<ICurrentParticipantService>();
             var handler = new JoinRetrospectiveCommandHandler(
                 this.Context,
-                currentParticipantService
+                currentParticipantService,
+                mediator,
+                mapper
             );
 
             // When
@@ -79,6 +87,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
                 ConfigureAwait(false);
 
             Assert.That(checkRetro.Participants.Select(x => x.Name), Contains.Item("The BOSS"));
+
+            await mediator.Received().
+                Publish(Arg.Any<RetrospectiveJoinedNotification>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
         }
     }
 }
