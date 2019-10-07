@@ -5,8 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospective.Commands.JoinRetrospective
-{
+namespace Return.Application.Retrospective.Commands.JoinRetrospective {
     using System;
     using System.Linq;
     using System.Linq.Expressions;
@@ -21,10 +20,8 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective
     using Microsoft.EntityFrameworkCore;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "This is a validation rule set.")]
-    public sealed class JoinRetrospectiveCommandValidator : AbstractValidator<JoinRetrospectiveCommand>
-    {
-        public JoinRetrospectiveCommandValidator()
-        {
+    public sealed class JoinRetrospectiveCommandValidator : AbstractValidator<JoinRetrospectiveCommand> {
+        public JoinRetrospectiveCommandValidator() {
             this.RuleFor(e => e.Name).NotEmpty().MaximumLength(256);
             this.RuleFor(e => e.Color).NotEmpty().Matches("^#?([A-F0-9]{2}){3}$", RegexOptions.IgnoreCase);
 
@@ -43,22 +40,19 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective
         }
     }
 
-    public sealed class PassphraseValidatorFactory
-    {
+    public sealed class PassphraseValidatorFactory {
         private readonly IReturnDbContext _returnDbContext;
         private readonly IPassphraseService _passphraseService;
 
-        private static readonly Expression<Func<Retrospective, string?>> GetManagerHash = r=>r.ManagerHashedPassphrase;
-        private static readonly Expression<Func<Retrospective, string?>> GetParticipantHash = r=> r.HashedPassphrase;
+        private static readonly Expression<Func<Retrospective, string?>> GetManagerHash = r => r.ManagerHashedPassphrase;
+        private static readonly Expression<Func<Retrospective, string?>> GetParticipantHash = r => r.HashedPassphrase;
 
-        public PassphraseValidatorFactory(IReturnDbContext returnDbContext, IPassphraseService passphraseService)
-        {
+        public PassphraseValidatorFactory(IReturnDbContext returnDbContext, IPassphraseService passphraseService) {
             this._returnDbContext = returnDbContext;
             this._passphraseService = passphraseService;
         }
 
-        public IValidator<string> MakePassphraseValidator(string retroId, bool isManagerRole, string passphrase)
-        {
+        public IValidator<string> MakePassphraseValidator(string retroId, bool isManagerRole, string passphrase) {
             Expression<Func<Retrospective, string?>> property = isManagerRole ? GetManagerHash : GetParticipantHash;
             Task<string?> RetrospectiveCallback(CancellationToken ct) => this._returnDbContext.Retrospectives.Where(x => x.UrlId.StringId == retroId).Select(property).FirstOrDefaultAsync(ct);
 
@@ -69,14 +63,12 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective
             );
         }
 
-        private sealed class PassphraseValidator : IValidator<string>
-        {
+        private sealed class PassphraseValidator : IValidator<string> {
             private readonly IPassphraseService _passphraseService;
             private readonly Func<CancellationToken, Task<string?>> _getter;
             private readonly string _passphrase;
 
-            public PassphraseValidator(IPassphraseService passphraseService, Func<CancellationToken, Task<string?>> getter, string passphrase)
-            {
+            public PassphraseValidator(IPassphraseService passphraseService, Func<CancellationToken, Task<string?>> getter, string passphrase) {
                 this._passphraseService = passphraseService;
                 this._getter = getter;
                 this._passphrase = passphrase;
@@ -90,7 +82,7 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective
             public Task<ValidationResult> ValidateAsync(
                 object instance,
                 CancellationToken cancellation = new CancellationToken()
-            ) => this.ValidateAsync((string) instance, cancellation);
+            ) => this.ValidateAsync((string)instance, cancellation);
 
             public ValidationResult Validate(ValidationContext context) => this.
                 ValidateAsync(context, CancellationToken.None).
@@ -110,11 +102,9 @@ namespace Return.Application.Retrospective.Commands.JoinRetrospective
             public async Task<ValidationResult> ValidateAsync(
                 string instance,
                 CancellationToken cancellation = new CancellationToken()
-            )
-            {
+            ) {
                 string? hash = await this._getter(cancellation).ConfigureAwait(false);
-                if (hash == null)
-                {
+                if (hash == null) {
                     return new ValidationResult();
                 }
 

@@ -34,8 +34,7 @@ namespace Return.Persistence.Configurations {
                 OnDelete(DeleteBehavior.Cascade);
 
             builder.OwnsOne(e => e.Options,
-                e =>
-                {
+                e => {
                     e.WithOwner();
                 });
 

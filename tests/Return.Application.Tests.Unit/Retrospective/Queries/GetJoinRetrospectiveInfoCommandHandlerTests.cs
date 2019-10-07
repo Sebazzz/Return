@@ -5,8 +5,7 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Queries
-{
+namespace Return.Application.Tests.Unit.Retrospective.Queries {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -17,11 +16,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries
     using Support;
 
     [TestFixture]
-    public sealed class GetJoinRetrospectiveInfoCommandTests : QueryTestBase
-    {
+    public sealed class GetJoinRetrospectiveInfoCommandTests : QueryTestBase {
         [Test]
-        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsNull_OnRetrospectiveNotFound()
-        {
+        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsNull_OnRetrospectiveNotFound() {
             // Given
             string retroId = "whatever-whatever";
             var handler = new GetJoinRetrospectiveInfoCommandHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoCommandHandler>());
@@ -35,11 +32,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries
         }
 
         [Test]
-        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsInfo_OnRetrospectiveFound()
-        {
+        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsInfo_OnRetrospectiveFound() {
             // Given
-            var retrospective = new Retrospective
-            {
+            var retrospective = new Retrospective {
                 Title = "Hello",
                 CreationTimestamp = DateTimeOffset.Now,
                 HashedPassphrase = "hello"

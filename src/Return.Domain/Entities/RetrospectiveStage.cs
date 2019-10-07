@@ -5,10 +5,8 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Entities
-{
-    public enum RetrospectiveStage
-    {
+namespace Return.Domain.Entities {
+    public enum RetrospectiveStage {
         /// <summary>
         /// The retrospective is not started yet and waiting for a manager to appear
         /// </summary>

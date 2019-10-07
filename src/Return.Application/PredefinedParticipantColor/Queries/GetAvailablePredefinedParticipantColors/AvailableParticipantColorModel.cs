@@ -5,8 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors
-{
+namespace Return.Application.PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors {
     using System;
     using AutoMapper;
     using Common.Mapping;
@@ -15,12 +14,10 @@ namespace Return.Application.PredefinedParticipantColor.Queries.GetAvailablePred
 
 #nullable disable
 
-    public class AvailableParticipantColorModel : ColorModel, IMapFrom<PredefinedParticipantColor>
-    {
+    public class AvailableParticipantColorModel : ColorModel, IMapFrom<PredefinedParticipantColor> {
         public string Name { get; set; }
 
-        public override void Mapping(Profile profile)
-        {
+        public override void Mapping(Profile profile) {
             if (profile == null) throw new ArgumentNullException(nameof(profile));
 
             profile.CreateMap<PredefinedParticipantColor, AvailableParticipantColorModel>().

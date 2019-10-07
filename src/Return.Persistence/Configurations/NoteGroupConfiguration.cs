@@ -6,17 +6,14 @@
 // ******************************************************************************
 
 
-namespace Return.Persistence.Configurations
-{
+namespace Return.Persistence.Configurations {
     using System;
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-    public sealed class NoteGroupConfiguration : IEntityTypeConfiguration<NoteGroup>
-    {
-        public void Configure(EntityTypeBuilder<NoteGroup> builder)
-        {
+    public sealed class NoteGroupConfiguration : IEntityTypeConfiguration<NoteGroup> {
+        public void Configure(EntityTypeBuilder<NoteGroup> builder) {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.HasOne(e => e.Retrospective).

@@ -5,14 +5,12 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospective.Commands.JoinRetrospective
-{
+namespace Return.Application.Retrospective.Commands.JoinRetrospective {
     using MediatR;
 
-    #nullable disable
+#nullable disable
 
-    public sealed class JoinRetrospectiveCommand : IRequest
-    {
+    public sealed class JoinRetrospectiveCommand : IRequest {
         public string Name { get; set; }
         public string Color { get; set; }
 

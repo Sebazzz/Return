@@ -61,8 +61,7 @@ namespace Return.Domain.Entities {
         public RetrospectiveOptions Options => this._options;
     }
 
-    public class RetrospectiveOptions
-    {
+    public class RetrospectiveOptions {
         public int MaximumNumberOfVotes { get; set; } = 5;
     }
 }

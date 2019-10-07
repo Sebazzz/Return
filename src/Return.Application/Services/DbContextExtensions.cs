@@ -5,8 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Services
-{
+namespace Return.Application.Services {
     using System;
     using System.Linq;
     using System.Threading;
@@ -14,14 +13,12 @@ namespace Return.Application.Services
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
 
-    public static class RetrospectiveQueryExtensions
-    {
+    public static class RetrospectiveQueryExtensions {
         public static Task<Retrospective> FindByRetroId(
             this IQueryable<Retrospective> queryable,
             string retroIdentifier,
             CancellationToken cancellationToken
-        )
-        {
+        ) {
             if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
 
             return queryable.FirstOrDefaultAsync(predicate: x => x.UrlId.StringId == retroIdentifier,

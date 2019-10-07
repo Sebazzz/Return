@@ -5,12 +5,10 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Entities
-{
+namespace Return.Domain.Entities {
     // These members are mandatory. Let's don't do nullability here for clarity sake.
 #nullable disable
-    public class NoteVote
-    {
+    public class NoteVote {
         public int Id { get; set; }
         public Note Note { get; set; }
         public Participant Participant { get; set; }

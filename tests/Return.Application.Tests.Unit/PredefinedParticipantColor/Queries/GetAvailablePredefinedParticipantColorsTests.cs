@@ -5,8 +5,7 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit
-{
+namespace Return.Application.Tests.Unit {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -20,18 +19,15 @@ namespace Return.Application.Tests.Unit
     using Support;
 
     [TestFixture]
-    public sealed class GetAvailablePredefinedParticipantColorsTests : QueryTestBase
-    {
+    public sealed class GetAvailablePredefinedParticipantColorsTests : QueryTestBase {
         [Test]
-        public async Task GetAvailablePredefinedParticipantColorsTest()
-        {
+        public async Task GetAvailablePredefinedParticipantColorsTest() {
             // Given
-            var retro = new Domain.Entities.Retrospective
-            {
+            var retro = new Domain.Entities.Retrospective {
                 CreationTimestamp = DateTimeOffset.UtcNow,
                 ManagerHashedPassphrase = "xxx",
                 Title = "xxx",
-                Participants = {new Participant {Name = "John", Color = Color.Gold}}
+                Participants = { new Participant { Name = "John", Color = Color.Gold } }
             };
             Trace.Assert(retro.UrlId.ToString() != null);
             this.Context.Retrospectives.Add(retro);

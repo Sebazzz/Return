@@ -67,20 +67,17 @@ namespace Return.Web.Services {
             return user.FindFirstValue(ParticipantNameClaimType);
         }
 
-        public void SetParticipant(int participantId, string name, bool isManager)
-        {
+        public void SetParticipant(int participantId, string name, bool isManager) {
             var hostEnvProvider = this._authenticationStateProvider as IHostEnvironmentAuthenticationStateProvider;
 
-            if (hostEnvProvider == null)
-            {
+            if (hostEnvProvider == null) {
                 return;
             }
 
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ParticipantClaimType, participantId.ToString(Culture.Invariant), participantId.GetType().FullName));
             identity.AddClaim(new Claim(ParticipantNameClaimType, name, typeof(string).FullName));
-            if (isManager)
-            {
+            if (isManager) {
                 identity.AddClaim(new Claim(ManagerClaimType, ManagerClaimContent, ManagerClaimContent.GetType().FullName));
             }
 
@@ -97,7 +94,7 @@ namespace Return.Web.Services {
             if (this._hasNoHttpContext) {
                 return new ClaimsPrincipal();
             }
-           
+
             AuthenticationState authState = await this._authenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
 
             if (authState != null) {

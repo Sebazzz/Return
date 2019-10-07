@@ -13,24 +13,20 @@
     using Microsoft.EntityFrameworkCore;
     using Services;
 
-    public sealed class GetAvailablePredefinedParticipantColorsRequestHandler : IRequestHandler<GetAvailablePredefinedParticipantColorsRequest, IList<AvailableParticipantColorModel>>
-    {
+    public sealed class GetAvailablePredefinedParticipantColorsRequestHandler : IRequestHandler<GetAvailablePredefinedParticipantColorsRequest, IList<AvailableParticipantColorModel>> {
         private readonly IReturnDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public GetAvailablePredefinedParticipantColorsRequestHandler(IReturnDbContext dbContext, IMapper mapper)
-        {
+        public GetAvailablePredefinedParticipantColorsRequestHandler(IReturnDbContext dbContext, IMapper mapper) {
             this._dbContext = dbContext;
             this._mapper = mapper;
         }
 
-        public async Task<IList<AvailableParticipantColorModel>> Handle(GetAvailablePredefinedParticipantColorsRequest request, CancellationToken cancellationToken)
-        {
+        public async Task<IList<AvailableParticipantColorModel>> Handle(GetAvailablePredefinedParticipantColorsRequest request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             Retrospective? retrospective = await this._dbContext.Retrospectives.Include(x => x.Participants).FindByRetroId(request.RetrospectiveId, cancellationToken).ConfigureAwait(false);
-            if (retrospective == null)
-            {
+            if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetrospectiveId);
             }
 

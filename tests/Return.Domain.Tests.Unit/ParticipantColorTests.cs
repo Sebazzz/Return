@@ -5,18 +5,15 @@
 //  Project         : Return.Domain.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Domain.Tests.Unit
-{
+namespace Return.Domain.Tests.Unit {
     using System.Drawing;
     using Domain.ValueObjects;
     using NUnit.Framework;
 
     [TestFixture]
-    public static class ParticipantColorTests
-    {
+    public static class ParticipantColorTests {
         [Test]
-        public static void ParticipantColor_FromColor_AssignsComponentsCorrectly()
-        {
+        public static void ParticipantColor_FromColor_AssignsComponentsCorrectly() {
             // Given
             Color source = Color.BlueViolet;
 
@@ -30,8 +27,7 @@ namespace Return.Domain.Tests.Unit
         }
 
         [Test]
-        public static void ParticipantColor_ToHex_FormatsCorrectly()
-        {
+        public static void ParticipantColor_ToHex_FormatsCorrectly() {
             // Given
             Color source = Color.BlueViolet;
             ParticipantColor target = source;

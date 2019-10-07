@@ -5,22 +5,18 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Support
-{
+namespace Return.Application.Tests.Unit.Support {
     using System;
     using AutoMapper;
     using Common.Mapping;
     using Persistence;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]
-    public class QueryTestBase : IDisposable
-    {
-        public QueryTestBase()
-        {
+    public class QueryTestBase : IDisposable {
+        public QueryTestBase() {
             this.Context = ReturnDbContextFactory.Create();
 
-            var configurationProvider = new MapperConfiguration(configure: cfg =>
-            {
+            var configurationProvider = new MapperConfiguration(configure: cfg => {
                 cfg.AddProfile<MappingProfile>();
             });
 

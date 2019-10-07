@@ -5,15 +5,12 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Support
-{
+namespace Return.Application.Tests.Unit.Support {
     using AutoMapper;
     using Common.Mapping;
 
-    public class MappingTestBase
-    {
-        public MappingTestBase()
-        {
+    public class MappingTestBase {
+        public MappingTestBase() {
             this.ConfigurationProvider =
                 new MapperConfiguration(configure: cfg => { cfg.AddProfile<MappingProfile>(); });
 

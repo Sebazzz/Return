@@ -5,22 +5,18 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Entities
-{
+namespace Return.Domain.Entities {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using ValueObjects;
 
-    public class PredefinedParticipantColor
-    {
-        public PredefinedParticipantColor(string name)
-        {
+    public class PredefinedParticipantColor {
+        public PredefinedParticipantColor(string name) {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.Color = new ParticipantColor();
         }
 
-        public PredefinedParticipantColor(string name, ParticipantColor participantColor)
-        {
+        public PredefinedParticipantColor(string name, ParticipantColor participantColor) {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.Color = participantColor;
         }

@@ -5,8 +5,7 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Commands
-{
+namespace Return.Application.Tests.Unit.Retrospective.Commands {
     using System.Drawing;
     using System.Linq;
     using System.Threading;
@@ -23,14 +22,11 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands
     using Support;
 
     [TestFixture]
-    public sealed class JoinRetrospectiveCommandTests : CommandTestBase
-    {
+    public sealed class JoinRetrospectiveCommandTests : CommandTestBase {
         [Test]
-        public void JoinRetrospectiveCommand_ThrowsException_WhenNotFound()
-        {
+        public void JoinRetrospectiveCommand_ThrowsException_WhenNotFound() {
             // Given
-            var command = new JoinRetrospectiveCommand
-            {
+            var command = new JoinRetrospectiveCommand {
                 RetroId = "not found"
             };
             var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>());
@@ -43,11 +39,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands
         }
 
         [Test]
-        public async Task JoinRetrospectiveCommand_SetsParticipantId_WhenJoiningRetrospective()
-        {
+        public async Task JoinRetrospectiveCommand_SetsParticipantId_WhenJoiningRetrospective() {
             // Given
-            var retro = new Retrospective
-            {
+            var retro = new Retrospective {
                 Title = "What",
                 Participants =
                 {
@@ -56,8 +50,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands
                 },
                 HashedPassphrase = "abef"
             };
-            var command = new JoinRetrospectiveCommand
-            {
+            var command = new JoinRetrospectiveCommand {
                 RetroId = retro.UrlId.StringId,
                 Color = "ABCDEF",
                 JoiningAsManager = true,

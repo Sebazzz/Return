@@ -20,33 +20,28 @@ namespace Return.Application.App.Commands.SeedBaseData {
             this._returnDbContext = returnDbContext;
         }
 
-        public async Task SeedAllAsync(CancellationToken cancellationToken)
-        {
+        public async Task SeedAllAsync(CancellationToken cancellationToken) {
             await this.SeedNoteLanes(cancellationToken).ConfigureAwait(false);
             await this.SeedPredefinedParticipantColor(cancellationToken).ConfigureAwait(false);
 
             await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task SeedNoteLanes(CancellationToken cancellationToken)
-        {
-            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken).ConfigureAwait(false))
-            {
+        private async Task SeedNoteLanes(CancellationToken cancellationToken) {
+            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken).ConfigureAwait(false)) {
                 return;
             }
 
             // Seed note lanes
             this._returnDbContext.NoteLanes.AddRange(
-                new NoteLane {Id = KnownNoteLane.Start, Name = "Start"},
-                new NoteLane {Id = KnownNoteLane.Stop, Name = "Stop"},
-                new NoteLane {Id = KnownNoteLane.Continue, Name = "Start"}
+                new NoteLane { Id = KnownNoteLane.Start, Name = "Start" },
+                new NoteLane { Id = KnownNoteLane.Stop, Name = "Stop" },
+                new NoteLane { Id = KnownNoteLane.Continue, Name = "Start" }
             );
         }
 
-        private async Task SeedPredefinedParticipantColor(CancellationToken cancellationToken)
-        {
-            if (await this._returnDbContext.PredefinedParticipantColors.AnyAsync(cancellationToken).ConfigureAwait(false))
-            {
+        private async Task SeedPredefinedParticipantColor(CancellationToken cancellationToken) {
+            if (await this._returnDbContext.PredefinedParticipantColors.AnyAsync(cancellationToken).ConfigureAwait(false)) {
                 return;
             }
 

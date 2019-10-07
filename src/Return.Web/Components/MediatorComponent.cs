@@ -5,13 +5,11 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Components
-{
+namespace Return.Web.Components {
     using MediatR;
     using Microsoft.AspNetCore.Components;
 
-    public class MediatorComponent : ComponentBase
-    {
+    public class MediatorComponent : ComponentBase {
         [Inject]
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public IMediator Mediator { get; set; }

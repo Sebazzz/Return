@@ -5,8 +5,7 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospective.Queries
-{
+namespace Return.Application.Tests.Unit.Retrospective.Queries {
     using System.Drawing;
     using System.Linq;
     using System.Threading;
@@ -17,11 +16,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries
     using Support;
 
     [TestFixture]
-    public sealed class GetParticipantsInfoCommandTests : QueryTestBase
-    {
+    public sealed class GetParticipantsInfoCommandTests : QueryTestBase {
         [Test]
-        public async Task GetParticipantsInfoCommand_ReturnsEmptyList_OnRetrospectiveNotFound()
-        {
+        public async Task GetParticipantsInfoCommand_ReturnsEmptyList_OnRetrospectiveNotFound() {
             // Given
             const string retroId = "surely-not-found";
             var query = new GetParticipantsInfoCommand(retroId);
@@ -35,11 +32,9 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries
         }
 
         [Test]
-        public async Task GetParticipantsInfoCommand_ReturnsList_OnRetrospectiveFound()
-        {
+        public async Task GetParticipantsInfoCommand_ReturnsList_OnRetrospectiveFound() {
             // Given
-            var retro = new Retrospective
-            {
+            var retro = new Retrospective {
                 Title = "What",
                 Participants =
                 {

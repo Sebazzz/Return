@@ -6,17 +6,14 @@
 // ******************************************************************************
 
 
-namespace Return.Persistence.Configurations
-{
+namespace Return.Persistence.Configurations {
     using System;
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-    public sealed class PredefinedParticipantColorConfiguration : IEntityTypeConfiguration<PredefinedParticipantColor>
-    {
-        public void Configure(EntityTypeBuilder<PredefinedParticipantColor> builder)
-        {
+    public sealed class PredefinedParticipantColorConfiguration : IEntityTypeConfiguration<PredefinedParticipantColor> {
+        public void Configure(EntityTypeBuilder<PredefinedParticipantColor> builder) {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.OwnsOne(e => e.Color);

@@ -5,8 +5,7 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit
-{
+namespace Return.Application.Tests.Unit {
     using System.Drawing;
     using Application.Retrospective.Queries.GetParticipantsInfo;
     using Domain.Entities;
@@ -15,17 +14,14 @@ namespace Return.Application.Tests.Unit
     using Support;
 
     [TestFixture]
-    public sealed class MappingTests : MappingTestBase
-    {
+    public sealed class MappingTests : MappingTestBase {
         [Test]
-        public void ShouldHaveValidConfiguration()
-        {
+        public void ShouldHaveValidConfiguration() {
             this.ConfigurationProvider.AssertConfigurationIsValid();
         }
 
         [Test]
-        public void ShouldMap_PredefinedParticipantColor_ToAvailableParticipantColor()
-        {
+        public void ShouldMap_PredefinedParticipantColor_ToAvailableParticipantColor() {
             // Given
             var entity = new PredefinedParticipantColor("Color A", Color.Tomato);
 
@@ -40,11 +36,9 @@ namespace Return.Application.Tests.Unit
         }
 
         [Test]
-        public void ShouldMap_Participant_ToPredefinedParticipantInfo()
-        {
+        public void ShouldMap_Participant_ToPredefinedParticipantInfo() {
             // Given
-            var entity = new Participant
-            {
+            var entity = new Participant {
                 Name = "Josh",
                 Color = Color.BlueViolet
             };
