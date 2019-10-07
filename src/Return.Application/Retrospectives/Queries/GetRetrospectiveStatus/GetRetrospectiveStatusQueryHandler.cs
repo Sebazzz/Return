@@ -37,7 +37,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
             }
 
             var retrospectiveStatus = new RetrospectiveStatus(retrospective.UrlId.StringId, retrospective.CurrentStage, retrospective.Title);
-            retrospectiveStatus.Lanes.AddRange(this._returnDbContext.NoteLanes.AsNoTracking().ProjectTo<RetrospectiveLane>(this._mapper.ConfigurationProvider));
+            retrospectiveStatus.Lanes.AddRange(await this._returnDbContext.NoteLanes.AsNoTracking().ProjectTo<RetrospectiveLane>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken).ConfigureAwait(false));
 
             return retrospectiveStatus;
         }

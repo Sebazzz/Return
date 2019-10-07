@@ -1,3 +1,7 @@
+@inherits MediatorComponent
+@using System.Threading
+@using Return.Application.Common.Models
+@using Return.Application.RetrospectiveLanes.Queries
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 
 @if (this.Lane == null)
@@ -7,6 +11,15 @@
 
 <h2 class="title has-text-centered">@Lane.Name</h2>
 
+@if (this.Contents == null)
+{
+    return;
+}
+
+@foreach (RetrospectiveNote note in this.Contents.Notes)
+{
+    <Note @key="note.Id" Data="@note"/>
+}
 
 @code {
 
@@ -17,4 +30,11 @@
 
     [Parameter]
     public string RetroId { get; set; }
+
+    private RetrospectiveLaneContent Contents { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId, this.Lane?.Id ?? 0), CancellationToken.None);
+    }
 }

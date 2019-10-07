@@ -11,7 +11,10 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
     using System.Threading;
     using System.Threading.Tasks;
     using Application.RetrospectiveLanes.Queries;
+    using Common.Abstractions;
     using Domain.Entities;
+    using Domain.Services;
+    using NSubstitute;
     using NUnit.Framework;
     using Support;
 
@@ -22,7 +25,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             // Given
             const string retroId = "surely-not-found";
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
-            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper);
+            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
@@ -32,7 +35,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
         }
 
         [Test]
-        public async Task GetRetrospectiveLaneContentCommand_ReturnsNotes_RetrospectiveFound() {
+        public async Task GetRetrospectiveLaneContentCommand_ReturnsNotesAnon_RetrospectiveFound() {
             // Given
             var participant1 = new Participant { Name = "John", Color = Color.BlueViolet };
             var stopLane = this.Context.NoteLanes.Find(KnownNoteLane.Stop);
@@ -67,7 +70,54 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
-            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper);
+            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
+
+            // When
+            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+
+            // Then
+            Assert.That(result.Notes, Is.Not.Empty);
+            Assert.That(result.Notes.Select(x => x.Text), Does.Not.Contain("I'm angry"));
+            Assert.That(result.Notes.Select(x => x.Text), Does.Not.Contain("I'm happy"));
+        }
+
+        [Test]
+        public async Task GetRetrospectiveLaneContentCommand_ReturnsNotes_RetrospectiveFound() {
+            // Given
+            var participant1 = new Participant { Name = "John", Color = Color.BlueViolet };
+            var stopLane = this.Context.NoteLanes.Find(KnownNoteLane.Stop);
+            var startLane = this.Context.NoteLanes.Find(KnownNoteLane.Start);
+            var retro = new Retrospective {
+                Title = "Yet another test",
+                Participants =
+                {
+                    participant1,
+                    new Participant {Name = "Jane", Color = Color.Aqua},
+                },
+                HashedPassphrase = "abef",
+                CurrentStage = RetrospectiveStage.Discuss,
+                Notes =
+                {
+                    new Note
+                    {
+                        Lane = stopLane,
+                        Participant = participant1,
+                        Text = "I'm angry",
+                    },
+                    new Note
+                    {
+                        Lane = startLane,
+                        Participant = participant1,
+                        Text = "I'm happy",
+                    }
+                }
+            };
+            string retroId = retro.UrlId.StringId;
+            this.Context.Retrospectives.Add(retro);
+            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+
+            var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
+            var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
             var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);

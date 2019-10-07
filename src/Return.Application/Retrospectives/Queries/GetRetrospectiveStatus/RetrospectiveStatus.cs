@@ -6,6 +6,7 @@
 // ******************************************************************************
 
 namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
+    using System;
     using System.Collections.Generic;
     using Domain.Entities;
 
@@ -25,6 +26,12 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
             this.RetroId = retroId;
             this._retrospectiveStage = retrospectiveStage;
             this.Title = title;
+        }
+
+        public RetrospectiveStatus() {
+            this.RetroId = String.Empty;
+            this.Title = String.Empty;
+            this._retrospectiveStage = RetrospectiveStage.NotStarted;
         }
     }
 }

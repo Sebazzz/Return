@@ -7,16 +7,18 @@
 <h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
 
 <div class="columns">
-    <div class="column is-three-quarters">
-       <div class="columns">
-           @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
-           {
-               <div class="column">
-                   <NoteLane @key="@lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
-               </div>
-           }
-       </div>
-    </div>
+    <CascadingValue Value=@this.RetrospectiveStatus Name="RetrospectiveStatus">
+        <div class="column is-three-quarters">
+           <div class="columns">
+               @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+               {
+                   <div class="column">
+                       <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
+                   </div>
+               }
+           </div>
+        </div>
+    </CascadingValue>
 
     <div class="column">
         <RetrospectiveOnlineList RetroId="@this.RetroId"/>

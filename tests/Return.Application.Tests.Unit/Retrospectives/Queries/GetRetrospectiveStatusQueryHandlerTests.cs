@@ -38,8 +38,8 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
                 Title = "Yet another test",
                 Participants =
                 {
-                    new Participant {Name = "John", Color = Color.BlueViolet},
-                    new Participant {Name = "Jane", Color = Color.Aqua},
+                    new Participant { Name = "John", Color = Color.BlueViolet },
+                    new Participant { Name = "Jane", Color = Color.Aqua },
                 },
                 HashedPassphrase = "abef",
                 CurrentStage = RetrospectiveStage.Writing

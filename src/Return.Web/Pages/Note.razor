@@ -1,5 +1,25 @@
-﻿<h3>Note</h3>
+@using Return.Application.Common.Models
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+
+<div class="box @(this.RetrospectiveStatus.IsViewingOtherNotesAllowed ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
+    @if (this.CanEdit())
+    {
+        <InputTextArea class="textarea box__content is-small has-fixed-size" rows="3" placeholder="Enter your text here" @bind-Value="@Data.Text"/>
+    }
+    else
+    {
+        <p class="box__content">
+            @Data.Text
+        </p>
+    }
+</div>
 
 @code {
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; } = new RetrospectiveStatus();
 
+    [Parameter]
+    public RetrospectiveNote Data { get; set; } = new RetrospectiveNote();
+
+    private bool CanEdit() => this.RetrospectiveStatus.IsEditingNotesAllowed && this.Data.IsOwnedByCurrentUser;
 }
