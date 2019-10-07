@@ -1,0 +1,20 @@
+@using Return.Application.Retrospective.Queries.GetRetrospectiveStatus
+
+@if (this.Lane == null)
+{
+    return;
+}
+
+<h2 class="title has-text-centered">@Lane.Name</h2>
+
+
+@code {
+
+    #nullable disable
+
+    [Parameter]
+    public RetrospectiveLane Lane { get; set; }
+
+    [Parameter]
+    public string RetroId { get; set; }
+}

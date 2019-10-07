@@ -1,9 +1,39 @@
 @page "/retrospective/{retroId}/lobby"
+@using System.Threading
+@using Return.Application.Retrospective.Queries.GetRetrospectiveStatus
+@using Return.Domain.Entities
+@inherits MediatorComponent
 
-<h1 class="title">Retrospective lobby</h1>
-<h2 class="subtitle">This has not been implemented yet.</h2>
+<h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
+
+<div class="columns">
+    <div class="column is-three-quarters">
+       <div class="columns">
+           @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+           {
+               <div class="column">
+                   <NoteLane @key="@lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
+               </div>
+           }
+       </div>
+    </div>
+
+    <div class="column">
+        <RetrospectiveOnlineList RetroId="@this.RetroId"/>
+    </div>
+</div>
+
 
 @code {
+    #nullable disable
+
     [Parameter]
     public string RetroId { get; set; }
+
+    public RetrospectiveStatus RetrospectiveStatus { get; set; } = new RetrospectiveStatus(String.Empty, RetrospectiveStage.NotStarted, String.Empty);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusCommand(this.RetroId), CancellationToken.None);
+    }
 }

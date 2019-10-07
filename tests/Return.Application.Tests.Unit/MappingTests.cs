@@ -8,6 +8,7 @@
 namespace Return.Application.Tests.Unit {
     using System.Drawing;
     using Application.Retrospective.Queries.GetParticipantsInfo;
+    using Common.Models;
     using Domain.Entities;
     using NUnit.Framework;
     using PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors;
@@ -53,6 +54,48 @@ namespace Return.Application.Tests.Unit {
             Assert.That(mapped.Color.R, Is.EqualTo(entity.Color.R));
             Assert.That(mapped.Color.B, Is.EqualTo(entity.Color.B));
             Assert.That(mapped.Color.G, Is.EqualTo(entity.Color.G));
+        }
+
+        [Test]
+        public void ShouldMap_NoteLane_ToRetrospectiveLane() {
+            // Given
+            var entity = new NoteLane {
+                Id = KnownNoteLane.Stop,
+                Name = "Stop!!!"
+            };
+
+            // When
+            var mapped = this.Mapper.Map<Application.Retrospective.Queries.GetRetrospectiveStatus.RetrospectiveLane>(entity);
+
+            // Then
+            Assert.That(mapped, Is.Not.Null);
+
+            Assert.That(mapped.Name, Is.EqualTo(entity.Name));
+            Assert.That(mapped.Id, Is.EqualTo((int)entity.Id));
+        }
+
+        [Test]
+        public void ShouldMap_Note_ToRetrospectiveNote() {
+            // Given
+            var entity = new Note {
+                Id = 1337,
+                Participant = new Participant {
+                    Color = Color.White,
+                    Name = "Jane"
+                },
+                Text = "Bla bla bla"
+            };
+
+            // When
+            var mapped = this.Mapper.Map<RetrospectiveNote>(entity);
+
+            // Then
+            Assert.That(mapped, Is.Not.Null);
+
+            Assert.That(mapped.Id, Is.EqualTo((int)entity.Id));
+            Assert.That(mapped.Text, Is.EqualTo(entity.Text));
+            Assert.That(mapped.ParticipantName, Is.EqualTo(entity.Participant.Name));
+            Assert.That(mapped.ParticipantColor.HexString, Is.EqualTo("FFFFFF"));
         }
     }
 }
