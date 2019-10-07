@@ -13,7 +13,7 @@ namespace Return.Application {
     using Microsoft.Extensions.DependencyInjection;
     using Notifications;
     using Notifications.RetrospectiveJoined;
-    using Retrospective.Commands.JoinRetrospective;
+    using Retrospectives.Commands.JoinRetrospective;
 
     public static class ServiceCollectionExtensions {
         public static IServiceCollection AddApplication(this IServiceCollection services) {

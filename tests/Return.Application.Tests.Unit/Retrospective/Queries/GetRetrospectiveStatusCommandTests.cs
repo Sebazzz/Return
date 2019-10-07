@@ -9,7 +9,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Retrospective.Queries.GetRetrospectiveStatus;
+    using Retrospectives.Queries.GetRetrospectiveStatus;
     using Common;
     using Domain.Entities;
     using NUnit.Framework;

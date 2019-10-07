@@ -7,11 +7,11 @@
 
 namespace Return.Application.Tests.Unit {
     using System.Drawing;
-    using Application.Retrospective.Queries.GetParticipantsInfo;
+    using Retrospectives.Queries.GetParticipantsInfo;
     using Common.Models;
     using Domain.Entities;
     using NUnit.Framework;
-    using PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors;
+    using PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Support;
 
     [TestFixture]
@@ -65,7 +65,7 @@ namespace Return.Application.Tests.Unit {
             };
 
             // When
-            var mapped = this.Mapper.Map<Application.Retrospective.Queries.GetRetrospectiveStatus.RetrospectiveLane>(entity);
+            var mapped = this.Mapper.Map<Application.Retrospectives.Queries.GetRetrospectiveStatus.RetrospectiveLane>(entity);
 
             // Then
             Assert.That(mapped, Is.Not.Null);

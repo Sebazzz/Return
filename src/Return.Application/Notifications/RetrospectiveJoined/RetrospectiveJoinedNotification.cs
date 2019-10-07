@@ -7,7 +7,7 @@
 
 namespace Return.Application.Notifications {
     using MediatR;
-    using Retrospective.Queries.GetParticipantsInfo;
+    using Retrospectives.Queries.GetParticipantsInfo;
 
     public sealed class RetrospectiveJoinedNotification : INotification {
         public ParticipantInfo ParticipantInfo { get; }

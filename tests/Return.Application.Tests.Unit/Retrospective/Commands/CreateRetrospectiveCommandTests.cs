@@ -10,7 +10,7 @@ namespace Return.Application.Tests.Unit.Retrospective.CreateRetrospective {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Retrospective.Commands.CreateRetrospective;
+    using Retrospectives.Commands.CreateRetrospective;
     using Domain.Services;
     using Domain.ValueObjects;
     using Microsoft.Extensions.Logging.Abstractions;

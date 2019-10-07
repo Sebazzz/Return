@@ -10,7 +10,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Retrospective.Queries.GetParticipantsInfo;
+    using Retrospectives.Queries.GetParticipantsInfo;
     using Domain.Entities;
     using NUnit.Framework;
     using Support;

@@ -11,7 +11,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Commands {
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Notifications;
-    using Application.Retrospective.Commands.JoinRetrospective;
+    using Retrospectives.Commands.JoinRetrospective;
     using AutoMapper;
     using Common;
     using Common.Abstractions;

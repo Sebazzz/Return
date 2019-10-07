@@ -9,7 +9,7 @@ namespace Return.Application.Tests.Unit.Retrospective.Queries {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Retrospective.Queries.GetJoinRetrospectiveInfo;
+    using Retrospectives.Queries.GetJoinRetrospectiveInfo;
     using Domain.Entities;
     using Microsoft.Extensions.Logging.Abstractions;
     using NUnit.Framework;

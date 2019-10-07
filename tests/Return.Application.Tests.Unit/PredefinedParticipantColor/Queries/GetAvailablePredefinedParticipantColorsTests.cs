@@ -15,7 +15,7 @@ namespace Return.Application.Tests.Unit {
     using System.Threading.Tasks;
     using Domain.Entities;
     using NUnit.Framework;
-    using PredefinedParticipantColor.Queries.GetAvailablePredefinedParticipantColors;
+    using PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Support;
 
     [TestFixture]
