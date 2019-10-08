@@ -36,7 +36,7 @@ namespace Return.Application.RetrospectiveLanes.Queries {
         public async Task<RetrospectiveLaneContent> Handle(GetRetrospectiveLaneContentQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken).ConfigureAwait(false);
+            Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
 
             var laneId = (KnownNoteLane)request.LaneId;
             var query =
@@ -48,10 +48,10 @@ namespace Return.Application.RetrospectiveLanes.Queries {
 
             var lane = new RetrospectiveLaneContent();
             lane.Notes.AddRange(
-                await query.ProjectTo<RetrospectiveNote>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken).ConfigureAwait(false)
+                await query.ProjectTo<RetrospectiveNote>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken)
             );
 
-            int currentUserId = await this._currentParticipantService.GetParticipantId().ConfigureAwait(false);
+            int currentUserId = await this._currentParticipantService.GetParticipantId();
             foreach (RetrospectiveNote note in lane.Notes) {
                 note.IsOwnedByCurrentUser = currentUserId == note.ParticipantId;
 

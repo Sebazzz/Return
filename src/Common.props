@@ -16,6 +16,10 @@
 
         <!-- Suppress warning about localizable inspections.-->
         <NoWarn>$(NoWarn);CA1303</NoWarn>
+
+        <!-- CA2007 [Consider calling ConfigureAwait on awaited task] is causing Blazor to go haywire -->
+        <!-- Apparently a re-entrance issue kept occurring with Entity Framework -->
+        <NoWarn>$(NoWarn);CA2007</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

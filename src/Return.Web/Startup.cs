@@ -12,8 +12,8 @@ namespace Return.Web {
     using Configuration;
     using Domain;
     using FluentValidation;
-    using FluentValidation.AspNetCore;
     using Infrastructure;
+    using MediatR;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Middleware;
@@ -41,6 +41,11 @@ namespace Return.Web {
             services.AddSingleton<ISiteUrlDetectionService, SiteUrlDetectionService>();
 
             services.AddSingleton<IUrlGenerator, WebUrlGenerator>();
+
+            // ... Blazor does on an await InitializeAsync/ParametersSetAsync already render children.
+            //     so scope services may actually be called concurrently. Wrap the Mediator
+            //     with a semaphore to mitigate and fix the locks
+            services.Decorate<IMediator, ScopeSafeMediatorDecorator>();
 
             // ... Config
             services.Configure<DatabaseOptions>(this.Configuration.GetSection("database"));

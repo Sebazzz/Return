@@ -14,6 +14,9 @@
 
     <PackageReference Include="NReco.Logging.File" Version="1.0.4" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.0" />
+
+    <!--Scrutor provides decorator abilities for IServiceCollection -->
+    <PackageReference Include="Scrutor" Version="3.1.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,20 +29,4 @@
     <Compile Remove="wwwroot\**\*;node_modules\**\*" />
     <TypeScriptCompile Remove="wwwroot\**\*;node_modules\**\*" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <TypeScriptTarget>ES5</TypeScriptTarget>
-    <TypeScriptJSXEmit>React</TypeScriptJSXEmit>
-    <TypeScriptModuleKind />
-    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
-    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
-    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
-    <TypeScriptOutFile />
-    <TypeScriptOutDir />
-    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
-    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
-    <TypeScriptSourceMap>True</TypeScriptSourceMap>
-    <TypeScriptMapRoot />
-    <TypeScriptSourceRoot />
-  </PropertyGroup>
 </Project>

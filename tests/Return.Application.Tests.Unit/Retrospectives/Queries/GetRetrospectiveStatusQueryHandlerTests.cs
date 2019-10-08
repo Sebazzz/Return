@@ -25,7 +25,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             var handler = new GetRetrospectiveStatusQueryHandler(this.Context, this.Mapper);
 
             // When
-            TestDelegate action = () => handler.Handle(query, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
+            TestDelegate action = () => handler.Handle(query, CancellationToken.None).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<NotFoundException>());
@@ -46,13 +46,13 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             };
             string retroId = retro.UrlId.StringId;
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var query = new GetRetrospectiveStatusQuery(retroId);
             var handler = new GetRetrospectiveStatusQueryHandler(this.Context, this.Mapper);
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Lanes, Has.Count.EqualTo(3 /* Based on seed data */));

@@ -44,7 +44,7 @@ namespace Return.Web {
                     returnDbContext.Database.Migrate();
 
                     var mediator = services.GetRequiredService<IMediator>();
-                    await mediator.Send(new SeedBaseDataCommand(), CancellationToken.None).ConfigureAwait(false);
+                    await mediator.Send(new SeedBaseDataCommand());
                 }
                 catch (Exception ex) {
                     ILogger logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(Program));
@@ -52,7 +52,7 @@ namespace Return.Web {
                 }
             }
 
-            await host.RunAsync().ConfigureAwait(false);
+            await host.RunAsync();
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and exit instead of crash")]

@@ -25,7 +25,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
             // When
-            var result = await handler.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(command, CancellationToken.None);
 
             // Then
             Assert.That(result, Is.Null);
@@ -41,13 +41,13 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             };
             string retroId = retrospective.UrlId.StringId;
             this.Context.Retrospectives.Add(retrospective);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
             var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
             // When
-            var result = await handler.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(command, CancellationToken.None);
 
             // Then
             Assert.That(result, Is.Not.Null);

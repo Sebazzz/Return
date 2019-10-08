@@ -44,7 +44,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             };
 
             // When
-            CreateRetrospectiveCommandResponse result = await handler.Handle(request, CancellationToken.None).ConfigureAwait(false);
+            CreateRetrospectiveCommandResponse result = await handler.Handle(request, CancellationToken.None);
 
             // Then
             Assert.That(result.Identifier.StringId, Is.Not.Null);

@@ -35,10 +35,10 @@ namespace Return.Application.Tests.Unit.Notifications {
             dispatcher.Subscribe(subscriber2);
             GC.Collect();
 
-            await dispatcher.Dispatch(notification, CancellationToken.None).ConfigureAwait(false);
+            await dispatcher.Dispatch(notification, CancellationToken.None);
 
             // Then
-            await (subscriber.Received(1).Callback(notification) ?? Task.CompletedTask).ConfigureAwait(false);
+            await (subscriber.Received(1).Callback(notification) ?? Task.CompletedTask);
         }
 
 

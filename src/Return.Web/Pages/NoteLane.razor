@@ -33,8 +33,8 @@
 
     private RetrospectiveLaneContent Contents { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId, this.Lane?.Id ?? 0), CancellationToken.None);
+        this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId, this.Lane?.Id ?? 0));
     }
 }

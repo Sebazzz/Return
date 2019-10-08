@@ -159,11 +159,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        this.RetrospectiveInfo = await this.Mediator.Send(new GetJoinRetrospectiveInfoQuery { RetroId = this.RetroId }, CancellationToken.None);
+        this.RetrospectiveInfo = await this.Mediator.Send(new GetJoinRetrospectiveInfoQuery { RetroId = this.RetroId });
 
         if (this.RetrospectiveInfo != null)
         {
-            this.AvailablePredefinedColors = await this.Mediator.Send(new GetAvailablePredefinedParticipantColorsQuery(this.RetroId), CancellationToken.None);
+            this.AvailablePredefinedColors = await this.Mediator.Send(new GetAvailablePredefinedParticipantColorsQuery(this.RetroId));
         }
     }
 

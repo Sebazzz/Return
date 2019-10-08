@@ -17,6 +17,9 @@
 
         <!-- Unit testing users different conventions -->
         <NoWarn>$(NoWarn);CA1707;IDE0055;CA1303</NoWarn>
+
+        <!-- CA2007 [Consider calling ConfigureAwait on awaited task] is unnecessary for tests -->
+        <NoWarn>$(NoWarn);CA2007</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

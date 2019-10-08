@@ -31,12 +31,12 @@ namespace Return.Application.Tests.Unit.PredefinedParticipantColors.Queries {
             };
             Trace.Assert(retro.UrlId.ToString() != null);
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             // When
             var command = new GetAvailablePredefinedParticipantColorsQueryHandler(this.Context, this.Mapper);
 
-            IList<AvailableParticipantColorModel> result = await command.Handle(new GetAvailablePredefinedParticipantColorsQuery(retro.UrlId.StringId), CancellationToken.None).ConfigureAwait(false);
+            IList<AvailableParticipantColorModel> result = await command.Handle(new GetAvailablePredefinedParticipantColorsQuery(retro.UrlId.StringId), CancellationToken.None);
 
             // Then
             List<int> colors = result.Select(x => Color.FromArgb(255, x.R, x.G, x.B).ToArgb()).ToList();

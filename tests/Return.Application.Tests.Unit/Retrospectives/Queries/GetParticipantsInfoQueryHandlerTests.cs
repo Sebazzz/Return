@@ -25,7 +25,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Participants, Is.Empty);
@@ -45,13 +45,13 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             };
             string retroId = retro.UrlId.StringId;
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var query = new GetParticipantsInfoQuery(retroId);
             var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Participants, Is.Not.Empty);

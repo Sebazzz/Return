@@ -36,7 +36,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
         public async Task<Unit> Handle(JoinRetrospectiveCommand request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken).ConfigureAwait(false);
+            Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
 
             if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);
@@ -54,13 +54,13 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             };
 
             this._returnDbContext.Participants.Add(participant);
-            await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await this._returnDbContext.SaveChangesAsync(cancellationToken);
 
             this._currentParticipantService.SetParticipant(participant.Id, participant.Name, request.JoiningAsManager);
 
             await this._mediator.Publish(
                 new RetrospectiveJoinedNotification(this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)
-                .ConfigureAwait(false);
+                ;
 
             return Unit.Value;
         }

@@ -21,7 +21,7 @@
         public async Task<JoinRetrospectiveInfo?> Handle(GetJoinRetrospectiveInfoQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            Retrospective retrospective = await this._dbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken).ConfigureAwait(false);
+            Retrospective retrospective = await this._dbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
             if (retrospective == null) {
                 this._logger.LogWarning($"Retrospective with id {request.RetroId} was not found");
 

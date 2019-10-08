@@ -18,7 +18,7 @@ namespace Return.Application {
     public static class ServiceCollectionExtensions {
         public static IServiceCollection AddApplication(this IServiceCollection services) {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly());
+            services.AddMediatR(opts => opts.AsScoped(), Assembly.GetExecutingAssembly());
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));

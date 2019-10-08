@@ -35,7 +35,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>(), Substitute.For<IMediator>(), Substitute.For<IMapper>());
 
             // When
-            TestDelegate action = () => handler.Handle(command, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult();
+            TestDelegate action = () => handler.Handle(command, CancellationToken.None).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<NotFoundException>());
@@ -61,7 +61,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
                 Passphrase = "Not relevant"
             };
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var mediator = Substitute.For<IMediator>();
             var mapper = Substitute.For<IMapper>();
@@ -75,7 +75,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             );
 
             // When
-            await handler.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await handler.Handle(command, CancellationToken.None);
 
             // Then
             currentParticipantService.ReceivedWithAnyArgs(Quantity.Exactly(1))
@@ -89,7 +89,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             Assert.That(checkRetro.Participants.Select(x => x.Name), Contains.Item("The BOSS"));
 
             await mediator.Received().
-                Publish(Arg.Any<RetrospectiveJoinedNotification>(), Arg.Any<CancellationToken>()).ConfigureAwait(false);
+                Publish(Arg.Any<RetrospectiveJoinedNotification>(), Arg.Any<CancellationToken>());
         }
     }
 }

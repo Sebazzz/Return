@@ -69,7 +69,8 @@ p {
     }
 
     &--blurred &__content {
-        filter: blur(1em);
+        filter: blur(2px);
         text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        color: transparent;
     }
 }

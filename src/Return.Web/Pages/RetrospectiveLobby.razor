@@ -4,6 +4,11 @@
 @using Return.Domain.Entities
 @inherits MediatorComponent
 
+@if (this.RetrospectiveStatus == null)
+{
+    return;
+}
+
 <h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
 
 <div class="columns">
@@ -32,10 +37,10 @@
     [Parameter]
     public string RetroId { get; set; }
 
-    public RetrospectiveStatus RetrospectiveStatus { get; set; } = new RetrospectiveStatus(String.Empty, RetrospectiveStage.NotStarted, String.Empty);
+    public RetrospectiveStatus RetrospectiveStatus { get; set; } = null;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId), CancellationToken.None);
+        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
     }
 }

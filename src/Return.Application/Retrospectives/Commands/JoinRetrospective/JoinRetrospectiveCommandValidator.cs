@@ -77,7 +77,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             }
 
             public ValidationResult Validate(object instance) =>
-                this.ValidateAsync(instance).ConfigureAwait(false).GetAwaiter().GetResult();
+                this.ValidateAsync(instance).GetAwaiter().GetResult();
 
             public Task<ValidationResult> ValidateAsync(
                 object instance,
@@ -97,13 +97,13 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             public bool CanValidateInstancesOfType(Type type) => typeof(string) == type;
 
             public ValidationResult Validate(string instance) =>
-                this.ValidateAsync(instance).ConfigureAwait(false).GetAwaiter().GetResult();
+                this.ValidateAsync(instance).GetAwaiter().GetResult();
 
             public async Task<ValidationResult> ValidateAsync(
                 string instance,
                 CancellationToken cancellation = new CancellationToken()
             ) {
-                string? hash = await this._getter(cancellation).ConfigureAwait(false);
+                string? hash = await this._getter(cancellation);
                 if (hash == null) {
                     return new ValidationResult();
                 }

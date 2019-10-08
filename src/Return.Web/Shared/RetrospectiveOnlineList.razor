@@ -46,7 +46,7 @@
 @code {
 #nullable disable
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         this.Participants = await this.Mediator.Send(new GetParticipantsInfoQuery(this.RetroId));
         Debug.Assert(this.Participants != null);

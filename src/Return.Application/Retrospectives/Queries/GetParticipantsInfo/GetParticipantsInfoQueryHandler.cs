@@ -34,7 +34,7 @@ namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
                     .Where(r => r.UrlId.StringId == request.RetroId)
                     .SelectMany(r => r.Participants)
                     .ProjectTo<ParticipantInfo>(this._mapper.ConfigurationProvider)
-                    .ToListAsync(cancellationToken).ConfigureAwait(false)
+                    .ToListAsync(cancellationToken)
             );
 
             return returnValue;

@@ -28,7 +28,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Notes, Is.Empty);
@@ -67,13 +67,13 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             };
             string retroId = retro.UrlId.StringId;
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
             var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Notes, Is.Not.Empty);
@@ -114,13 +114,13 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             };
             string retroId = retro.UrlId.StringId;
             this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
+            await this.Context.SaveChangesAsync(CancellationToken.None);
 
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
             var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None).ConfigureAwait(false);
+            var result = await handler.Handle(query, CancellationToken.None);
 
             // Then
             Assert.That(result.Notes, Is.Not.Empty);

@@ -59,7 +59,7 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
 
             this._returnDbContext.Retrospectives.Add(retrospective);
 
-            await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await this._returnDbContext.SaveChangesAsync(cancellationToken);
 
             return result;
         }

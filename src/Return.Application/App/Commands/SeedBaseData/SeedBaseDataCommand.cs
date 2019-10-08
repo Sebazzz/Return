@@ -24,7 +24,7 @@ namespace Return.Application.App.Commands.SeedBaseData {
         public async Task<Unit> Handle(SeedBaseDataCommand request, CancellationToken cancellationToken) {
             var seeder = new BaseDataSeeder(this._returnDbContext);
 
-            await seeder.SeedAllAsync(cancellationToken).ConfigureAwait(false);
+            await seeder.SeedAllAsync(cancellationToken);
 
             return Unit.Value;
         }

@@ -21,14 +21,14 @@ namespace Return.Application.App.Commands.SeedBaseData {
         }
 
         public async Task SeedAllAsync(CancellationToken cancellationToken) {
-            await this.SeedNoteLanes(cancellationToken).ConfigureAwait(false);
-            await this.SeedPredefinedParticipantColor(cancellationToken).ConfigureAwait(false);
+            await this.SeedNoteLanes(cancellationToken);
+            await this.SeedPredefinedParticipantColor(cancellationToken);
 
-            await this._returnDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+            await this._returnDbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task SeedNoteLanes(CancellationToken cancellationToken) {
-            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken).ConfigureAwait(false)) {
+            if (await this._returnDbContext.NoteLanes.AnyAsync(cancellationToken)) {
                 return;
             }
 
@@ -41,7 +41,7 @@ namespace Return.Application.App.Commands.SeedBaseData {
         }
 
         private async Task SeedPredefinedParticipantColor(CancellationToken cancellationToken) {
-            if (await this._returnDbContext.PredefinedParticipantColors.AnyAsync(cancellationToken).ConfigureAwait(false)) {
+            if (await this._returnDbContext.PredefinedParticipantColors.AnyAsync(cancellationToken)) {
                 return;
             }
 
