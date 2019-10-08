@@ -2,7 +2,7 @@
 @using Return.Application.Notes.Commands
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 
-<div class="box @(this.RetrospectiveStatus.IsViewingOtherNotesAllowed ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
+<div class="box @(this.CanView() ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
     @if (this.CanEdit())
     {
     <EditForm Model="@Data" OnValidSubmit="OnHandleNoteFormSubmit">
@@ -53,4 +53,5 @@
     }
 
     private bool CanEdit() => this.RetrospectiveStatus.IsEditingNotesAllowed && this.Data.IsOwnedByCurrentUser;
+    private bool CanView() => this.RetrospectiveStatus.IsViewingOtherNotesAllowed && this.Data.IsOwnedByCurrentUser;
 }
