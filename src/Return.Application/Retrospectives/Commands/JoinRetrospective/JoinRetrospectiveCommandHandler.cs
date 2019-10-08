@@ -16,6 +16,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
     using Domain.Entities;
     using Domain.ValueObjects;
     using MediatR;
+    using Notifications;
     using Notifications.RetrospectiveJoined;
     using Queries.GetParticipantsInfo;
     using Return.Common;
@@ -59,7 +60,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             this._currentParticipantService.SetParticipant(participant.Id, participant.Name, request.JoiningAsManager);
 
             await this._mediator.Publish(
-                new RetrospectiveJoinedNotification(this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)
+                new RetrospectiveJoinedNotification(request.RetroId, this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)
                 ;
 
             return Unit.Value;

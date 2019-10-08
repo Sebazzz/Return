@@ -13,7 +13,6 @@ namespace Return.Application {
     using Microsoft.Extensions.DependencyInjection;
     using Notifications;
     using Notifications.RetrospectiveJoined;
-    using Retrospectives.Commands.JoinRetrospective;
 
     public static class ServiceCollectionExtensions {
         public static IServiceCollection AddApplication(this IServiceCollection services) {
@@ -22,7 +21,6 @@ namespace Return.Application {
 
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
-            services.AddScoped<PassphraseValidatorFactory>();
 
             services.AddNotificationDispatcher<RetrospectiveJoinedNotificationDispatcher>();
 

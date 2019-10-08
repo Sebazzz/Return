@@ -57,7 +57,7 @@ namespace Return.Web {
             // Framework
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly);
+            services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly, ServiceLifetime.Scoped);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory) {
