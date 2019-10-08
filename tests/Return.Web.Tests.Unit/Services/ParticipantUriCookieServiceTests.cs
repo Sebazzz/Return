@@ -120,7 +120,7 @@ namespace Return.Web.Tests.Unit.Services {
 
             // When
             string cookie = this._participantUriCookieService.Encrypt(input);
-            cookie = cookie.Substring(0, 4) + "AA" + cookie.Substring(6);
+            cookie = cookie.Substring(0, 4) + "DF" + cookie.Substring(6);
             CurrentParticipantModel output = this._participantUriCookieService.Decrypt(cookie);
 
             // Then
@@ -138,6 +138,10 @@ namespace Return.Web.Tests.Unit.Services {
 
         private static void AssertRoundtripResult(ref CurrentParticipantModel output, ref CurrentParticipantModel input, string cookie) {
             TestContext.Out.WriteLine($"[{input.Id},{input.IsManager},{input.Name}] resulted in cookie of length {cookie.Length}: {cookie}");
+
+            if (output == default) {
+                Assert.Fail("It appeared that decryption failed and the default value was returned.");
+            }
 
             Assert.That(cookie, Is.EqualTo(Uri.EscapeDataString(cookie)), "Cookie is not URI safe by default");
 

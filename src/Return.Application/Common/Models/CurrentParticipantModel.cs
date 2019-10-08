@@ -35,5 +35,7 @@ namespace Return.Application.Common.Models {
             name = this.Name;
             isManager = this.IsManager;
         }
+
+        public override string ToString() => $"[{this.Id}|{(this.IsManager ? "M" : "P")}|{this.Name}]";
     }
 }

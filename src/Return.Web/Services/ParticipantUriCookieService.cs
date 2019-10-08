@@ -76,40 +76,44 @@ namespace Return.Web.Services {
             // Validate checksum
             Span<byte> computedHash = stackalloc byte[ChecksumLength];
 
-            using (var hmac = new HMACMD5()) {
-                for (int offset = 0; offset >= MaxDurationHours * -1; offset--) {
-                    Debug.Assert(hmac.Key.Length == 64, "hmac.Key.Length == 64");
-                    this.CreateKey(hmac.Key, offset);
+            bool isValidChecksum = false;
+            for (int offset = 0; offset >= MaxDurationHours * -1; offset--) {
+                var key = new byte[64];
+                this.CreateKey(key, offset);
+                using var hmac = new HMACMD5(key);
 
-                    bool isValidChecksum;
-                    try {
-                        Span<byte> currentHash = protectedBytes[0..ChecksumLength];
-                        if (!hmac.TryComputeHash(currentHash, computedHash, out int bytesWritten)) {
-                            throw new InvalidOperationException("Failed to decrypt cookie: cannot write hash");
-                        }
-
-                        if (bytesWritten != ChecksumLength) {
-                            throw new InvalidOperationException(
-                                $"Failed to decrypt cookie: cannot write hash [{bytesWritten} != {ChecksumLength}]");
-                        }
-
-                        isValidChecksum = true;
-                        for (int i = 0; i < ChecksumLength; i++) {
-                            if (computedHash[i] != currentHash[i]) {
-                                isValidChecksum = false;
-                                break;
-                            }
-                        }
-                    }
-                    catch (InvalidOperationException ex) {
-                        this._logger.LogError(ex, $"Failed to decrypt cookie [{uriCookie}]");
-                        return default;
+                try {
+                    Span<byte> currentHash = protectedBytes[0..ChecksumLength];
+                    if (!hmac.TryComputeHash(protectedBytes[(ChecksumLength + 1)..], computedHash, out int bytesWritten)) {
+                        throw new InvalidOperationException("Failed to decrypt cookie: cannot write hash");
                     }
 
-                    if (isValidChecksum) {
-                        break;
+                    if (bytesWritten != ChecksumLength) {
+                        throw new InvalidOperationException(
+                            $"Failed to decrypt cookie: cannot write hash [{bytesWritten} != {ChecksumLength}]");
+                    }
+
+                    isValidChecksum = true;
+                    for (int i = 0; i < ChecksumLength; i++) {
+                        if (computedHash[i] != currentHash[i]) {
+                            Debug.WriteLine($"[{String.Join("|", computedHash.ToArray())}] != [{String.Join("|", currentHash.ToArray())}]");
+                            isValidChecksum = false;
+                            break;
+                        }
                     }
                 }
+                catch (InvalidOperationException ex) {
+                    this._logger.LogError(ex, $"Failed to decrypt cookie [{uriCookie}]");
+                    return default;
+                }
+
+                if (isValidChecksum) {
+                    break;
+                }
+            }
+
+            if (!isValidChecksum) {
+                return default;
             }
 
             byte[] unprotectedBytes = protectedBytes;
@@ -182,7 +186,7 @@ namespace Return.Web.Services {
             this.CreateKey(key);
 
             using (var hmac = new HMACMD5(key)) {
-                if (!hmac.TryComputeHash(buffer[ChecksumLength..], buffer, out int bytesWritten)) {
+                if (!hmac.TryComputeHash(buffer[(ChecksumLength + 1)..], buffer, out int bytesWritten)) {
                     throw new InvalidOperationException("Failed to create protected string");
                 }
 
