@@ -9,10 +9,10 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common;
+    using Application.Common.Abstractions;
+    using Application.Common.Models;
     using Application.Retrospectives.Commands.RejoinRetrospective;
-    using Common;
-    using Common.Abstractions;
-    using Common.Models;
     using Domain.Entities;
     using NSubstitute;
     using NUnit.Framework;

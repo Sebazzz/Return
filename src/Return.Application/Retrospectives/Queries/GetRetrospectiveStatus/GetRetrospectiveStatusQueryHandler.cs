@@ -10,19 +10,17 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
     using System.Threading;
     using System.Threading.Tasks;
     using AutoMapper;
-    using AutoMapper.QueryableExtensions;
     using Common;
     using Common.Abstractions;
     using Domain.Entities;
     using MediatR;
-    using Microsoft.EntityFrameworkCore;
     using Services;
 
     public sealed class GetRetrospectiveStatusQueryHandler : IRequestHandler<GetRetrospectiveStatusQuery, RetrospectiveStatus> {
         private readonly IReturnDbContext _returnDbContext;
-        private readonly IMapper _mapper;
+        private readonly IRetrospectiveStatusMapper _mapper;
 
-        public GetRetrospectiveStatusQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
+        public GetRetrospectiveStatusQueryHandler(IReturnDbContext returnDbContext, IRetrospectiveStatusMapper mapper) {
             this._returnDbContext = returnDbContext;
             this._mapper = mapper;
         }
@@ -36,10 +34,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
                 throw new NotFoundException();
             }
 
-            var retrospectiveStatus = new RetrospectiveStatus(retrospective.UrlId.StringId, retrospective.CurrentStage, retrospective.Title);
-            retrospectiveStatus.Lanes.AddRange(await this._returnDbContext.NoteLanes.AsNoTracking().ProjectTo<RetrospectiveLane>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken));
-
-            return retrospectiveStatus;
+            return await this._mapper.GetRetrospectiveStatus(retrospective, cancellationToken);
         }
     }
 }

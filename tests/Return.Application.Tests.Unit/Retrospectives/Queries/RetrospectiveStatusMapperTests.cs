@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
-//  © 2019 Sebastiaan Dammann | damsteen.nl
+//  ©  Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : GetRetrospectiveStatusQueryHandlerTests.cs
+//  File:           : RetrospectiveStatusMapperTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
@@ -9,31 +9,27 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Common;
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Domain.Entities;
-    using NSubstitute;
     using NUnit.Framework;
     using Support;
 
     [TestFixture]
-    public sealed class GetRetrospectiveStatusQueryHandlerTests : QueryTestBase {
+    public sealed class RetrospectiveStatusMapperTests : QueryTestBase {
         [Test]
-        public void GetRetrospectiveStatusCommand_ThrowsNotFoundException_WhenNotFound() {
+        public void RetrospectiveStatusMapper_NullArgument_ThrowsArgumentNullException() {
             // Given
-            const string retroId = "surely-not-found";
-            var query = new GetRetrospectiveStatusQuery(retroId);
-            var handler = new GetRetrospectiveStatusQueryHandler(this.Context, Substitute.For<IRetrospectiveStatusMapper>());
+            var mapper = new RetrospectiveStatusMapper(this.Context, this.Mapper);
 
             // When
-            TestDelegate action = () => handler.Handle(query, CancellationToken.None).GetAwaiter().GetResult();
+            TestDelegate action = () => mapper.GetRetrospectiveStatus(null, CancellationToken.None).GetAwaiter().GetResult();
 
             // Then
-            Assert.That(action, Throws.InstanceOf<NotFoundException>());
+            Assert.That(action, Throws.ArgumentNullException);
         }
 
         [Test]
-        public async Task GetRetrospectiveStatusCommand_ReturnsRetrospectiveInfo() {
+        public async Task RetrospectiveStatusMapper_ReturnsRetrospectiveInfo() {
             // Given
             var retro = new Retrospective {
                 Title = "Yet another test",
@@ -49,11 +45,10 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None);
 
-            var query = new GetRetrospectiveStatusQuery(retroId);
-            var handler = new GetRetrospectiveStatusQueryHandler(this.Context, new RetrospectiveStatusMapper(this.Context, this.Mapper));
+            var mapper = new RetrospectiveStatusMapper(this.Context, this.Mapper);
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None);
+            var result = await mapper.GetRetrospectiveStatus(retro, CancellationToken.None);
 
             // Then
             Assert.That(result.Lanes, Has.Count.EqualTo(3 /* Based on seed data */));

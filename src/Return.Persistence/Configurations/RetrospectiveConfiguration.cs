@@ -38,6 +38,11 @@ namespace Return.Persistence.Configurations {
                     e.WithOwner();
                 });
 
+            builder.OwnsOne(e => e.WorkflowData,
+                e => {
+                    e.WithOwner();
+                });
+
             builder.UsePropertyAccessMode(PropertyAccessMode.PreferField);
         }
     }

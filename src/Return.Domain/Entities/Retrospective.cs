@@ -23,6 +23,7 @@ namespace Return.Domain.Entities {
 
         private readonly RetroIdentifier _urlId = RetroIdentifierService.CreateNewInternal();
         private readonly RetrospectiveOptions _options = new RetrospectiveOptions();
+        private readonly RetrospectiveWorkflowData _workflowData = new RetrospectiveWorkflowData();
 
         public int Id { get; set; }
 
@@ -59,9 +60,16 @@ namespace Return.Domain.Entities {
         public DateTimeOffset CreationTimestamp { get; set; }
 
         public RetrospectiveOptions Options => this._options;
+        public RetrospectiveWorkflowData WorkflowData => this._workflowData;
     }
 
     public class RetrospectiveOptions {
         public int MaximumNumberOfVotes { get; set; } = 5;
+    }
+
+    public class RetrospectiveWorkflowData {
+        public DateTimeOffset CurrentWorkflowInitiationTimestamp { get; set; }
+
+        public int CurrentWorkflowTimeLimitInMinutes { get; set; }
     }
 }

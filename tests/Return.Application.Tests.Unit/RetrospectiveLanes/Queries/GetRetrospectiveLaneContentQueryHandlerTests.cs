@@ -10,8 +10,8 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common.Abstractions;
     using Application.RetrospectiveLanes.Queries;
-    using Common.Abstractions;
     using Domain.Entities;
     using Domain.Services;
     using NSubstitute;

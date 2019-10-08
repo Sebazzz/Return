@@ -1,0 +1,87 @@
+@using Microsoft.Extensions.Logging
+@using Return.Application.RetrospectiveWorkflows.Commands
+@using Return.Domain.ValueObjects
+@typeparam TModel
+@inject ILogger<NextStageInvocationForm<TModel>> Logger
+
+@* Fix up when blazor supports type param constraints: https://github.com/aspnet/AspNetCore/issues/8433 *@
+@if (this.Model == null)
+{
+    return;
+}
+
+@if (ShowErrorMessage)
+{
+    <ErrorMessage Text="Something went wrong executing your command. Please try again." />
+}
+
+<EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+    <FluentValidation.FluentValidator />
+
+    <div class="field">
+        <label class="label">@TimeLabelText</label>
+        <div class="control has-icons-left">
+            <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.TimeInMinutes" style="width: 8em" />
+            <span class="icon is-small is-left">
+                <i class="fas fa-stopwatch"></i>
+            </span>
+
+            <ValidationMessage For="() => this.Model.TimeInMinutes" />
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <button type="submit" class="button is-primary">@ButtonText</button>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+#nullable disable
+
+    [Parameter]
+    public string ButtonText { get; set; }
+
+    [Parameter]
+    public string TimeLabelText { get; set; }
+
+    [Parameter]
+    public AbstractTimedStageCommand Model { get; set; }
+
+    [CascadingParameter]
+    public RetroIdentifier RetroId { get; set; }
+
+    [Parameter]
+    public EventCallback<TModel> OnContinue { get; set; }
+
+    private bool ShowErrorMessage { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (this.RetroId != null && this.Model != null)
+        {
+            this.Model.RetroId = this.RetroId.StringId;
+        }
+
+        base.OnParametersSet();
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        this.ShowErrorMessage = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await this.OnContinue.InvokeAsync((TModel)(object)this.Model);
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogError(ex, $"Unable to start the next stage of retrospective {this.RetroId} from form: {this.ButtonText}");
+            this.ShowErrorMessage = true;
+        }
+    }
+}

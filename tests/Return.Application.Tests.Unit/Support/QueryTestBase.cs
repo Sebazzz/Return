@@ -7,8 +7,8 @@
 
 namespace Return.Application.Tests.Unit.Support {
     using System;
+    using Application.Common.Mapping;
     using AutoMapper;
-    using Common.Mapping;
     using Persistence;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]

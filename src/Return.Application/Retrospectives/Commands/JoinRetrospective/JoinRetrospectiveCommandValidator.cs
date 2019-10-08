@@ -48,7 +48,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
                 return true;
             }
 
-            if (String.IsNullOrEmpty(hash)) {
+            if (String.IsNullOrEmpty(passphrase)) {
                 return false;
             }
 

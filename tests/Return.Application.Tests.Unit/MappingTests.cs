@@ -7,6 +7,7 @@
 
 namespace Return.Application.Tests.Unit {
     using System.Drawing;
+    using Application.Common.Models;
     using Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Application.Retrospectives.Queries.GetParticipantsInfo;
     using Common.Models;

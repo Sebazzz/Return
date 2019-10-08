@@ -3,42 +3,48 @@
 @using Return.Application.Common.Abstractions
 @using Return.Application.Common.Models
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
-@inherits MediatorComponent
+@using Return.Domain.ValueObjects
+@inherits SubscribingComponent<Return.Application.Notifications.RetrospectiveStatusUpdated.IRetrospectiveStatusUpdatedSubscriber>
+@implements Return.Application.Notifications.RetrospectiveStatusUpdated.IRetrospectiveStatusUpdatedSubscriber
 @inject ICurrentParticipantService CurrentParticipantService
 @inject NavigationManager NavigationManager
 
 @if (this.RetrospectiveStatus == null)
 {
-    <ErrorMessage Text="This retrospective cannot be found!"/>
+    <ErrorMessage Text="This retrospective cannot be found!" />
     return;
 }
 
 <h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
 
-<div class="columns">
-    <CascadingValue Value=@this.CurrentParticipant Name="CurrentParticipant">
-        <CascadingValue Value=@this.RetrospectiveStatus Name="RetrospectiveStatus">
-            <div class="column is-three-quarters">
-               <div class="columns">
-                   @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
-                   {
-                       <div class="column">
-                           <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
-                       </div>
-                   }
-               </div>
+<CascadingValue Value=@this.RetroIdObject IsFixed="true">
+    <CascadingValue Value=@this.CurrentParticipant IsFixed="true">
+        <CascadingValue Value=@this.RetrospectiveStatus>
+            <div class="columns">
+                <div class="column is-three-quarters">
+                    <div class="columns">
+                        @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+                        {
+                            <div class="column">
+                                <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId" />
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="column">
+                    <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
+
+                    <RetrospectiveStatusPanel />
+                </div>
             </div>
         </CascadingValue>
     </CascadingValue>
-
-    <div class="column">
-        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant"/>
-    </div>
-</div>
+</CascadingValue>
 
 
 @code {
-    #nullable disable
+#nullable disable
 
     [Parameter]
     public string RetroId { get; set; }
@@ -47,6 +53,14 @@
     public CurrentParticipantModel CurrentParticipant { get; set; }
 
     public RetrospectiveStatus RetrospectiveStatus { get; set; } = null;
+
+    public RetroIdentifier RetroIdObject { get; set; }
+
+    protected override void OnInitialized()
+    {
+        this.RetroIdObject = new RetroIdentifier(this.RetroId);
+        base.OnInitialized();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,10 +77,26 @@
         try
         {
             this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
+
+            this.StateHasChanged();
         }
         catch (NotFoundException)
         {
             this.RetrospectiveStatus = null;
         }
+    }
+
+    public Task OnRetrospectiveStatusUpdated(RetrospectiveStatus retrospectiveStatus)
+    {
+        if (this.RetrospectiveStatus?.RetroId != this.RetroId)
+        {
+            return Task.CompletedTask;
+        }
+
+        return this.InvokeAsync(() =>
+        {
+            this.RetrospectiveStatus = retrospectiveStatus;
+            this.StateHasChanged();
+        });
     }
 }

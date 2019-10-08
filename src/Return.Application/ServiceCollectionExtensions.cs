@@ -13,6 +13,9 @@ namespace Return.Application {
     using Microsoft.Extensions.DependencyInjection;
     using Notifications;
     using Notifications.RetrospectiveJoined;
+    using Notifications.RetrospectiveStatusUpdated;
+    using Retrospectives.Queries.GetRetrospectiveStatus;
+    using RetrospectiveWorkflows.Common;
 
     public static class ServiceCollectionExtensions {
         public static IServiceCollection AddApplication(this IServiceCollection services) {
@@ -22,7 +25,11 @@ namespace Return.Application {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
 
+            services.AddScoped<IRetrospectiveStatusMapper, RetrospectiveStatusMapper>();
+            services.AddScoped<IRetrospectiveStatusUpdateDispatcher, RetrospectiveStatusUpdateDispatcher>();
+
             services.AddNotificationDispatcher<RetrospectiveJoinedNotificationDispatcher>();
+            services.AddNotificationDispatcher<RetrospectiveStatusUpdatedNotificationDispatcher>();
 
             return services;
         }

@@ -37,7 +37,7 @@ namespace Return.Application.Tests.Unit.Common.Models {
             bool result = color.HasSameColors(derivedColor);
 
             // Then
-            Assert.That(result, Is.True);
+            Assert.That(result, Is.False);
         }
 
         private sealed class DerivedColorModel : ColorModel {

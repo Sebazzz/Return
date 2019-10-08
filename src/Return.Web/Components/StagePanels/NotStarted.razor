@@ -1,0 +1,27 @@
+@using Return.Application.RetrospectiveWorkflows.Commands
+@inherits MediatorComponent
+
+<RetrospectiveRolePanel>
+    <Manager>
+        <p>
+            You can start the retrospective with the button below. Participants can still join after the retrospective has started.
+        </p>
+
+        <NextStageInvocationForm TModel="InitiateWritingStageCommand"
+                                 Model="@this.Command" 
+                                 OnContinue="@this.OnInvokeContinueToNextStage"
+                                 ButtonText="Start retrospective"
+                                 TimeLabelText="Number of minutes of write time"/>
+    </Manager>
+    <Participant>
+        <p>
+            Please wait while the manager starts the retrospective.
+        </p>
+    </Participant>
+</RetrospectiveRolePanel>
+
+@code {
+    private InitiateWritingStageCommand Command { get; } = new InitiateWritingStageCommand();
+
+    private Task OnInvokeContinueToNextStage(InitiateWritingStageCommand command) => this.Mediator.Send(this.Command);
+}

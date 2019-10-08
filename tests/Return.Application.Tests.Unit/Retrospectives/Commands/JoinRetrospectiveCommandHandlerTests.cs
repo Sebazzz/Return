@@ -11,12 +11,12 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common;
+    using Application.Common.Abstractions;
+    using Application.Common.Models;
     using Application.Notifications.RetrospectiveJoined;
     using Application.Retrospectives.Commands.JoinRetrospective;
     using AutoMapper;
-    using Common;
-    using Common.Abstractions;
-    using Common.Models;
     using Domain.Entities;
     using MediatR;
     using Microsoft.EntityFrameworkCore;

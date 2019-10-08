@@ -1,0 +1,63 @@
+@using Return.Domain.Entities
+
+<article class="message">
+    <div class="message-header">
+        @* Each stage has its own title *@
+        <p>
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.NotStarted"
+                                    Text="Not started yet" />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Writing"
+                                    Text="Writing down findings" />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Discuss"
+                                    Text="Discussion" />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Grouping"
+                                    Text="Grouping" />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Voting"
+                                    Text="Voting" />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Finished"
+                                    Text="Finished" />
+        </p>
+    </div>
+    <div class="message-body">
+        @* Each stage has its own explanation *@
+        <p>
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.NotStarted"
+                                    Text="We are waiting for the manager to start the retrospective." />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Writing"
+                                    Text="You can now write down your findings by adding notes in each of the lanes. Until the next phase what you write down is not visible to others." />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Discuss"
+                                    Text="All the cards are on the table. The manager leads the dissussion." />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Grouping"
+                                    Text="The manager will now group the related notes together." />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Voting"
+                                    Text="You can now vote on the groups to deem important." />
+            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Finished"
+                                    Text="The retrospective has finished. You can now view the results here." />
+        </p>
+
+        @* Each stage has its own panel and controls *@
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.NotStarted">
+            <Return.Web.Components.StagePanels.NotStarted />
+        </RetrospectiveStagePanel>
+
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.Writing">
+            <Return.Web.Components.StagePanels.Writing />
+        </RetrospectiveStagePanel>
+
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.Discuss">
+            <Return.Web.Components.StagePanels.Discuss />
+        </RetrospectiveStagePanel>
+
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.Grouping">
+            <Return.Web.Components.StagePanels.Grouping />
+        </RetrospectiveStagePanel>
+
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.Voting">
+            <Return.Web.Components.StagePanels.Voting />
+        </RetrospectiveStagePanel>
+
+        <RetrospectiveStagePanel ApplicableTo="@RetrospectiveStage.Finished">
+            <Return.Web.Components.StagePanels.Finished />
+        </RetrospectiveStagePanel>
+    </div>
+</article>

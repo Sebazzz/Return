@@ -20,6 +20,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
 
         public void Mapping(Profile profile) {
             if (profile == null) throw new ArgumentNullException(nameof(profile));
+
             profile.CreateMap<NoteLane, RetrospectiveLane>()
                    .ForMember(x => x.Id, m => m.MapFrom(e => (int)e.Id));
         }

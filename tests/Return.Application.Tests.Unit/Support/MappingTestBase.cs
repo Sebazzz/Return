@@ -6,8 +6,8 @@
 // ******************************************************************************
 
 namespace Return.Application.Tests.Unit.Support {
+    using Application.Common.Mapping;
     using AutoMapper;
-    using Common.Mapping;
 
     public class MappingTestBase {
         public MappingTestBase() {

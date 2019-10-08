@@ -1,10 +1,17 @@
 @using Return.Application.Common.Models
+@using Return.Application.Notes.Commands
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 
 <div class="box @(this.RetrospectiveStatus.IsViewingOtherNotesAllowed ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
     @if (this.CanEdit())
     {
-        <InputTextArea class="textarea box__content is-small has-fixed-size" rows="3" placeholder="Enter your text here" @bind-Value="@Data.Text"/>
+    <EditForm Model="@Data" OnValidSubmit="OnHandleNoteFormSubmit">
+        <InputTextArea class="textarea box__content is-small has-fixed-size" 
+                       rows="3" 
+                       placeholder="Enter your text here" 
+                       @bind-Value="@Data.Text" 
+                       @oninput="@OnHandleNoteUpdateTyping"/>
+    </EditForm>
     }
     else
     {
@@ -20,6 +27,30 @@
 
     [Parameter]
     public RetrospectiveNote Data { get; set; } = new RetrospectiveNote();
+
+    public UpdateNoteCommand Model { get; } = new UpdateNoteCommand();
+
+    protected override void OnParametersSet()
+    {
+        if (this.Data != null)
+        {
+            this.Model.Id = this.Data.Id;
+            this.Model.Text = this.Data.Text;
+        }
+
+        base.OnParametersSet();
+    }
+
+    protected Task OnHandleNoteFormSubmit()
+    {
+        return Task.CompletedTask;
+    }
+
+    protected Task OnHandleNoteUpdateTyping()
+    {
+        // TODO: dispatch update
+        return Task.CompletedTask;
+    }
 
     private bool CanEdit() => this.RetrospectiveStatus.IsEditingNotesAllowed && this.Data.IsOwnedByCurrentUser;
 }
