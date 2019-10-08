@@ -50,7 +50,7 @@ namespace Return.Application.Common.Behaviours {
                     "Return.App Long running request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@Request}",
                     name,
                     this._timer.ElapsedMilliseconds,
-                    await this._currentParticipantService.GetParticipantId().ConfigureAwait(false),
+                    (await this._currentParticipantService.GetParticipant().ConfigureAwait(false)).Id,
                     request);
             }
 

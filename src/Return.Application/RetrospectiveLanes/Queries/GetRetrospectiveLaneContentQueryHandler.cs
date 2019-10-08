@@ -51,7 +51,7 @@ namespace Return.Application.RetrospectiveLanes.Queries {
                 await query.ProjectTo<RetrospectiveNote>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken)
             );
 
-            int currentUserId = await this._currentParticipantService.GetParticipantId();
+            int currentUserId = (await this._currentParticipantService.GetParticipant().ConfigureAwait(false)).Id;
             foreach (RetrospectiveNote note in lane.Notes) {
                 note.IsOwnedByCurrentUser = currentUserId == note.ParticipantId;
 

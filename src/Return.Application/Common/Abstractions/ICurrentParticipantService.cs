@@ -7,13 +7,10 @@
 
 namespace Return.Application.Common.Abstractions {
     using System.Threading.Tasks;
+    using Models;
 
     public interface ICurrentParticipantService {
-        Task<int> GetParticipantId();
-
-        Task<bool> IsManager();
-        Task<string> GetName();
-
-        void SetParticipant(int participantId, string name, bool isManager);
+        ValueTask<CurrentParticipantModel> GetParticipant();
+        void SetParticipant(CurrentParticipantModel participant);
     }
 }

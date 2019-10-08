@@ -18,7 +18,7 @@
             string name = typeof(TRequest).Name;
 
             this._logger.LogInformation("Return.App Request: {Name} {@UserId} {@Request}",
-                name, await this._currentUserService.GetParticipantId().ConfigureAwait(false), request);
+                name, (await this._currentUserService.GetParticipant().ConfigureAwait(false)).Id, request);
         }
     }
 }

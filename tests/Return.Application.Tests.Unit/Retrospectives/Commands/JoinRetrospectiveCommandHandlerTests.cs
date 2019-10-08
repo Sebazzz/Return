@@ -15,6 +15,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
     using AutoMapper;
     using Common;
     using Common.Abstractions;
+    using Common.Models;
     using Domain.Entities;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
@@ -79,7 +80,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
 
             // Then
             currentParticipantService.ReceivedWithAnyArgs(Quantity.Exactly(1))
-                .SetParticipant(Arg.Any<int>(), Arg.Any<string>(), true);
+                .SetParticipant(Arg.Any<CurrentParticipantModel>());
 
             Retrospective checkRetro = await this.Context.Retrospectives.AsNoTracking().
                 Include(x => x.Participants).

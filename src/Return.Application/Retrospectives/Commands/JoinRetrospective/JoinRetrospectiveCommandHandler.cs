@@ -13,6 +13,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
     using AutoMapper;
     using Common;
     using Common.Abstractions;
+    using Common.Models;
     using Domain.Entities;
     using Domain.ValueObjects;
     using MediatR;
@@ -57,7 +58,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             this._returnDbContext.Participants.Add(participant);
             await this._returnDbContext.SaveChangesAsync(cancellationToken);
 
-            this._currentParticipantService.SetParticipant(participant.Id, participant.Name, request.JoiningAsManager);
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(participant.Id, participant.Name, request.JoiningAsManager));
 
             await this._mediator.Publish(
                 new RetrospectiveJoinedNotification(request.RetroId, this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)

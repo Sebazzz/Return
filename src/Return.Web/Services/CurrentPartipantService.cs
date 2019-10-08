@@ -11,6 +11,7 @@ namespace Return.Web.Services {
     using System.Security.Claims;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
+    using Application.Common.Models;
     using Common;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Components.Authorization;
@@ -26,53 +27,35 @@ namespace Return.Web.Services {
 
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private bool _hasNoHttpContext;
+        private ClaimsPrincipal? _currentClaimsPrincipal;
 
         public CurrentParticipantService(AuthenticationStateProvider authenticationStateProvider) {
-            this._authenticationStateProvider = authenticationStateProvider;
+            this._authenticationStateProvider = authenticationStateProvider ?? throw new ArgumentNullException(nameof(authenticationStateProvider));
+
+            this._authenticationStateProvider.AuthenticationStateChanged += this.OnAuthenticationStateChanged;
         }
+
+        private void OnAuthenticationStateChanged(Task<AuthenticationState> task) =>
+            task.ContinueWith(t =>
+                {
+                    if (t.IsCompletedSuccessfully)
+                    {
+                        this._currentClaimsPrincipal = t.Result?.User;
+                    }
+                }, TaskScheduler.Current);
 
         internal void SetHttpContext(HttpContext httpContext) => this._httpContext = httpContext;
 
         internal void SetNoHttpContext() => this._hasNoHttpContext = true;
 
-        public async Task<int> GetParticipantId() {
-            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
-
-            string? rawParticipantId = user.FindFirstValue(ParticipantClaimType);
-            if (String.IsNullOrEmpty(rawParticipantId)) {
-                return default;
-            }
-
-            if (!Int32.TryParse(rawParticipantId, out int participantId)) {
-                return default;
-            }
-
-            return participantId;
-        }
-
-        public async Task<bool> IsManager() {
-            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
-
-            string? rawParticipantId = user.FindFirstValue(ManagerClaimType);
-            if (String.IsNullOrEmpty(rawParticipantId)) {
-                return default;
-            }
-
-            return String.Equals(rawParticipantId, ManagerClaimContent, StringComparison.Ordinal);
-        }
-
-        public async Task<string> GetName() {
-            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
-
-            return user.FindFirstValue(ParticipantNameClaimType);
-        }
-
-        public void SetParticipant(int participantId, string name, bool isManager) {
+        public void SetParticipant(CurrentParticipantModel currentParticipant) {
             var hostEnvProvider = this._authenticationStateProvider as IHostEnvironmentAuthenticationStateProvider;
 
             if (hostEnvProvider == null) {
                 return;
             }
+
+            ( int participantId, string? name, bool isManager ) = currentParticipant;
 
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ParticipantClaimType, participantId.ToString(Culture.Invariant), participantId.GetType().FullName));
@@ -90,14 +73,30 @@ namespace Return.Web.Services {
             );
         }
 
+        public async ValueTask<CurrentParticipantModel> GetParticipant()
+        {
+            ClaimsPrincipal user = await this.GetUser().ConfigureAwait(false);
+
+            return new CurrentParticipantModel(
+                GetParticipantId(user),
+                GetNameLocal(user),
+                IsManager(user)
+            );
+        }
+
         private async ValueTask<ClaimsPrincipal> GetUser() {
             if (this._hasNoHttpContext) {
                 return new ClaimsPrincipal();
             }
 
+            if (this._currentClaimsPrincipal != null) {
+                return this._currentClaimsPrincipal;
+            }
+
             AuthenticationState authState = await this._authenticationStateProvider.GetAuthenticationStateAsync().ConfigureAwait(false);
 
             if (authState != null) {
+                this._currentClaimsPrincipal = authState.User;
                 return authState.User;
             }
 
@@ -106,6 +105,35 @@ namespace Return.Web.Services {
             }
 
             return this._httpContext.User;
+        }
+
+        private static string GetNameLocal(ClaimsPrincipal user) => user.FindFirstValue(ParticipantNameClaimType);
+
+        private static bool IsManager(ClaimsPrincipal user)
+        {
+            string? rawParticipantId = user.FindFirstValue(ManagerClaimType);
+            if (String.IsNullOrEmpty(rawParticipantId))
+            {
+                return default;
+            }
+
+            return String.Equals(rawParticipantId, ManagerClaimContent, StringComparison.Ordinal);
+        }
+
+        private static int GetParticipantId(ClaimsPrincipal user)
+        {
+            string? rawParticipantId = user.FindFirstValue(ParticipantClaimType);
+            if (String.IsNullOrEmpty(rawParticipantId))
+            {
+                return default;
+            }
+
+            if (!Int32.TryParse(rawParticipantId, out int participantId))
+            {
+                return default;
+            }
+
+            return participantId;
         }
     }
 
