@@ -42,6 +42,28 @@ namespace Return.Application.Tests.Unit.Notifications {
         }
 
 
+        [Test]
+        public async Task NotificationDispatcher_Unsubscribe_NotDispatchesNotification() {
+            // Given
+            using var dispatcher = new TestNotificationDispatcher();
+            var subscriber = Substitute.For<ITestNotificationSubscriber>();
+            subscriber.UniqueId.Returns(Guid.NewGuid());
+            subscriber.Callback(Arg.Any<TestNotification>()).Returns(Task.CompletedTask);
+
+            var notification = new TestNotification();
+
+            // When
+            dispatcher.Subscribe(subscriber);
+
+            await dispatcher.Dispatch(notification, CancellationToken.None);
+
+            dispatcher.Unsubscribe(subscriber);
+
+            // Then
+            await (subscriber.Received(1).Callback(notification) ?? Task.CompletedTask);
+        }
+
+
         private sealed class TestNotificationDispatcher : NotificationDispatcher<TestNotification, ITestNotificationSubscriber> {
             protected override Task DispatchCore(ITestNotificationSubscriber subscriber, TestNotification notification) => subscriber.Callback(notification);
         }

@@ -40,6 +40,11 @@ namespace Return.Application.Notifications {
             this._subscriberCollection.Subscribe(subscriber);
         }
 
+        public void Unsubscribe(TSubscriber subscriber) {
+            if (subscriber == null) throw new ArgumentNullException(nameof(subscriber));
+            this._subscriberCollection.Unsubscribe(subscriber);
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "Direct dispatch")]
         Task INotificationHandler<TNotification>.Handle(TNotification notification, CancellationToken cancellationToken) {
             if (notification == null) throw new ArgumentNullException(nameof(notification));

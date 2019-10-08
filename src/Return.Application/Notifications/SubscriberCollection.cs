@@ -23,6 +23,11 @@ namespace Return.Application.Notifications {
             this._subscribers.TryAdd(subscriber.UniqueId, new WeakReference<TSubscriber>(subscriber));
         }
 
+        public void Unsubscribe(TSubscriber subscriber) {
+            if (subscriber == null) throw new ArgumentNullException(nameof(subscriber));
+            this._subscribers.TryRemove(subscriber.UniqueId, out _);
+        }
+
         public IEnumerable<TSubscriber> GetItems() {
             // While we iterate through the queue we need to take note of any dead subscribers 
             var deadSubscribers = new List<Guid>();
