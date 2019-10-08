@@ -10,6 +10,6 @@ namespace Return.Application.Notifications.RetrospectiveJoined {
     using Retrospectives.Queries.GetParticipantsInfo;
 
     public interface IRetrospectiveJoinedSubscriber : ISubscriber {
-        Task OnParticipantJoinedRetrospective(ParticipantInfo participantInfo);
+        Task OnParticipantJoinedRetrospective(RetrospectiveEvent<ParticipantInfo> eventArgs);
     }
 }

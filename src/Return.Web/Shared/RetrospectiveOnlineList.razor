@@ -3,6 +3,7 @@
 @using Return.Application.Notifications.RetrospectiveJoined
 
 @using System.Diagnostics
+@using Return.Application.Notifications
 @using Return.Application.Retrospectives.Queries.GetParticipantsInfo
 
 @if (this.Participants == null)
@@ -61,11 +62,22 @@
     [Parameter]
     public string RetroId { get; set; }
 
-    public Task OnParticipantJoinedRetrospective(ParticipantInfo participantInfo) => this.InvokeAsync(() =>
+    public Task OnParticipantJoinedRetrospective(RetrospectiveEvent<ParticipantInfo> eventArgs)
     {
-        this.Participants.Participants.Add(participantInfo);
-        this.Participants.Participants.Sort((a, b) => StringComparer.CurrentCulture.Compare(a.Name, b.Name));
+        if (eventArgs.RetroId != this.RetroId)
+        {
+            return Task.CompletedTask;
+        }
 
-        this.NotificationIsHandled();
-    });
+        ParticipantInfo participantInfo = eventArgs.Argument;
+
+        return this.InvokeAsync(() =>
+        {
+            this.Participants.Participants.Add(participantInfo);
+            this.Participants.Participants.Sort((a, b) => StringComparer.CurrentCulture.Compare(a.Name, b.Name));
+
+            this.NotificationIsHandled();
+        });
+    }
+
 }

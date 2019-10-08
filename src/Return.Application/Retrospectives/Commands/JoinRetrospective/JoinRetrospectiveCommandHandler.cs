@@ -16,7 +16,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
     using Domain.Entities;
     using Domain.ValueObjects;
     using MediatR;
-    using Notifications;
+    using Notifications.RetrospectiveJoined;
     using Queries.GetParticipantsInfo;
     using Return.Common;
     using Services;

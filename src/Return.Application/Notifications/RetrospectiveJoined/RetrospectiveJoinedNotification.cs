@@ -5,14 +5,13 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications {
-    using MediatR;
+namespace Return.Application.Notifications.RetrospectiveJoined {
     using Retrospectives.Queries.GetParticipantsInfo;
 
-    public sealed class RetrospectiveJoinedNotification : INotification {
+    public sealed class RetrospectiveJoinedNotification : RetrospectiveNotification {
         public ParticipantInfo ParticipantInfo { get; }
 
-        public RetrospectiveJoinedNotification(ParticipantInfo participantInfo) {
+        public RetrospectiveJoinedNotification(string retroId, ParticipantInfo participantInfo) : base(retroId) {
             this.ParticipantInfo = participantInfo;
         }
     }
