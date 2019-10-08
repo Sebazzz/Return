@@ -8,6 +8,7 @@
 namespace Return.Web.Tests.Unit.Services {
     using System;
     using Application.Common.Models;
+    using Infrastructure;
     using Microsoft.AspNetCore.DataProtection;
     using Microsoft.Extensions.Logging.Abstractions;
     using NUnit.Framework;
@@ -19,7 +20,9 @@ namespace Return.Web.Tests.Unit.Services {
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "NullLoggerFactory does nothing")]
         public ParticipantUriCookieServiceTests() {
-            this._participantUriCookieService = new ParticipantUriCookieService(new EphemeralDataProtectionProvider(new NullLoggerFactory()), new NullLogger<ParticipantUriCookieService>());
+            this._participantUriCookieService = new ParticipantUriCookieService(
+                new MachineSystemClock(),
+                new NullLogger<ParticipantUriCookieService>());
         }
 
         [Test]
@@ -144,7 +147,7 @@ namespace Return.Web.Tests.Unit.Services {
 
             Assert.That(output.Name, Is.EqualTo(input.Name), $"Difference in input/output: {nameof(input.Name)}");
 
-            Assert.That(cookie, Has.Length.LessThan(256));
+            Assert.That(cookie, Has.Length.LessThan(256 * 2));
         }
     }
 }

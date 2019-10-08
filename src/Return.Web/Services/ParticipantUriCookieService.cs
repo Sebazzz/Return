@@ -7,7 +7,11 @@
 
 namespace Return.Web.Services {
     using System;
+    using System.Diagnostics;
     using System.Globalization;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.Intrinsics;
+    using System.Runtime.Intrinsics.X86;
     using System.Security.Cryptography;
     using System.Text;
     using Application.Common.Models;
@@ -22,25 +26,30 @@ namespace Return.Web.Services {
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1054:Uri parameters should not be strings", Justification = "FxCop is trigger-happy. This is about data protection in the URI.")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms", Justification = "This is not meant for strong security.")]
     public class ParticipantUriCookieService : IParticipantUriCookieService {
         private const int Int32Length = sizeof(Int32);
         private const int Int16Length = sizeof(Int16);
         private const int BooleanLength = sizeof(Boolean);
+        private const int ChecksumLength = 128 / 8;
         private const short StringNull = -1;
         private const int MaximumStringLength = 256;
+
         private const int MaxDurationHours = 2;
-        private readonly ITimeLimitedDataProtector _dataProtector;
+
         private readonly Encoding _encoding = Encoding.UTF8;
+        private readonly ISystemClock _systemClock;
+        private readonly byte[] _baseMachineKey;
         private readonly ILogger<ParticipantUriCookieService> _logger;
 
-        public ParticipantUriCookieService(IDataProtectionProvider dataProtectionProvider, ILogger<ParticipantUriCookieService> logger) {
-            if (dataProtectionProvider == null) throw new ArgumentNullException(nameof(dataProtectionProvider));
+        public ParticipantUriCookieService(ISystemClock systemClock, ILogger<ParticipantUriCookieService> logger) {
+            this._systemClock = systemClock;
             this._logger = logger;
+            this._baseMachineKey = Encoding.UTF8.GetBytes(Environment.OSVersion.VersionString + Environment.MachineName + Environment.UserName + Environment.Version);
 
             // The URI cookie contents is protected by a data protection mechanism.
             // Unprotected, the format is:
-            // Int32 id | bool isManager | string name
-            this._dataProtector = dataProtectionProvider.CreateProtector(nameof(ParticipantUriCookieService)).ToTimeLimitedDataProtector();
+            // byte[16] checksum | Int32 id | bool isManager | Int16 nameLength | string name
         }
 
         public unsafe CurrentParticipantModel Decrypt(string uriCookie) {
@@ -48,6 +57,7 @@ namespace Return.Web.Services {
             if (String.IsNullOrEmpty(uriCookie)) throw new ArgumentException("Empty uri cookie", nameof(uriCookie));
             if (uriCookie.Length % 2 != 0) return default;
 
+            // Create bytes array
             var protectedBytes = new byte[uriCookie.Length / 2];
 
             try {
@@ -63,34 +73,71 @@ namespace Return.Web.Services {
                 return default;
             }
 
-            byte[] unprotectedBytes;
+            // Validate checksum
+            Span<byte> computedHash = stackalloc byte[ChecksumLength];
 
-            try {
-                unprotectedBytes = this._dataProtector.Unprotect(protectedBytes);
-            }
-            catch (CryptographicException ex) {
-                this._logger.LogError(ex, $"Failed to decrypt cookie [{uriCookie}]");
-                return default;
+            using (var hmac = new HMACMD5()) {
+                for (int offset = 0; offset >= MaxDurationHours * -1; offset--) {
+                    Debug.Assert(hmac.Key.Length == 64, "hmac.Key.Length == 64");
+                    this.CreateKey(hmac.Key, offset);
+
+                    bool isValidChecksum;
+                    try {
+                        Span<byte> currentHash = protectedBytes[0..ChecksumLength];
+                        if (!hmac.TryComputeHash(currentHash, computedHash, out int bytesWritten)) {
+                            throw new InvalidOperationException("Failed to decrypt cookie: cannot write hash");
+                        }
+
+                        if (bytesWritten != ChecksumLength) {
+                            throw new InvalidOperationException(
+                                $"Failed to decrypt cookie: cannot write hash [{bytesWritten} != {ChecksumLength}]");
+                        }
+
+                        isValidChecksum = true;
+                        for (int i = 0; i < ChecksumLength; i++) {
+                            if (computedHash[i] != currentHash[i]) {
+                                isValidChecksum = false;
+                                break;
+                            }
+                        }
+                    }
+                    catch (InvalidOperationException ex) {
+                        this._logger.LogError(ex, $"Failed to decrypt cookie [{uriCookie}]");
+                        return default;
+                    }
+
+                    if (isValidChecksum) {
+                        break;
+                    }
+                }
             }
 
-            // Decrypt
+            byte[] unprotectedBytes = protectedBytes;
 
             // .. string length and string
-            int strLength = BitConverter.ToInt16(unprotectedBytes[(Int32Length + BooleanLength)..(Int32Length + BooleanLength + Int16Length)]);
+            Span<byte> current = unprotectedBytes[ChecksumLength..];
+            int id = BitConverter.ToInt32(current);
+            current = current[Int32Length..];
+
+            bool isManager = BitConverter.ToBoolean(current);
+            current = current[BooleanLength..];
+
+            int strLength = BitConverter.ToInt16(current);
+            current = current[Int16Length..];
 
             string? str = null;
             if (strLength != StringNull) {
                 Span<char> chars = stackalloc char[strLength];
                 chars.Fill(Char.MinValue);
-                this._encoding.GetChars(unprotectedBytes[(Int32Length + BooleanLength + Int16Length)..], chars);
+                this._encoding.GetChars(current, chars);
 
                 str = chars.ToString();
             }
 
             return new CurrentParticipantModel(
-                BitConverter.ToInt32(unprotectedBytes[0..Int32Length]),
+                id,
                 str,
-                BitConverter.ToBoolean(unprotectedBytes[Int32Length..(Int32Length + BooleanLength)])
+                isManager
             );
         }
 
@@ -101,18 +148,18 @@ namespace Return.Web.Services {
 
             // Buffer for creating the unprotected string
             // We stackalloc this array, because we create a large enough one later on.
-            Span<byte> unprotectedBytes = stackalloc byte[MaximumStringLength + Int32Length + BooleanLength + Int16Length];
+            Span<byte> buffer = stackalloc byte[MaximumStringLength + Int32Length + BooleanLength + Int16Length + ChecksumLength];
 
-            int pos;
+            int pos = ChecksumLength;
             {
-                FillSpan(BitConverter.GetBytes(currentParticipant.Id), ref unprotectedBytes);
-                Span<byte> current = unprotectedBytes[4..];
-                // pos = 4
+                Span<byte> current = buffer[ChecksumLength..];
+                FillSpan(BitConverter.GetBytes(currentParticipant.Id), ref current);
+                current = current[Int32Length..];
+                pos += Int32Length;
 
                 FillSpan(BitConverter.GetBytes(currentParticipant.IsManager), ref current);
-                current = current[1..];
-                // pos = 1 + 4 = 5
-                pos = Int32Length + BooleanLength;
+                current = current[BooleanLength..];
+                pos += BooleanLength;
 
                 if (currentParticipant.Name != null) {
                     // pos = 5 + 2 = 7
@@ -131,10 +178,21 @@ namespace Return.Web.Services {
             }
 
             // Protect the array
-            var unprotectedByteArray = new byte[pos];
-            unprotectedBytes.Slice(0, pos).CopyTo(unprotectedByteArray);
+            var key = new byte[64];
+            this.CreateKey(key);
 
-            byte[] protectedBytes = this._dataProtector.Protect(unprotectedByteArray, DateTimeOffset.Now.AddHours(MaxDurationHours));
+            using (var hmac = new HMACMD5(key)) {
+                if (!hmac.TryComputeHash(buffer[ChecksumLength..], buffer, out int bytesWritten)) {
+                    throw new InvalidOperationException("Failed to create protected string");
+                }
+
+                if (ChecksumLength != bytesWritten) {
+                    throw new InvalidOperationException($"Failed to create protected string [{ChecksumLength} != {bytesWritten}]");
+                }
+            }
+
+            var protectedBytes = new byte[pos];
+            buffer.Slice(0, pos).CopyTo(protectedBytes);
 
             // ... Convert to string cookie
             Span<char> uriCookie = stackalloc char[protectedBytes.Length * 2];
@@ -150,10 +208,19 @@ namespace Return.Web.Services {
             return uriCookie.ToString();
         }
 
-        private static void FillSpan(byte[] array, ref Span<byte> span) {
+        private static void FillSpan(Span<byte> array, ref Span<byte> span) {
             for (int idx = 0; idx < array.Length; idx++) {
                 span[idx] = array[idx];
             }
+        }
+
+        private void CreateKey(Span<byte> bytes64, int hourOffset = 0) {
+            DateTime date = this._systemClock.Now;
+            var dateWithHour = new DateTime(date.Year, date.Month, date.Day, date.Hour + hourOffset, 0, 0);
+
+            int minLength = Math.Min(this._baseMachineKey.Length, bytes64.Length);
+            FillSpan(this._baseMachineKey[..minLength], ref bytes64);
+            FillSpan(BitConverter.GetBytes(dateWithHour.ToFileTimeUtc()), ref bytes64);
         }
     }
 }
