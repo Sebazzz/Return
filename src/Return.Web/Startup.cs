@@ -41,7 +41,6 @@ namespace Return.Web {
             services.AddSingleton<ISiteUrlDetectionService, SiteUrlDetectionService>();
 
             services.AddSingleton<IUrlGenerator, WebUrlGenerator>();
-            services.AddSingleton<IParticipantUriCookieService, ParticipantUriCookieService>();
 
             // ... Blazor does on an await InitializeAsync/ParametersSetAsync already render children.
             //     so scope services may actually be called concurrently. Wrap the Mediator

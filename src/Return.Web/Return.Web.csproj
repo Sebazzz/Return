@@ -25,10 +25,6 @@
     <ProjectReference Include="..\Return.Persistence\Return.Persistence.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="wwwroot\**\*;node_modules\**\*" />
     <TypeScriptCompile Remove="wwwroot\**\*;node_modules\**\*" />
