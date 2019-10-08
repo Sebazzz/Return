@@ -17,13 +17,13 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
     using Domain.Entities;
     using Domain.ValueObjects;
     using MediatR;
-    using Notifications;
+    using Microsoft.EntityFrameworkCore;
     using Notifications.RetrospectiveJoined;
     using Queries.GetParticipantsInfo;
     using Return.Common;
     using Services;
 
-    public sealed class JoinRetrospectiveCommandHandler : IRequestHandler<JoinRetrospectiveCommand> {
+    public sealed class JoinRetrospectiveCommandHandler : IRequestHandler<JoinRetrospectiveCommand, ParticipantInfo> {
         private readonly IReturnDbContext _returnDbContext;
         private readonly ICurrentParticipantService _currentParticipantService;
         private readonly IMapper _mapper;
@@ -36,7 +36,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             this._mapper = mapper;
         }
 
-        public async Task<Unit> Handle(JoinRetrospectiveCommand request, CancellationToken cancellationToken) {
+        public async Task<ParticipantInfo> Handle(JoinRetrospectiveCommand request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
             Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
 
@@ -44,27 +44,45 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);
             }
 
-            var participant = new Participant {
-                IsManager = request.JoiningAsManager,
-                Name = request.Name,
-                Retrospective = retrospective,
-                Color = new ParticipantColor {
-                    R = Byte.Parse(request.Color[0..2], NumberStyles.AllowHexSpecifier, Culture.Invariant),
-                    G = Byte.Parse(request.Color[2..4], NumberStyles.AllowHexSpecifier, Culture.Invariant),
-                    B = Byte.Parse(request.Color[4..6], NumberStyles.AllowHexSpecifier, Culture.Invariant),
-                }
+            // Create domain object
+            Participant participant = await this.GetOrCreateParticipantAsync(request.RetroId, request.Name, cancellationToken);
+
+            participant.IsManager = request.JoiningAsManager;
+            participant.Name = request.Name;
+            participant.Retrospective = retrospective;
+            participant.Color = new ParticipantColor {
+                R = Byte.Parse(request.Color[0..2], NumberStyles.AllowHexSpecifier, Culture.Invariant),
+                G = Byte.Parse(request.Color[2..4], NumberStyles.AllowHexSpecifier, Culture.Invariant),
+                B = Byte.Parse(request.Color[4..6], NumberStyles.AllowHexSpecifier, Culture.Invariant),
             };
 
-            this._returnDbContext.Participants.Add(participant);
+            // Save it
+            bool isNew = !this._returnDbContext.Participants.Local.Contains(participant);
+            if (isNew) this._returnDbContext.Participants.Add(participant);
+
             await this._returnDbContext.SaveChangesAsync(cancellationToken);
 
+            // Update auth info
             this._currentParticipantService.SetParticipant(new CurrentParticipantModel(participant.Id, participant.Name, request.JoiningAsManager));
 
-            await this._mediator.Publish(
-                new RetrospectiveJoinedNotification(request.RetroId, this._mapper.Map<ParticipantInfo>(participant)), cancellationToken)
-                ;
+            // Broadcast
+            var participantInfo = this._mapper.Map<ParticipantInfo>(participant);
 
-            return Unit.Value;
+            if (isNew) {
+                await this._mediator.Publish(new RetrospectiveJoinedNotification(request.RetroId, participantInfo), cancellationToken);
+            }
+
+            return participantInfo;
+        }
+
+        private async Task<Participant> GetOrCreateParticipantAsync(string retroId, string name, CancellationToken cancellationToken) {
+            Participant? existingParticipant = await this._returnDbContext.Participants.FirstOrDefaultAsync(x => x.Name == name && x.Retrospective.UrlId.StringId == retroId, cancellationToken);
+
+            if (existingParticipant == null) {
+                return new Participant();
+            }
+
+            return existingParticipant;
         }
     }
 }

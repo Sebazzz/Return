@@ -7,6 +7,8 @@
 @using Return.Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors
 @using Return.Application.Retrospectives.Commands.JoinRetrospective
 @using Return.Application.Retrospectives.Queries.GetJoinRetrospectiveInfo
+@using Return.Application.Retrospectives.Queries.GetParticipant
+@using Return.Application.Retrospectives.Queries.GetParticipantsInfo
 
 @if (this.RetrospectiveInfo == null)
 {
@@ -51,10 +53,19 @@ else
                 <div class="field">
                     <label class="label" for="retro-name">Your name</label>
                     <div class="control">
-                        <InputText id="retro-name" class="input" type="text" @bind-Value="@Model.Name" placeholder="Enter your name, so we know who you are" />
+                        <InputText id="retro-name"
+                                   class="input"
+                                   type="text"
+                                   @bind-Value="@Model.Name"
+                                   @onblur="@OnParticipantNameChanged"
+                                   placeholder="Enter your name, so we know who you are" />
                     </div>
 
                     <ValidationMessage For="() => Model.Name"></ValidationMessage>
+                    @if (this.ShowParticipantAlreadyJoinedWarning)
+                    {
+                        <p class="help is-info">@Model.Name has already joined the retrospective. If this was not you, please choose a different name.</p>
+                    }
                 </div>
 
                 @if (UseOwnColor)
@@ -62,7 +73,7 @@ else
                     <div class="field">
                         <label class="label" for="retro-color">Your custom color</label>
                         <div class="control">
-                            <InputText id="retro-color" type="color" class="input" @bind-Value="@Model.Color" />
+                            <InputText id="retro-color" type="color" class="input" @bind-Value="@Model.Color" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
                         </div>
 
                         <ValidationMessage For="() => Model.Color"></ValidationMessage>
@@ -78,7 +89,7 @@ else
                                     <InputSelect @bind-Value="@Model.Color">
                                         <option value="">Select an option</option>
                                         @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
-                                            <option style="color: #@color.HexString" value="@color.HexString">@color.Name</option>
+                                            <option style="color: #@color.HexString" value="#@color.HexString">@color.Name</option>
                                         }
                                     </InputSelect>
                                 </div>
@@ -95,7 +106,7 @@ else
                 <div class="field">
                     <div class="control">
                         <label class="checkbox">
-                            <InputCheckbox @bind-Value="@Model.JoiningAsManager" />
+                            <InputCheckbox @bind-Value="@Model.JoiningAsManager" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
                             I'm the manager of this retrospective
                         </label>
                     </div>
@@ -150,6 +161,7 @@ else
     private JoinRetrospectiveInfo RetrospectiveInfo { get; set; }
     private IList<AvailableParticipantColorModel> AvailablePredefinedColors { get; set; }
     private bool ShowErrorMessage { get; set; }
+    private bool ShowParticipantAlreadyJoinedWarning { get; set; }
 
     [Parameter]
     public JoinRetrospectiveCommand Model { get; set; } = new JoinRetrospectiveCommand();
@@ -177,6 +189,33 @@ else
         this.UseOwnColor = true;
     }
 
+    private async Task OnParticipantNameChanged()
+    {
+        if (String.IsNullOrEmpty(this.Model.Name))
+        {
+            return;
+        }
+
+        bool wasShowingParticipantWarning = this.ShowParticipantAlreadyJoinedWarning;
+
+        ParticipantInfo result = await this.Mediator.Send(new GetParticipantQuery(this.Model.Name, this.RetroId));
+        this.ShowParticipantAlreadyJoinedWarning = result != null;
+
+        if (result != null)
+        {
+            // Disable controls as the choice has already been made
+            this.Model.JoiningAsManager = result.IsManager;
+            this.UseOwnColor = this.AvailablePredefinedColors.Any(x => x.HasSameColors(result.Color)) == false;
+            this.Model.Color = "#" + result.Color.HexString;
+        } else if (wasShowingParticipantWarning)
+        {
+            // Reset form to use normal controls
+            this.UseOwnColor = false;
+            this.Model.Color = null;
+            this.Model.JoiningAsManager = false;
+        }
+    }
+
     private async Task HandleValidSubmit()
     {
         this.ShowErrorMessage = false;
@@ -193,6 +232,7 @@ else
             this.ShowErrorMessage = true;
 
             Logger.LogError(ex, $"Error joining retrospective {this.RetroId} with name {this.Model.Name}");
+            return;
         }
 
         this.NavigationManager.NavigateTo("retrospective/" + this.RetroId + "/lobby");

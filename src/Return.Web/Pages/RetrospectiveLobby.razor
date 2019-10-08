@@ -1,32 +1,38 @@
 @page "/retrospective/{retroId}/lobby"
-@using System.Threading
+@using Return.Application.Common
+@using Return.Application.Common.Abstractions
+@using Return.Application.Common.Models
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
-@using Return.Domain.Entities
 @inherits MediatorComponent
+@inject ICurrentParticipantService CurrentParticipantService
+@inject NavigationManager NavigationManager
 
 @if (this.RetrospectiveStatus == null)
 {
+    <ErrorMessage Text="This retrospective cannot be found!"/>
     return;
 }
 
 <h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
 
 <div class="columns">
-    <CascadingValue Value=@this.RetrospectiveStatus Name="RetrospectiveStatus">
-        <div class="column is-three-quarters">
-           <div class="columns">
-               @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
-               {
-                   <div class="column">
-                       <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
-                   </div>
-               }
-           </div>
-        </div>
+    <CascadingValue Value=@this.CurrentParticipant Name="CurrentParticipant">
+        <CascadingValue Value=@this.RetrospectiveStatus Name="RetrospectiveStatus">
+            <div class="column is-three-quarters">
+               <div class="columns">
+                   @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+                   {
+                       <div class="column">
+                           <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId"/>
+                       </div>
+                   }
+               </div>
+            </div>
+        </CascadingValue>
     </CascadingValue>
 
     <div class="column">
-        <RetrospectiveOnlineList RetroId="@this.RetroId"/>
+        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant"/>
     </div>
 </div>
 
@@ -37,10 +43,30 @@
     [Parameter]
     public string RetroId { get; set; }
 
+    [Parameter]
+    public CurrentParticipantModel CurrentParticipant { get; set; }
+
     public RetrospectiveStatus RetrospectiveStatus { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
-        this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
+        CurrentParticipantModel currentParticipant = await this.CurrentParticipantService.GetParticipant();
+
+        if (!currentParticipant.IsAuthenticated)
+        {
+            this.NavigationManager.NavigateTo("/retrospective/" + this.RetroId + "/join");
+            return;
+        }
+
+        this.CurrentParticipant = currentParticipant;
+
+        try
+        {
+            this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
+        }
+        catch (NotFoundException)
+        {
+            this.RetrospectiveStatus = null;
+        }
     }
 }

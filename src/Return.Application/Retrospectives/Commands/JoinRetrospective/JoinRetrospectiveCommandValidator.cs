@@ -48,6 +48,10 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
                 return true;
             }
 
+            if (String.IsNullOrEmpty(hash)) {
+                return false;
+            }
+
             return this._passphraseService.ValidatePassphrase(passphrase, hash);
         }
     }

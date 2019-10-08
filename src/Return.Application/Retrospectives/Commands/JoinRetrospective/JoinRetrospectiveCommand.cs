@@ -7,10 +7,11 @@
 
 namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
     using MediatR;
+    using Queries.GetParticipantsInfo;
 
 #nullable disable
 
-    public sealed class JoinRetrospectiveCommand : IRequest {
+    public sealed class JoinRetrospectiveCommand : IRequest<ParticipantInfo> {
         public string Name { get; set; }
         public string Color { get; set; }
 

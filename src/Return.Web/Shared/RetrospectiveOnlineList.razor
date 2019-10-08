@@ -3,6 +3,7 @@
 @using Return.Application.Notifications.RetrospectiveJoined
 
 @using System.Diagnostics
+@using Return.Application.Common.Models
 @using Return.Application.Notifications
 @using Return.Application.Retrospectives.Queries.GetParticipantsInfo
 
@@ -35,7 +36,7 @@
             <ul>
                 @foreach (ParticipantInfo participant in this.Participants.Participants)
                 {
-                    <li>
+                    <li class="@(participant.Name == this.CurrentParticipant.Name ? "is-current-participant" : null)">
                         @RenderParticipant(participant)
                     </li>
                 }
@@ -53,7 +54,11 @@
         Debug.Assert(this.Participants != null);
     }
 
-    protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>@<span style="color: #@participantInfo.Color.HexString">@participantInfo.Name</span>;
+    protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>
+        @<span style="color: #@participantInfo.Color.HexString">
+            @if (participantInfo.IsManager) { <span class="fas fa-crown"></span> }
+            @participantInfo.Name
+         </span>;
 
     #nullable disable
 
@@ -61,6 +66,9 @@
 
     [Parameter]
     public string RetroId { get; set; }
+
+    [Parameter]
+    public CurrentParticipantModel CurrentParticipant { get; set; }
 
     public Task OnParticipantJoinedRetrospective(RetrospectiveEvent<ParticipantInfo> eventArgs)
     {
