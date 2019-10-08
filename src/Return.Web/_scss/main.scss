@@ -26,8 +26,15 @@ $primary-invert: $pink-invert;
 // 4. Import the rest of Bulma
 */
 
+// Import font awesome
+$fa-font-path: '/build/fonts';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
+
+// Import bulma
 @import '../node_modules/bulma/bulma';
 
+// App rules
 .navbar-brand > .navbar-item {
     font-weight: bold;
 }
@@ -72,5 +79,13 @@ p {
         filter: blur(2px);
         text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         color: transparent;
+    }
+}
+
+.online-list {
+    &__item {
+        &--is-self {
+            font-style: italic;
+        }
     }
 }

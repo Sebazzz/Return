@@ -7,28 +7,30 @@
     "license": "GPLv3",
     "private": true,
     "devDependencies": {
-        "husky": "^3.0.7",
-        "prettier": "^1.18.2",
-        "pretty-quick": "^1.11.1",
         "@fortawesome/fontawesome-free": "^5.11.2",
         "autoprefixer": "^9.6.4",
         "bulma": "^0.7.5",
+        "husky": "^3.0.7",
         "node-sass": "^4.12.0",
-        "postcss-cli": "^6.1.3"
+        "postcss-cli": "^6.1.3",
+        "prettier": "^1.18.2",
+        "pretty-quick": "^1.11.1"
     },
     "scripts": {
-        "css-deploy": "yarn css-build && yarn css-postcss",
-        "css-build": "node-sass _scss/main.scss obj/css/main.css",
-        "css-postcss": "postcss --use autoprefixer --output wwwroot/build/css/main.css obj/css/main.css",
-        "css-watch": "yarn css-build --watch",
-        "build": "yarn css-deploy",
+        "build": "gulp build",
         "pre-commit": "../../pre-commit",
         "test": "echo 0",
-        "watch": "yarn css-watch"
+        "watch": "gulp sass:watch"
     },
     "husky": {
         "hooks": {
             "pre-commit": "yarn pre-commit"
         }
+    },
+    "dependencies": {
+        "gulp": "^4.0.2",
+        "gulp-autoprefixer": "^7.0.1",
+        "gulp-cli": "^2.2.0",
+        "gulp-sass": "^4.0.2"
     }
 }
