@@ -47,7 +47,9 @@ namespace Return.Persistence.Migrations
                     Title = table.Column<string>(maxLength: 256, nullable: false),
                     ManagerHashedPassphrase = table.Column<string>(unicode: false, fixedLength: true, maxLength: 64, nullable: false),
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false),
-                    Options_MaximumNumberOfVotes = table.Column<int>(nullable: true)
+                    Options_MaximumNumberOfVotes = table.Column<int>(nullable: true),
+                    WorkflowData_CurrentWorkflowInitiationTimestamp = table.Column<DateTimeOffset>(nullable: true),
+                    WorkflowData_CurrentWorkflowTimeLimitInMinutes = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,7 +116,7 @@ namespace Return.Persistence.Migrations
                     RetrospectiveId = table.Column<int>(nullable: false),
                     Text = table.Column<string>(maxLength: 2048, nullable: false),
                     LaneId = table.Column<int>(nullable: false),
-                    ParticipantId = table.Column<int>(nullable: true),
+                    ParticipantId = table.Column<int>(nullable: false),
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false),
                     GroupId = table.Column<int>(nullable: true)
                 },

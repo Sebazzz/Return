@@ -20,12 +20,14 @@
 
     <div class="field">
         <label class="label">@TimeLabelText</label>
-        <div class="control has-icons-left">
-            <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.TimeInMinutes" style="width: 8em" />
-            <span class="icon is-small is-left">
-                <i class="fas fa-stopwatch"></i>
-            </span>
-
+        
+        <div class="control">
+            <div class="control has-icons-left">
+                <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.TimeInMinutes" style="width: 8em" />
+                <span class="icon is-small is-left">
+                    <i class="fas fa-stopwatch"></i>
+                </span>
+             </div>
             <ValidationMessage For="() => this.Model.TimeInMinutes" />
         </div>
     </div>

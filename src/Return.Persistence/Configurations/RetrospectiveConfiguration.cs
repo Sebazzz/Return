@@ -17,6 +17,7 @@ namespace Return.Persistence.Configurations {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             builder.HasKey(e => e.Id);
+
             builder.OwnsOne(e => e.UrlId,
                 e => {
                     e.WithOwner();
@@ -40,10 +41,13 @@ namespace Return.Persistence.Configurations {
 
             builder.OwnsOne(e => e.WorkflowData,
                 e => {
+                    e.Property(x => x.CurrentWorkflowTimeLimitInMinutes);
+                    e.Property(x => x.CurrentWorkflowInitiationTimestamp);
+
                     e.WithOwner();
                 });
 
-            builder.UsePropertyAccessMode(PropertyAccessMode.PreferField);
+            builder.UsePropertyAccessMode(PropertyAccessMode.PreferProperty);
         }
     }
 }

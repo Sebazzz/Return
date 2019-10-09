@@ -33,6 +33,7 @@ $fa-font-path: '/build/fonts';
 
 // Import bulma
 @import '../node_modules/bulma/bulma';
+@import 'circle-progress/circle';
 
 // App rules
 .navbar-brand > .navbar-item {

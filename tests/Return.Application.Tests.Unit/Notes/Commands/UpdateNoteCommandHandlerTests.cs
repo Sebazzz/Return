@@ -14,6 +14,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
     using Application.Notes.Commands.UpdateNote;
     using Application.Notifications.NoteUpdated;
     using Domain.Entities;
+    using Domain.Services;
     using MediatR;
     using NSubstitute;
     using NUnit.Framework;
@@ -22,10 +23,10 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
     [TestFixture]
     public sealed class UpdateNoteCommandHandlerTests : CommandTestBase {
         [Test]
-        public async Task UpdateNoteCommandHandler_InvalidNoteId_ThrowsNotFoundException() {
+        public void UpdateNoteCommandHandler_InvalidNoteId_ThrowsNotFoundException() {
             // Given
             var command = new UpdateNoteCommand { Id = 1, Text = "HEY!" };
-            var handler = new UpdateNoteCommandHandler(this.Context, Substitute.For<IMediator>(), Substitute.For<ISecurityValidator>());
+            var handler = new UpdateNoteCommandHandler(this.Context, Substitute.For<IMediator>(), Substitute.For<ISecurityValidator>(), Substitute.For<ITextAnonymizingService>());
 
             // When
             TestDelegate action = () => handler.Handle(command, CancellationToken.None).GetAwaiter().GetResult();
@@ -58,7 +59,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
             var mediator = Substitute.For<IMediator>();
             var securityValidator = Substitute.For<ISecurityValidator>();
 
-            var handler = new UpdateNoteCommandHandler(this.Context, mediator, securityValidator);
+            var handler = new UpdateNoteCommandHandler(this.Context, mediator, securityValidator, Substitute.For<ITextAnonymizingService>());
 
             // When
             await handler.Handle(updateCommand, CancellationToken.None);

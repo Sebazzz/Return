@@ -1,0 +1,61 @@
+@using System.Threading
+@implements IDisposable
+
+<div class="c100 @("p"+ ConstrainedPercent)">
+    <span>@(Text)</span>
+    <div class="slice">
+        <div class="bar"></div>
+        <div class="fill"></div>
+    </div>
+</div>
+
+@code {
+    private int ConstrainedPercent => (int) Math.Ceiling(Math.Min(Math.Max(this.Percent, 0), 100));
+
+    [Parameter]
+    public double Percent { get; set; }
+
+    [Parameter]
+    public string Text { get; set; } = "-";
+
+    [Parameter]
+    public int IntervalMilliseconds { get; set; } = 1000;
+
+    [Parameter]
+    public Func<bool> Callback { get; set; } = () => false;
+
+    private System.Timers.Timer? _runningTimer = null;
+
+    public void Start()
+    {
+        if (this._runningTimer == null)
+        {
+            this._runningTimer = new System.Timers.Timer(this.IntervalMilliseconds);
+            this._runningTimer.Elapsed += delegate
+            {
+                this.InvokeAsync(() =>
+                {
+                    bool shouldContinue = this.Callback.Invoke();
+
+                    if (!shouldContinue) {
+                        this._runningTimer.Stop();
+                        this._runningTimer = null;
+
+                        this.StateHasChanged();
+                        return;
+                    }
+                   
+                    this.StateHasChanged();
+                });
+            };
+            this._runningTimer.Start();
+        }
+    }
+
+    public void Dispose()
+    {
+        this._runningTimer?.Stop();
+        this._runningTimer?.Dispose();
+        this._runningTimer = null;
+    }
+}

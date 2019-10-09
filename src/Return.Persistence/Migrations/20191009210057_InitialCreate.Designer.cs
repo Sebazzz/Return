@@ -10,7 +10,7 @@ using Return.Persistence;
 namespace Return.Persistence.Migrations
 {
     [DbContext(typeof(ReturnDbContext))]
-    [Migration("20191007084208_InitialCreate")]
+    [Migration("20191009210057_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,7 +37,7 @@ namespace Return.Persistence.Migrations
                     b.Property<int>("LaneId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ParticipantId")
+                    b.Property<int>("ParticipantId")
                         .HasColumnType("int");
 
                     b.Property<int>("RetrospectiveId")
@@ -222,7 +222,8 @@ namespace Return.Persistence.Migrations
                     b.HasOne("Return.Domain.Entities.Participant", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
                         .WithMany("Notes")
@@ -331,6 +332,27 @@ namespace Return.Persistence.Migrations
                                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                             b1.Property<int>("MaximumNumberOfVotes")
+                                .HasColumnType("int");
+
+                            b1.HasKey("RetrospectiveId");
+
+                            b1.ToTable("Retrospective");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RetrospectiveId");
+                        });
+
+                    b.OwnsOne("Return.Domain.Entities.RetrospectiveWorkflowData", "WorkflowData", b1 =>
+                        {
+                            b1.Property<int>("RetrospectiveId")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int")
+                                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                            b1.Property<DateTimeOffset>("CurrentWorkflowInitiationTimestamp")
+                                .HasColumnType("datetimeoffset");
+
+                            b1.Property<int>("CurrentWorkflowTimeLimitInMinutes")
                                 .HasColumnType("int");
 
                             b1.HasKey("RetrospectiveId");

@@ -309,3 +309,8 @@ space_after_colon_in_inheritance_clause = true
 
 space_before_type_parameter_constraint_colon= true
 space_after_type_parameter_constraint_colon= true
+
+[*.cs]
+
+# CS0660: Type defines operator == or operator != but does not override Object.Equals(object o)
+dotnet_diagnostic.CS0660.severity = none

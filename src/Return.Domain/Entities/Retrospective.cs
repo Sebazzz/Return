@@ -16,14 +16,15 @@ namespace Return.Domain.Entities {
     /// <summary>
     /// A retrospective consists of notes created by participants. A retrospective has a unique identifier.
     /// </summary>
+    [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "EFCore")]
     public class Retrospective {
         private ICollection<Note>? _notes;
         private ICollection<NoteGroup>? _noteGroups;
         private Collection<Participant>? _participants;
 
         private readonly RetroIdentifier _urlId = RetroIdentifierService.CreateNewInternal();
-        private readonly RetrospectiveOptions _options = new RetrospectiveOptions();
-        private readonly RetrospectiveWorkflowData _workflowData = new RetrospectiveWorkflowData();
+        private RetrospectiveOptions? _options;
+        private RetrospectiveWorkflowData? _workflowData;
 
         public int Id { get; set; }
 
@@ -59,8 +60,15 @@ namespace Return.Domain.Entities {
 
         public DateTimeOffset CreationTimestamp { get; set; }
 
-        public RetrospectiveOptions Options => this._options;
-        public RetrospectiveWorkflowData WorkflowData => this._workflowData;
+        public RetrospectiveOptions Options {
+            get => this._options ??= new RetrospectiveOptions();
+            set => this._options = value;
+        }
+
+        public RetrospectiveWorkflowData WorkflowData {
+            get => this._workflowData ??= new RetrospectiveWorkflowData();
+            set => this._workflowData = value;
+        }
     }
 
     public class RetrospectiveOptions {

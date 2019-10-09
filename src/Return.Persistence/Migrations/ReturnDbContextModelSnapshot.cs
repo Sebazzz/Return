@@ -35,7 +35,7 @@ namespace Return.Persistence.Migrations
                     b.Property<int>("LaneId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ParticipantId")
+                    b.Property<int>("ParticipantId")
                         .HasColumnType("int");
 
                     b.Property<int>("RetrospectiveId")
@@ -220,7 +220,8 @@ namespace Return.Persistence.Migrations
                     b.HasOne("Return.Domain.Entities.Participant", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
                         .WithMany("Notes")

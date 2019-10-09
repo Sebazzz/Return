@@ -1,0 +1,116 @@
+@using System.Globalization
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Common
+@inject ISystemClock SystemClock
+
+<div class="has-text-centered @GetCssClass()">
+    <Timer @ref="@_waitTimer"
+            Percent="@CalculatePercent()"
+            Text="@GetTimerText()"
+            Callback="@OnTimerCallback"/>
+
+    <div class="is-clearfix"></div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public RetrospectiveStatus? RetrospectiveStatus { get; set; }
+    
+    #pragma warning disable 649 // @ref
+    private Timer? _waitTimer;
+#pragma warning restore 649
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        this.StartTimerIfNecessary();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        this.StartTimerIfNecessary();
+    }
+
+    private void StartTimerIfNecessary()
+    {
+        if (this._waitTimer != null && this.RetrospectiveStatus != null && !this.RetrospectiveStatus.WorkflowStatus.HasReachedTimeLimit(this.SystemClock.CurrentTimeOffset))
+        {
+            this._waitTimer?.Start();
+        }
+    }
+
+    private bool OnTimerCallback()
+    {
+        RetrospectiveStatus? status = this.RetrospectiveStatus;
+        if (status == null)
+        {
+            return false;
+        }
+
+        RetrospectiveWorkflowStatus workflowStatus = status.WorkflowStatus;
+
+        this.StateHasChanged();
+        return !workflowStatus.HasReachedTimeLimit(this.SystemClock.CurrentTimeOffset);
+    }
+
+    private string GetTimerText()
+    {
+        RetrospectiveStatus? status = this.RetrospectiveStatus;
+        if (status == null)
+        {
+            return "0:00";
+        }
+
+        RetrospectiveWorkflowStatus workflowStatus = status.WorkflowStatus;
+        TimeSpan timeLeft = workflowStatus.GetTimeLeft(this.SystemClock.CurrentTimeOffset);
+
+        return timeLeft.ToString(@"mm\:ss", CultureInfo.CurrentCulture);
+    }
+
+    private double CalculatePercent()
+    {
+        RetrospectiveStatus? status = this.RetrospectiveStatus;
+        if (status == null)
+        {
+            return 0;
+        }
+
+        RetrospectiveWorkflowStatus workflowStatus = status.WorkflowStatus;
+
+        TimeSpan timeLeft = workflowStatus.GetTimeLeft(this.SystemClock.CurrentTimeOffset);
+
+        double timeLeftMinutes = timeLeft.TotalMinutes;
+        double totalTimeMinutes = workflowStatus.TimeLimitInMinutes;
+        double percentage = ( totalTimeMinutes - timeLeftMinutes ) / totalTimeMinutes * 100;
+
+        return percentage;
+    }
+
+    private string GetCssClass()
+    {
+        RetrospectiveStatus? status = this.RetrospectiveStatus;
+        if (status == null)
+        {
+            return String.Empty;
+        }
+
+        RetrospectiveWorkflowStatus workflowStatus = status.WorkflowStatus;
+        double secondsLeft = workflowStatus.GetTimeLeft(this.SystemClock.CurrentTimeOffset).TotalSeconds;
+
+        string subClass = "normal";
+        if (secondsLeft <= 30)
+        {
+            subClass = "warning";
+        }
+
+        if (secondsLeft < 15)
+        {
+            subClass = "danger";
+        }
+
+        return $"workflow-status-timer workflow-status-timer--{subClass}";
+    }
+}
