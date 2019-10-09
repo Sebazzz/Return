@@ -1,17 +1,26 @@
+@using Microsoft.Extensions.Logging
 @using Return.Application.Common.Models
-@using Return.Application.Notes.Commands
+@using Return.Application.Notes.Commands.UpdateNote
+@using Return.Application.Notifications.NoteUpdated
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Web.Services
+@inherits SubscribingComponent<Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber>
+@implements Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber
+@inject ILogger<Note> Logger
 
 <div class="box @(this.CanView() ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
     @if (this.CanEdit())
     {
-    <EditForm Model="@Data" OnValidSubmit="OnHandleNoteFormSubmit">
-        <InputTextArea class="textarea box__content is-small has-fixed-size" 
-                       rows="3" 
-                       placeholder="Enter your text here" 
-                       @bind-Value="@Data.Text" 
-                       @oninput="@OnHandleNoteUpdateTyping"/>
-    </EditForm>
+        @if (this.ShowErrorMessage)
+        {
+            <p class="has-text-warning has-text-centered">Couldn't save, please try again!</p>
+        }
+
+        <textarea class="textarea box__content is-small has-fixed-size"
+                  rows="2"
+                  placeholder="Enter your text here" 
+                  @bind-value="@TextData" 
+                  @bind-value:event="oninput"></textarea>
     }
     else
     {
@@ -30,6 +39,21 @@
 
     public UpdateNoteCommand Model { get; } = new UpdateNoteCommand();
 
+    private bool ShowErrorMessage { get; set; }
+    private readonly AutoResettingBoolean _shouldRenderValue = new AutoResettingBoolean(true);
+
+    private string TextData
+    {
+        get => this.Model.Text;
+        set
+        {
+            this.Model.Text = value;
+            this.OnHandleNoteUpdateTyping();
+        }
+    }
+
+    protected override bool ShouldRender() => this._shouldRenderValue.GetValue();
+
     protected override void OnParametersSet()
     {
         if (this.Data != null)
@@ -41,17 +65,52 @@
         base.OnParametersSet();
     }
 
-    protected Task OnHandleNoteFormSubmit()
+    public Task OnNoteUpdated(NoteUpdate note)
     {
-        return Task.CompletedTask;
+        if (note.Id != this.Data.Id || this.CanEdit() || this.Data == null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return this.InvokeAsync(() =>
+        {
+            this.Data.Text = note.Text;
+            this.Model.Text = note.Text;
+
+            this.StateHasChanged();
+        });
     }
 
-    protected Task OnHandleNoteUpdateTyping()
+    private void OnHandleNoteUpdateTyping()
     {
-        // TODO: dispatch update
-        return Task.CompletedTask;
+        this.Data.Text = this.Model.Text;
+        this.ShowErrorMessage = false;
+
+        // Blazor calls StateChanged (which then calls ShouldRender) after the
+        // immediate executing of this method (returning the task) and after
+        // the task execution. Since we don't change any other state, we try
+        // to avoid much traffic and re-render by disabling rendering.
+        async Task OnHandleNoteUpdateWorker()
+        {
+            try
+            {
+                await this.Mediator.Send(this.Model);
+
+                this._shouldRenderValue.Set();
+            }
+            catch (Exception ex)
+            {
+    // We might just have a race condition here.
+                this.ShowErrorMessage = this.CanEdit();
+
+                this.Logger.LogError(ex, $"Error updating note #{this.Model.Id} with text '{this.Model.Text}'");
+            }
+        }
+
+        this._shouldRenderValue.Set();
+        this.InvokeAsync(OnHandleNoteUpdateWorker);
     }
 
     private bool CanEdit() => this.RetrospectiveStatus.IsEditingNotesAllowed && this.Data.IsOwnedByCurrentUser;
-    private bool CanView() => this.RetrospectiveStatus.IsViewingOtherNotesAllowed && this.Data.IsOwnedByCurrentUser;
+    private bool CanView() => this.RetrospectiveStatus.IsViewingOtherNotesAllowed || this.Data.IsOwnedByCurrentUser;
 }

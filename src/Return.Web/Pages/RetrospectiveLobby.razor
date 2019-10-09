@@ -26,7 +26,7 @@
                         @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
                         {
                             <div class="column">
-                                <NoteLane @key="lane.Id" Lane="@lane" RetroId="@this.RetroId" />
+                                <NoteLane @key="lane.Id" Lane="@lane" />
                             </div>
                         }
                     </div>

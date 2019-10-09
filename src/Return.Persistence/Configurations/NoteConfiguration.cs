@@ -22,7 +22,7 @@ namespace Return.Persistence.Configurations {
 
             builder.HasOne(e => e.Lane).WithMany().IsRequired().OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.Participant).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(e => e.Participant).WithMany().OnDelete(DeleteBehavior.Restrict).HasForeignKey(n => n.ParticipantId);
 
             builder.HasOne(e => e.Group).WithMany().IsRequired(false).OnDelete(DeleteBehavior.SetNull);
         }

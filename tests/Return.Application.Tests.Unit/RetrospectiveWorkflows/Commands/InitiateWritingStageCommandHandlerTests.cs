@@ -42,13 +42,15 @@ namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
             // When
             await handler.Handle(request, CancellationToken.None);
 
+            this.RefreshObject();
+
             // Then
             Assert.That(this.Retrospective.CurrentStage, Is.EqualTo(RetrospectiveStage.Writing));
 
             Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowInitiationTimestamp, Is.EqualTo(this.SystemClockMock.CurrentTimeOffset));
             Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowTimeLimitInMinutes, Is.EqualTo(request.TimeInMinutes));
 
-            await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(this.Retrospective, CancellationToken.None);
+            await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(Arg.Any<Retrospective>(), CancellationToken.None);
         }
     }
 }

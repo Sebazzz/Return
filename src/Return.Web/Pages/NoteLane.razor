@@ -1,8 +1,13 @@
-@inherits MediatorComponent
-@using System.Threading
+@inherits SubscribingComponent<Return.Application.Notifications.NoteAdded.INoteAddedSubscriber>
+@implements Return.Application.Notifications.NoteAdded.INoteAddedSubscriber
+@inject ILogger<NoteLane> Logger
+@using Microsoft.Extensions.Logging
 @using Return.Application.Common.Models
+@using Return.Application.Notes.Commands.AddNote
+@using Return.Application.Notifications.NoteAdded
 @using Return.Application.RetrospectiveLanes.Queries
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Domain.ValueObjects
 
 @if (this.Lane == null)
 {
@@ -21,6 +26,20 @@
     <Note @key="note.Id" Data="@note"/>
 }
 
+@if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
+{
+    @if (this.ShowErrorMessage)
+    {
+        <ErrorMessage />
+    }
+
+    <p class="has-text-centered">
+        <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
+            Add a note
+        </button>    
+    </p>
+}
+ 
 @code {
 
     #nullable disable
@@ -28,13 +47,60 @@
     [Parameter]
     public RetrospectiveLane Lane { get; set; }
 
-    [Parameter]
-    public string RetroId { get; set; }
+    [CascadingParameter]
+    public CurrentParticipantModel CurrentParticipant { get; set; }
+
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; }
+
+    [CascadingParameter]
+    public RetroIdentifier RetroId { get; set; }
 
     private RetrospectiveLaneContent Contents { get; set; }
 
+    private bool ShowErrorMessage { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId, this.Lane?.Id ?? 0));
+        this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId.StringId, this.Lane?.Id ?? 0));
+    }
+
+    private async Task AddNote()
+    {
+        try
+        {
+            this.ShowErrorMessage = false;
+
+            RetrospectiveNote result = await this.Mediator.Send(new AddNoteCommand(this.RetroId.StringId, this.Lane.Id));
+
+            this.Contents.Notes.Add(result);
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorMessage = true;
+
+            this.Logger.LogError(ex, $"Unable to add note for {this.RetroId} in lane {this.Lane?.Id}");
+        }
+    }
+
+    public Task OnNoteAdded(NoteAddedNotification notification)
+    {
+        if (notification.LaneId != this.Lane?.Id ||
+            notification.RetroId != this.RetroId.StringId ||
+            notification.Note.ParticipantId == this.CurrentParticipant.Id)
+        {
+            // We can ignore this notification if:
+            // 1. This isn't our lane
+            // 2. We added this notification (we caused this notification)
+            // 3. This isn't our retrospective
+            return Task.CompletedTask;
+        }
+
+        return this.InvokeAsync(() =>
+        {
+            this.Contents.Notes.Add(notification.Note);
+            
+            this.StateHasChanged();
+        });
     }
 }

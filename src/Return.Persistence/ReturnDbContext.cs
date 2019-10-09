@@ -7,16 +7,21 @@
 
 namespace Return.Persistence {
     using System;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Application.Common.Abstractions;
     using Conventions;
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-    public sealed class ReturnDbContext : DbContext, IReturnDbContext {
+    public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateManager {
+        private readonly DbContextOptions _options;
         private readonly IDatabaseOptions? _databaseOptions;
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public ReturnDbContext(DbContextOptions options) : base(options) {
+            this._options = options;
         }
 
         public ReturnDbContext(IDatabaseOptions databaseOptions) {
@@ -52,5 +57,12 @@ namespace Return.Persistence {
             // Conventions
             modelBuilder.RemovePluralizingTableNameConvention();
         }
+
+        public Task Reload(object entity, CancellationToken cancellationToken) {
+            EntityEntry entry = this.Entry(entity);
+            return entry.ReloadAsync(cancellationToken);
+        }
+
+        public IReturnDbContext CreateForEditContext() => this._databaseOptions != null ? new ReturnDbContext(this._databaseOptions) : new ReturnDbContext(this._options);
     }
 }

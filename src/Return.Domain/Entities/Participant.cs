@@ -6,10 +6,11 @@
 // ******************************************************************************
 
 namespace Return.Domain.Entities {
+    using Abstractions;
     using ValueObjects;
 
 #nullable disable
-    public class Participant {
+    public class Participant : IIdPrimaryKey {
         public int Id { get; set; }
 
         public ParticipantColor Color { get; set; }

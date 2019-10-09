@@ -7,6 +7,7 @@
 
 namespace Return.Domain.Entities {
     using System;
+    using Abstractions;
 
     // These members are mandatory. Let's don't do nullability here for clarity sake.
 #nullable disable
@@ -14,7 +15,7 @@ namespace Return.Domain.Entities {
     /// <summary>
     /// A note is a note made by a participant in the retrospective. 
     /// </summary>
-    public class Note {
+    public class Note : IOwnedByParticipant, IIdPrimaryKey {
         public int Id { get; set; }
 
         public Retrospective Retrospective { get; set; }
@@ -24,6 +25,7 @@ namespace Return.Domain.Entities {
         public NoteLane Lane { get; set; }
 
         public Participant Participant { get; set; }
+        public int ParticipantId { get; set; }
 
         public DateTimeOffset CreationTimestamp { get; set; }
 

@@ -52,8 +52,7 @@ namespace Return.Domain.Tests.Unit.Services {
         }
 
         [Test]
-        [Repeat(256)]
-        public void PassphraseService_Passphrase_CreatesValidPassphrase([Random(1, Distinct = true)] int randomInit) {
+        public void PassphraseService_Passphrase_CreatesValidPassphrase([Random(10, Distinct = true)] int randomInit) {
             // Given
             string passphrase = new Random(randomInit).Next(0x13371337, Int32.MaxValue).ToString("x4", Culture.Invariant);
 

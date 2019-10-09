@@ -9,11 +9,10 @@ namespace Return.Application {
     using System.Reflection;
     using AutoMapper;
     using Common.Behaviours;
+    using Common.Security;
     using MediatR;
     using Microsoft.Extensions.DependencyInjection;
     using Notifications;
-    using Notifications.RetrospectiveJoined;
-    using Notifications.RetrospectiveStatusUpdated;
     using Retrospectives.Queries.GetRetrospectiveStatus;
     using RetrospectiveWorkflows.Common;
 
@@ -22,14 +21,14 @@ namespace Return.Application {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(opts => opts.AsScoped(), Assembly.GetExecutingAssembly());
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehavior<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
 
             services.AddScoped<IRetrospectiveStatusMapper, RetrospectiveStatusMapper>();
             services.AddScoped<IRetrospectiveStatusUpdateDispatcher, RetrospectiveStatusUpdateDispatcher>();
+            services.AddScoped<ISecurityValidator, SecurityValidator>();
 
-            services.AddNotificationDispatcher<RetrospectiveJoinedNotificationDispatcher>();
-            services.AddNotificationDispatcher<RetrospectiveStatusUpdatedNotificationDispatcher>();
+            services.AddNotificationDispatchers();
 
             return services;
         }

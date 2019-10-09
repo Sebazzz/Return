@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : RequestValidationBehavior.cs
+//  File:           : RequestValidationBehaviour.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
@@ -16,11 +16,11 @@ namespace Return.Application.Common.Behaviours {
     using MediatR;
     using ValidationException = Return.Application.Common.ValidationException;
 
-    public sealed class RequestValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public sealed class RequestValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse> {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-        public RequestValidationBehavior(IEnumerable<IValidator<TRequest>> validators) {
+        public RequestValidationBehaviour(IEnumerable<IValidator<TRequest>> validators) {
             this._validators = validators;
         }
 

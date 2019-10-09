@@ -16,6 +16,8 @@ namespace Return.Persistence {
 
             services.AddScoped(svc => new ReturnDbContext(svc.GetRequiredService<IDatabaseOptions>()));
             services.ChainInterfaceImplementation<IReturnDbContext, ReturnDbContext>();
+            services.ChainInterfaceImplementation<IEntityStateManager, ReturnDbContext>();
+            services.ChainInterfaceImplementation<IReturnDbContextFactory, ReturnDbContext>();
 
             return services;
         }

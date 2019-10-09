@@ -18,24 +18,34 @@ namespace Return.Application.RetrospectiveWorkflows.Commands {
 
     public abstract class AbstractStageCommandHandler<TRequest> : IRequestHandler<TRequest> where TRequest : AbstractStageCommand, IRequest {
         private readonly IRetrospectiveStatusUpdateDispatcher _retrospectiveStatusUpdateDispatcher;
+        private readonly IReturnDbContextFactory _dbContextFactory;
 
-        protected IReturnDbContext DbContext { get; }
+#nullable disable
+        protected IReturnDbContext DbContext { get; private set; }
+#nullable enable
 
-        protected AbstractStageCommandHandler(IReturnDbContext returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher) {
-            this.DbContext = returnDbContext;
+        protected AbstractStageCommandHandler(IReturnDbContextFactory returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher) {
+            this._dbContextFactory = returnDbContext;
             this._retrospectiveStatusUpdateDispatcher = retrospectiveStatusUpdateDispatcher;
         }
 
         public async Task<Unit> Handle(TRequest request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            Retrospective? retrospective = await this.DbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
+            try {
+                this.DbContext = this._dbContextFactory.CreateForEditContext();
+                Retrospective? retrospective =
+                    await this.DbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
 
-            if (retrospective == null) {
-                throw new NotFoundException();
+                if (retrospective == null) {
+                    throw new NotFoundException();
+                }
+
+                return await this.HandleCore(request, retrospective, cancellationToken);
             }
-
-            return await this.HandleCore(request, retrospective, cancellationToken);
+            finally {
+                this.DbContext?.Dispose();
+            }
         }
 
         protected abstract Task<Unit> HandleCore(TRequest request, Retrospective retrospective, CancellationToken cancellationToken);

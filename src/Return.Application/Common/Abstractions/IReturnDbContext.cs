@@ -6,12 +6,13 @@
 // ******************************************************************************
 
 namespace Return.Application.Common.Abstractions {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
 
-    public interface IReturnDbContext {
+    public interface IReturnDbContext : IReturnDbContextFactory, IDisposable {
         DbSet<PredefinedParticipantColor> PredefinedParticipantColors { get; set; }
         DbSet<Note> Notes { get; set; }
         DbSet<NoteLane> NoteLanes { get; set; }

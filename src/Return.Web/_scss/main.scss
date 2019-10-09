@@ -68,11 +68,35 @@ p {
     margin-bottom: 1em;
 }
 
+@mixin box-textarea {
+    color: #fafafa;
+    text-shadow: 1px 1px 2px #000;
+}
+
 .box {
     &__content {
         background-color: inherit;
-        color: #fafafa;
-        text-shadow: 1px 1px 2px #000;
+        @include box-textarea;
+
+        &::placeholder {
+            @include box-textarea;
+        }
+
+        &::-moz-placeholder {
+            @include box-textarea;
+        }
+
+        &::-webkit-input-placeholder {
+            @include box-textarea;
+        }
+
+        &:-moz-placeholder {
+            @include box-textarea;
+        }
+
+        &:-ms-input-placeholder {
+            @include box-textarea;
+        }
     }
 
     &--blurred &__content {

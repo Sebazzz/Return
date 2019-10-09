@@ -5,7 +5,7 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notes.Commands {
+namespace Return.Application.Notes.Commands.UpdateNote {
     using MediatR;
 
 #nullable disable

@@ -9,6 +9,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
     using System.Drawing;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common.Abstractions;
     using Application.RetrospectiveWorkflows.Common;
     using Domain.Entities;
     using NSubstitute;
@@ -49,6 +50,11 @@ namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
         public void SetUp() {
             this.RetrospectiveStatusUpdateDispatcherMock = Substitute.For<IRetrospectiveStatusUpdateDispatcher>();
             this.SystemClockMock = Substitute.For<ISystemClock>();
+        }
+
+        protected void RefreshObject() {
+            using IReturnDbContext newEditContext = this.Context.CreateForEditContext();
+            this.Retrospective = newEditContext.Retrospectives.Find(this.Retrospective.Id);
         }
 
         protected virtual void ConfigureRetrospective(Retrospective retrospective) { }
