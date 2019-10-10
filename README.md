@@ -4,7 +4,7 @@ Retrospective tool built in ASP.NET Core + Blazor
 
 Licensed: GNU GPL v3.0
 
-[![Build status](https://ci.appveyor.com/api/projects/status/TODO?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return)
+[![Build status](https://ci.appveyor.com/api/projects/status/7bjrmgtek7j080d7?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return)
 [![CircleCI](https://circleci.com/gh/Sebazzz/Return.svg?style=svg)](https://circleci.com/gh/Sebazzz/Return)
 [![Github CI](https://github.com/sebazzz/Return/workflows/Continuous%20integration/badge.svg)](https://github.com/Sebazzz/Return/actions?workflow=Continuous+integration)
 
