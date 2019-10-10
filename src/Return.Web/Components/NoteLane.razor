@@ -6,84 +6,89 @@
     return;
 }
 
-<h2 class="title has-text-centered">@Lane.Name</h2>
+<CascadingValue Value="this">
+    <h2 class="title has-text-centered">@Lane.Name</h2>
 
-@if (this.Contents == null)
-{
-    return;
-}
+    @if (this.Contents == null)
+    {
+        return;
+    }
 
-@* Note groups section *@
-@if (DisplayGroupHeaders())
-{
+    @* Note groups section *@
     @if (DisplayGroupHeaders())
     {
-        <h3 class="title has-text-centered is-size-4">Grouped notes</h3>
+        @if (DisplayGroupHeaders())
+        {
+            <h3 class="title has-text-centered is-size-4">Grouped notes</h3>
+        }
+
+        @foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+        {
+            <NoteGroup @key="@("ng" + noteGroup.Id)" Data="@noteGroup" CanEdit="@IsGroupingAllowed()" />
+        }
+
+        @if (this.Contents.Groups.Count == 0)
+        {
+            <div class="box">
+                <p>
+                    No notes have been grouped.
+                </p>
+            </div>
+        }
     }
 
-    @foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+    @* Notes section *@
+    @if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
     {
-        <NoteGroup @key="@("ng" + noteGroup.Id)" Data="@noteGroup" CanEdit="@IsGroupingAllowed()" />
+        @if (DisplayGroupHeaders())
+        {
+            <h3 class="title has-text-centered is-size-4">Ungrouped notes</h3>
+        }
+
+        @foreach (RetrospectiveNote note in this.Contents.Notes)
+        {
+            <Note @key="@("n" + note.Id)" Data="@note" />
+        }
+
+        @if (this.Contents.Notes.Count == 0)
+        {
+            <div class="box">
+                <p>
+                    All notes in this lane have been grouped.
+                </p>
+            </div>
+        }
     }
 
-    @if (this.Contents.Groups.Count == 0)
+    @* Action section *@
+    @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
     {
-        <div class="box">
-            <p>
-                No notes have been grouped.
-            </p>
-        </div>
-    }
-}
+        @if (this.ShowErrorMessage)
+        {
+            <ErrorMessage />
+        }
 
-@* Notes section *@
-@if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
-{
-    @if (DisplayGroupHeaders())
+        <p class="has-text-centered">
+            <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
+                Add a note
+            </button>
+        </p>
+    }
+
+    @if (IsGroupingAllowed())
     {
-        <h3 class="title has-text-centered is-size-4">Ungrouped notes</h3>
+        @if (this.ShowErrorMessage)
+        {
+            <ErrorMessage />
+        }
+
+        <NoteUngroupDropzone/>
+
+        <p class="has-text-centered">
+            <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
+                Add a group
+            </button>
+        </p>
     }
 
-    @foreach (RetrospectiveNote note in this.Contents.Notes)
-    {
-        <Note @key="@("n" + note.Id)" Data="@note" />
-    }
-
-    @if (this.Contents.Notes.Count == 0)
-    {
-        <div class="box">
-            <p>
-                All notes in this lane have been grouped.
-            </p>
-        </div>
-    }
-}
-
-@* Action section *@
-@if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
-{
-    @if (this.ShowErrorMessage)
-    {
-        <ErrorMessage />
-    }
-
-    <p class="has-text-centered">
-        <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
-            Add a note
-        </button>
-    </p>
-}
-
-@if (IsGroupingAllowed())
-{
-    @if (this.ShowErrorMessage)
-    {
-        <ErrorMessage />
-    }
-
-    <p class="has-text-centered">
-        <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
-            Add a group
-        </button>
-    </p>
-}
+</CascadingValue>

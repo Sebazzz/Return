@@ -1,0 +1,42 @@
+<div class="box dropzone"
+     ondragover="event.preventDefault();"
+     @ondrop="@HandleDrop"
+     @ondragenter="@HandleDragEnter"
+     @ondragleave="@HandleDragLeave">
+    <p>
+        Drop here to ungroup
+    </p>
+</div>
+
+@code {
+    #nullable disable
+
+    protected string DropClass { get; private set; }
+
+    [CascadingParameter]
+    public NoteLane Container { get; set; }
+
+    protected void HandleDragEnter()
+    {
+        // Ignore drag to self
+        if (null == this.Container.Payload?.GroupId) return;
+
+        // TODO: check lane ID "no-drop"
+        this.DropClass = "can-drop";
+    }
+
+    protected void HandleDragLeave()
+    {
+        this.DropClass = "";
+    }
+
+    protected async Task HandleDrop()
+    {
+        this.DropClass = "";
+
+        // TODO: check lane ID
+        if (null == this.Container.Payload.GroupId) return;
+
+        await this.Container.UpdateGroupAsync(null);
+    }
+}

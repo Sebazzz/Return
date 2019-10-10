@@ -1,11 +1,11 @@
-@using Microsoft.Extensions.Logging
 @using Return.Application.Common.Models
-@using Return.Application.NoteGroups.Commands
-@using Return.Domain.ValueObjects
-@inherits MediatorComponent
-@inject ILogger<NoteGroup> Logger
+@inherits NoteGroupBase
 
-<div class="box">
+<div class="box dropzone"
+     ondragover="event.preventDefault();"
+     @ondrop="@HandleDrop"
+     @ondragenter="@HandleDragEnter"
+     @ondragleave="@HandleDragLeave">
     @if (this.CanEdit)
     {
         <div class="field has-addons" style="width: 100%">
@@ -46,55 +46,3 @@
         </div>
     }
 </div>
-
-@code {
-
-    [Parameter]
-    public RetrospectiveNoteGroup Data { get; set; } = new RetrospectiveNoteGroup();
-
-    [Parameter]
-    public bool CanEdit { get; set; }
-
-    [CascadingParameter]
-    public RetroIdentifier RetroId { get; set; } = new RetroIdentifier();
-
-    private string DataTitle
-    {
-        get => this.Data.Title;
-        set {
-            this.Data.Title = value;
-            this.ShowWarning = String.IsNullOrEmpty(value);
-            this.InvokeAsync(this.UpdateTitle);
-        }
-    }
-
-    private async Task UpdateTitle()
-    {
-        try
-        {
-            this.ShowError = false;
-            await this.Mediator.Send(new UpdateNoteGroupCommand(this.RetroId.StringId, this.Data.Id, this.Data.Title));
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogError(ex,"Unable to save note group title of #" + this.Data.Id);
-            this.ShowError = true;
-        }
-    }
-
-    private async Task DeleteNoteGroup()
-    {
-        try
-        {
-            await this.Mediator.Send(new DeleteNoteGroupCommand(this.RetroId.StringId, this.Data.Id));
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogError(ex,"Unable to delete note group #" + this.Data.Id);
-            this.ShowError = true;
-        }
-    }
-
-    private bool ShowWarning { get; set; }
-    private bool ShowError { get; set; }
-}

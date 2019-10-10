@@ -1,14 +1,9 @@
-@using Microsoft.Extensions.Logging
-@using Return.Application.Common.Models
-@using Return.Application.Notes.Commands.UpdateNote
-@using Return.Application.Notifications.NoteUpdated
-@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
-@using Return.Web.Services
-@inherits SubscribingComponent<Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber>
-@implements Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber
-@inject ILogger<Note> Logger
+@inherits NoteBase
 
-<div class="box @(this.CanView() ? "" : "box--blurred")" style="background-color: #@this.Data.ParticipantColor.HexString">
+<div class="box draggable @(this.CanView() ? "" : "box--blurred")" 
+     draggable="@(this.Container.IsGroupingAllowed() ? "true" : null)"
+     @ondragstart="@(() => HandleDragStart(this.Data))"
+     style="background-color: #@this.Data.ParticipantColor.HexString">
     @if (this.CanEdit())
     {
         @if (this.ShowErrorMessage)
@@ -29,88 +24,3 @@
         </p>
     }
 </div>
-
-@code {
-    [CascadingParameter]
-    public RetrospectiveStatus RetrospectiveStatus { get; set; } = new RetrospectiveStatus();
-
-    [Parameter]
-    public RetrospectiveNote Data { get; set; } = new RetrospectiveNote();
-
-    public UpdateNoteCommand Model { get; } = new UpdateNoteCommand();
-
-    private bool ShowErrorMessage { get; set; }
-    private readonly AutoResettingBoolean _shouldRenderValue = new AutoResettingBoolean(true);
-
-    private string TextData
-    {
-        get => this.Model.Text;
-        set
-        {
-            this.Model.Text = value;
-            this.OnHandleNoteUpdateTyping();
-        }
-    }
-
-    protected override bool ShouldRender() => this._shouldRenderValue.GetValue();
-
-    protected override void OnParametersSet()
-    {
-        if (this.Data != null)
-        {
-            this.Model.Id = this.Data.Id;
-            this.Model.Text = this.Data.Text;
-        }
-
-        base.OnParametersSet();
-    }
-
-    public Task OnNoteUpdated(NoteUpdate note)
-    {
-        if (note.Id != this.Data.Id || this.CanEdit() || this.Data == null)
-        {
-            return Task.CompletedTask;
-        }
-
-        return this.InvokeAsync(() =>
-        {
-            this.Data.Text = note.Text;
-            this.Model.Text = note.Text;
-
-            this.StateHasChanged();
-        });
-    }
-
-    private void OnHandleNoteUpdateTyping()
-    {
-        this.Data.Text = this.Model.Text;
-        this.ShowErrorMessage = false;
-
-        // Blazor calls StateChanged (which then calls ShouldRender) after the
-        // immediate executing of this method (returning the task) and after
-        // the task execution. Since we don't change any other state, we try
-        // to avoid much traffic and re-render by disabling rendering.
-        async Task OnHandleNoteUpdateWorker()
-        {
-            try
-            {
-                await this.Mediator.Send(this.Model);
-
-                this._shouldRenderValue.Set();
-            }
-            catch (Exception ex)
-            {
-    // We might just have a race condition here.
-                this.ShowErrorMessage = this.CanEdit();
-
-                this.Logger.LogError(ex, $"Error updating note #{this.Model.Id} with text '{this.Model.Text}'");
-            }
-        }
-
-        this._shouldRenderValue.Set();
-        this.InvokeAsync(OnHandleNoteUpdateWorker);
-    }
-
-    private bool CanEdit() => this.RetrospectiveStatus.IsEditingNotesAllowed && this.Data.IsOwnedByCurrentUser;
-    private bool CanView() => this.RetrospectiveStatus.IsViewingOtherNotesAllowed || this.Data.IsOwnedByCurrentUser;
-}

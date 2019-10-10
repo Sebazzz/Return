@@ -10,6 +10,7 @@ namespace Return.Web.Components {
 
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading.Tasks;
     using Application.Common.Models;
     using Application.NoteGroups.Commands;
@@ -39,6 +40,8 @@ namespace Return.Web.Components {
         public ILogger<NoteLane> Logger { get; set; }
 
         public Guid UniqueId { get; } = Guid.NewGuid();
+
+        [Parameter] public EventCallback<RetrospectiveNote> OnStatusUpdated { get; set; }
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
@@ -73,6 +76,8 @@ namespace Return.Web.Components {
         [CascadingParameter]
         public RetroIdentifier RetroId { get; set; }
 
+        internal RetrospectiveNote Payload { get; set; }
+
         protected RetrospectiveLaneContent Contents { get; private set; }
         protected bool ShowErrorMessage { get; private set; }
 
@@ -86,6 +91,65 @@ namespace Return.Web.Components {
             this.NoteLaneUpdatedSubscription.Subscribe(this);
             this.NoteAddedSubscription.Subscribe(this);
             base.OnInitialized();
+        }
+
+        internal async Task UpdateGroupAsync(int? groupId) {
+            if (this.Payload == null) {
+                return;
+            }
+
+            // Find the source group, target group and the note
+            RetrospectiveNoteGroup sourceGroup = null, targetGroup = null;
+            RetrospectiveNote note = null;
+            foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups) {
+                if (noteGroup.Id == groupId) {
+                    targetGroup = noteGroup;
+                }
+
+                foreach (RetrospectiveNote groupNote in noteGroup.Notes) {
+                    if (groupNote.Id == this.Payload.Id) {
+                        sourceGroup = noteGroup;
+                        note = groupNote;
+                    }
+                }
+
+                if (sourceGroup != null && targetGroup != null) {
+                    break;
+                }
+            }
+
+            foreach (RetrospectiveNote noGroupNote in this.Contents.Notes) {
+                if (noGroupNote.Id == this.Payload.Id) {
+                    sourceGroup = null;
+                    note = noGroupNote;
+                }
+            }
+
+            // No need to do anything or can't do anything
+            if (sourceGroup == targetGroup || note == null) {
+                return;
+            }
+
+            // Update state
+            if (sourceGroup == null) {
+                this.Contents.Notes.Remove(note);
+                targetGroup.Notes.Add(note);
+                note.GroupId = targetGroup.Id;
+            }
+            else if (targetGroup == null) {
+                sourceGroup.Notes.Remove(note);
+                this.Contents.Notes.Add(note);
+                note.GroupId = null;
+            }
+            else {
+                sourceGroup.Notes.Remove(note);
+                targetGroup.Notes.Add(note);
+                note.GroupId = targetGroup.Id;
+            }
+
+            await Task.Delay(10);
+
+            this.StateHasChanged();
         }
 
         private async Task Refresh() {
@@ -174,8 +238,8 @@ namespace Return.Web.Components {
             return Task.CompletedTask;
         }
 
-        private AutoResettingBoolean _skipFirstUpdate = new AutoResettingBoolean(false);
-        protected bool IsGroupingAllowed() => this.RetrospectiveStatus?.IsGroupingAllowed(this.CurrentParticipant.IsManager) == true;
+        private readonly AutoResettingBoolean _skipFirstUpdate = new AutoResettingBoolean(false);
+        protected internal bool IsGroupingAllowed() => this.RetrospectiveStatus?.IsGroupingAllowed(this.CurrentParticipant.IsManager) == true;
         protected bool DisplayGroupHeaders() => this.Contents?.Groups.Count > 0 || this.IsGroupingAllowed();
     }
 }
