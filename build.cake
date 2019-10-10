@@ -324,14 +324,7 @@ Task("Test-CS")
 	.IsDependentOn("Restore-NuGet-Packages")
     .Description("Test backend-end compiled code")
 	.Does(() => {
-		void RunTests(string part, string suffix = "Unit") {
-			DotNetCoreTest($"./tests/Return.{part}.Tests.Unit/Return.{part}.Tests.{suffix}.csproj");
-		}
-	
-		
-		RunTests("Domain");
-		RunTests("Application");
-		RunTests("Web");
+		DotNetCoreTest($"./Return.sln");
 	});
 
 Task("Test")
@@ -345,7 +338,7 @@ Task("Test")
 Task("None");
 
 Task("Default")
-    .IsDependentOn("Build");
+    .IsDependentOn("Test");
 
 //////////////////////////////////////////////////////////////////////
 // EXECUTION
