@@ -36,7 +36,7 @@ namespace Return.Application.App.Commands.SeedBaseData {
             this._returnDbContext.NoteLanes.AddRange(
                 new NoteLane { Id = KnownNoteLane.Start, Name = "Start" },
                 new NoteLane { Id = KnownNoteLane.Stop, Name = "Stop" },
-                new NoteLane { Id = KnownNoteLane.Continue, Name = "Start" }
+                new NoteLane { Id = KnownNoteLane.Continue, Name = "Continue" }
             );
         }
 
