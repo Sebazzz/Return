@@ -77,7 +77,7 @@ namespace Return.Application.Common.Security {
 
         private void InvokeTypeSecurityChecks(SecurityOperation operation, Retrospective retrospective, in CurrentParticipantModel participant, object entity) {
             try {
-                SecurityTypeHandlers.HandleOperation(operation, retrospective, entity);
+                SecurityTypeHandlers.HandleOperation(operation, retrospective, entity, participant);
 
                 if (this._logger.IsEnabled(LogLevel.Trace)) {
                     this._logger.LogTrace($"Operation {operation} granted for entity {entity.GetType()} for participant #{participant.Id}");

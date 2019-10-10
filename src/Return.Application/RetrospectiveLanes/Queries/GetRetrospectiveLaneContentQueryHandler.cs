@@ -7,6 +7,7 @@
 
 namespace Return.Application.RetrospectiveLanes.Queries {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -39,17 +40,33 @@ namespace Return.Application.RetrospectiveLanes.Queries {
             Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
 
             var laneId = (KnownNoteLane)request.LaneId;
-            var query =
-                from note in this._returnDbContext.Notes
-                where note.Retrospective.UrlId.StringId == request.RetroId
-                where note.Lane.Id == laneId
-                orderby note.CreationTimestamp
-                select note;
-
             var lane = new RetrospectiveLaneContent();
-            lane.Notes.AddRange(
-                await query.ProjectTo<RetrospectiveNote>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken)
-            );
+
+            {
+                IOrderedQueryable<Note> query =
+                    from note in this._returnDbContext.Notes
+                    where note.Retrospective.UrlId.StringId == request.RetroId
+                    where note.Lane.Id == laneId
+                    orderby note.CreationTimestamp
+                    select note;
+
+                lane.Notes.AddRange(
+                    await query.ProjectTo<RetrospectiveNote>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+                );
+            }
+            {
+                IQueryable<NoteGroup> query =
+                    from retro in this._returnDbContext.Retrospectives
+                    where retro.UrlId.StringId == request.RetroId
+                    from noteGroup in retro.NoteGroup
+                    where noteGroup.Lane.Id == laneId
+                    orderby noteGroup.Id
+                    select noteGroup;
+
+                lane.Groups.AddRange(
+                    await query.ProjectTo<RetrospectiveNoteGroup>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken)
+                );
+            }
 
             int currentUserId = (await this._currentParticipantService.GetParticipant().ConfigureAwait(false)).Id;
             foreach (RetrospectiveNote note in lane.Notes) {
@@ -61,6 +78,8 @@ namespace Return.Application.RetrospectiveLanes.Queries {
                     }
                 }
             }
+
+            this._mapper.Map<ICollection<RetrospectiveNote>, ICollection<RetrospectiveNoteGroup>>(lane.Notes, lane.Groups);
 
             return lane;
         }

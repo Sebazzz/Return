@@ -11,6 +11,7 @@ namespace Return.Application.Common.Security.TypeHandling {
     using System.Linq;
     using System.Reflection;
     using Domain.Entities;
+    using Models;
 
     internal static class SecurityTypeHandlers {
         private static readonly ITypeSecurityHandler[] All;
@@ -33,9 +34,9 @@ namespace Return.Application.Common.Security.TypeHandling {
             }
         }
 
-        public static void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entity) {
+        public static void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entity, in CurrentParticipantModel currentParticipant) {
             foreach (ITypeSecurityHandler handler in All) {
-                handler.HandleOperation(operation, retrospective, entity);
+                handler.HandleOperation(operation, retrospective, entity, currentParticipant);
             }
         }
     }

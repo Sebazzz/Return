@@ -11,5 +11,7 @@ namespace Return.Application.RetrospectiveLanes.Queries {
 
     public class RetrospectiveLaneContent {
         public List<RetrospectiveNote> Notes { get; } = new List<RetrospectiveNote>();
+
+        public List<RetrospectiveNoteGroup> Groups { get; } = new List<RetrospectiveNoteGroup>();
     }
 }

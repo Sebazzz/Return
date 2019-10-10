@@ -23,6 +23,7 @@ namespace Return.Application.Common.Models {
 
         public string Text { get; set; }
         public bool IsOwnedByCurrentUser { get; set; }
+        public int? GroupId { get; set; }
 
         public void Mapping(Profile profile) {
             if (profile == null) throw new ArgumentNullException(nameof(profile));

@@ -116,6 +116,13 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
             this.Context.Retrospectives.Add(retro);
             await this.Context.SaveChangesAsync(CancellationToken.None);
 
+            var ng = new NoteGroup { Title = "G1", Lane = stopLane };
+            ng.Retrospective = retro;
+            retro.NoteGroup.Add(ng);
+            retro.Notes.Add(new Note { Lane = stopLane, Participant = participant1, Text = "OK", Group = ng, GroupId = 1 });
+
+            await this.Context.SaveChangesAsync(CancellationToken.None);
+
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
             var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
@@ -124,8 +131,11 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
 
             // Then
             Assert.That(result.Notes, Is.Not.Empty);
-            Assert.That(result.Notes.Select(x => x.Text), Contains.Item("I'm angry"));
+            Assert.That(result.Notes.Select(x => x.Text), Is.EquivalentTo(new[] { "I'm angry" }));
             Assert.That(result.Notes.Select(x => x.Text), Does.Not.Contain("I'm happy"));
+
+            Assert.That(result.Groups.Select(x => x.Title), Is.EquivalentTo(new[] { "G1" }));
+            Assert.That(result.Groups.SelectMany(g => g.Notes).Select(x => x.Text), Is.EquivalentTo(new[] { "OK" }));
         }
     }
 }

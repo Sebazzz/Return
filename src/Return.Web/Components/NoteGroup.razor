@@ -1,0 +1,84 @@
+@using Microsoft.Extensions.Logging
+@using Return.Application.Common.Models
+@using Return.Application.NoteGroups.Commands
+@using Return.Domain.ValueObjects
+@inherits MediatorComponent
+@inject ILogger<NoteGroup> Logger
+
+<div class="box">
+    @if (this.CanEdit)
+    {
+        <div class="field">
+            <div class="control">
+                <input class="input is-large is-size-5 has-text-centered @(this.ShowError ? "is-danger" : (this.ShowWarning ? "is-warning" : null))" 
+                       type="text" 
+                       placeholder="Enter a title for the group" 
+                       @bind="@this.DataTitle" />
+            </div>
+        </div>
+
+    }
+    else
+    {
+        <h4 class="title has-text-centered is-size-5">@this.Data.Title</h4>
+    }
+
+    @foreach (RetrospectiveNote note in this.Data.Notes)
+    {
+        <Note @key="note.Id" Data="@note" />
+    }
+
+    @if (this.Data.Notes.Count == 0)
+    {
+        <div class="box">
+            <p>
+                This group is empty.
+                @if (this.CanEdit)
+                {
+                    <text>Drag-and-drop notes here to add them to this group!</text>
+                }
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public RetrospectiveNoteGroup Data { get; set; } = new RetrospectiveNoteGroup();
+
+    [Parameter]
+    public bool CanEdit { get; set; }
+
+    [CascadingParameter]
+    public RetroIdentifier RetroId { get; set; } = new RetroIdentifier();
+
+    private string DataTitle
+    {
+        get => this.Data.Title;
+        set {
+            this.Data.Title = value;
+            this.ShowWarning = String.IsNullOrEmpty(value);
+            this.InvokeAsync(this.UpdateTitle);
+        }
+    }
+
+    private async Task UpdateTitle()
+    {
+        try
+        {
+            this.ShowError = false;
+            await this.Mediator.Send(new UpdateNoteGroupCommand(this.RetroId.StringId, this.Data.Id, this.Data.Title));
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogError(ex,"Unable to save note group title of #" + this.Data.Id);
+            this.ShowError = true;
+        }
+
+        this.StateHasChanged();
+    }
+
+    private bool ShowWarning { get; set; }
+    private bool ShowError { get; set; }
+}

@@ -91,6 +91,68 @@ namespace Return.Application.Tests.Unit.Common.Security {
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
+        [Test]
+        public void SecurityValidator_DisallowsOperationOnNoteGroup_NotManager() {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
+            var noteGroup = new NoteGroup { Title = "G" };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(2, String.Empty, false));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
+        [Test]
+        public void SecurityValidator_DisallowsOperationOnNoteGroup_UnauthenticatedParticipant() {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
+            var noteGroup = new NoteGroup { Title = "G" };
+            this._currentParticipantService.Reset();
+            Assume.That(this._currentParticipantService.GetParticipant().Result, Is.EqualTo(default(CurrentParticipantModel)));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
+        [Test]
+        public void SecurityValidator_AllowsOperationOnNote_IsManager() {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
+            var noteGroup = new NoteGroup { Title = "G" };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(212, String.Empty, true));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.Nothing);
+        }
+
+        [Test]
+        [TestCase(RetrospectiveStage.NotStarted)]
+        [TestCase(RetrospectiveStage.Discuss)]
+        [TestCase(RetrospectiveStage.Writing)]
+        [TestCase(RetrospectiveStage.Voting)]
+        [TestCase(RetrospectiveStage.Finished)]
+        public void SecurityValidator_DisallowsOperationsOnNoteGroup_InStages(RetrospectiveStage stage) {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(stage);
+            var noteGroup = new NoteGroup { Title = "G" };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(252, String.Empty, true));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
         private static Retrospective GetRetrospectiveInStage(RetrospectiveStage retrospectiveStage) {
             return new Retrospective {
                 CurrentStage = retrospectiveStage

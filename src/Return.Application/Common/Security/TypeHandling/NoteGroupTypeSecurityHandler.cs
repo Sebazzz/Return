@@ -1,7 +1,7 @@
 ﻿// ******************************************************************************
-//  © 2019 Sebastiaan Dammann | damsteen.nl
+//  ©  Sebastiaan Dammann | damsteen.nl
 // 
-//  File:           : NoteTypeSecurityHandler.cs
+//  File:           : NoteGroupTypeSecurityHandler.cs
 //  Project         : Return.Application
 // ******************************************************************************
 
@@ -12,10 +12,14 @@ namespace Return.Application.Common.Security.TypeHandling {
 
     [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Instantiated by reflection")]
     [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Dynamically instantiated")]
-    internal sealed class NoteTypeSecurityHandler : AbstractTypeSecurityHandler<Note> {
-        protected override void HandleAddOrUpdate(Retrospective retrospective, Note entity, in CurrentParticipantModel unused) {
+    internal sealed class NoteGroupTypeSecurityHandler : AbstractTypeSecurityHandler<NoteGroup> {
+        protected override void HandleAddOrUpdate(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel unused) {
             switch (retrospective.CurrentStage) {
-                case RetrospectiveStage.Writing:
+                case RetrospectiveStage.Grouping:
+                    if (!unused.IsManager) {
+                        throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by manager role");
+
+                    }
                     break;
                 default:
                     throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
@@ -23,4 +27,3 @@ namespace Return.Application.Common.Security.TypeHandling {
         }
     }
 }
-

@@ -38,8 +38,6 @@ namespace Return.Web.Services {
 
         public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification => this._mediator.Publish(notification, cancellationToken);
 
-        public void Dispose() {
-            this._lock?.Dispose();
-        }
+        public void Dispose() => this._lock?.Dispose();
     }
 }

@@ -11,7 +11,7 @@ namespace Return.Web.Components {
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-    public class MediatorComponent : ComponentBase {
+    public abstract class MediatorComponent : ComponentBase {
         [Inject]
         public IMediator Mediator { get; set; }
     }

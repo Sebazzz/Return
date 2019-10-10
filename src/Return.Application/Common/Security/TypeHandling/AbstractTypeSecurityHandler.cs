@@ -8,9 +8,10 @@
 namespace Return.Application.Common.Security.TypeHandling {
     using System;
     using Domain.Entities;
+    using Models;
 
     internal abstract class AbstractTypeSecurityHandler<TEntity> : ITypeSecurityHandler where TEntity : class {
-        public void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entityObject) {
+        public void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entityObject, in CurrentParticipantModel currentParticipant) {
             var entity = entityObject as TEntity;
 
             if (entity == null) {
@@ -19,13 +20,13 @@ namespace Return.Application.Common.Security.TypeHandling {
 
             switch (operation) {
                 case SecurityOperation.AddOrUpdate:
-                    this.HandleAddOrUpdate(retrospective, entity);
+                    this.HandleAddOrUpdate(retrospective, entity, currentParticipant);
                     break;
                 default:
                     throw new NotImplementedException(operation.ToString());
             }
         }
 
-        protected abstract void HandleAddOrUpdate(Retrospective retrospective, TEntity entity);
+        protected abstract void HandleAddOrUpdate(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
     }
 }

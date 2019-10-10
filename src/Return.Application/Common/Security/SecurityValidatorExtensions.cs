@@ -7,12 +7,13 @@
 
 namespace Return.Application.Common.Security {
     using System;
+    using System.Threading.Tasks;
     using Domain.Entities;
 
     public static class SecurityValidatorExtensions {
-        public static void EnsureAddOrUpdate(this ISecurityValidator securityValidator, Retrospective retrospective, object entity) {
+        public static ValueTask EnsureAddOrUpdate(this ISecurityValidator securityValidator, Retrospective retrospective, object entity) {
             if (securityValidator == null) throw new ArgumentNullException(nameof(securityValidator));
-            securityValidator.EnsureOperation(retrospective, SecurityOperation.AddOrUpdate, entity);
+            return securityValidator.EnsureOperation(retrospective, SecurityOperation.AddOrUpdate, entity);
         }
     }
 }

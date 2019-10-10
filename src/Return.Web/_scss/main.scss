@@ -29,6 +29,7 @@ $primary-invert: $pink-invert;
 // Import font awesome
 $fa-font-path: '/build/fonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/regular.scss';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
 
 // Import bulma

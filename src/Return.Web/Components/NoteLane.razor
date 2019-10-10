@@ -1,13 +1,19 @@
 @inherits SubscribingComponent<Return.Application.Notifications.NoteAdded.INoteAddedSubscriber>
 @implements Return.Application.Notifications.NoteAdded.INoteAddedSubscriber
+@implements Return.Application.Notifications.NoteLaneUpdated.INoteLaneUpdatedSubscriber
+@inject INotificationSubscription<INoteLaneUpdatedSubscriber> NoteLaneUpdatedSubscription
 @inject ILogger<NoteLane> Logger
 @using Microsoft.Extensions.Logging
 @using Return.Application.Common.Models
+@using Return.Application.NoteGroups.Commands
 @using Return.Application.Notes.Commands.AddNote
+@using Return.Application.Notifications
 @using Return.Application.Notifications.NoteAdded
+@using Return.Application.Notifications.NoteLaneUpdated
 @using Return.Application.RetrospectiveLanes.Queries
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @using Return.Domain.ValueObjects
+@using Return.Web.Services
 
 @if (this.Lane == null)
 {
@@ -21,11 +27,53 @@
     return;
 }
 
-@foreach (RetrospectiveNote note in this.Contents.Notes)
+@* Note groups section *@
+@if (DisplayGroupHeaders())
 {
-    <Note @key="note.Id" Data="@note"/>
+    @if (DisplayGroupHeaders())
+    {
+        <h3 class="title has-text-centered is-size-4">Grouped notes</h3>
+    }
+
+    @foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+    {
+        <NoteGroup @key="@("ng" + noteGroup.Id)" Data="@noteGroup" CanEdit="@IsGroupingAllowed()" />
+    }
+
+    @if (this.Contents.Groups.Count == 0)
+    {
+        <div class="box">
+            <p>
+                No notes have been grouped.
+            </p>
+        </div>
+    }
 }
 
+@* Notes section *@
+@if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
+{
+    @if (DisplayGroupHeaders())
+    {
+        <h3 class="title has-text-centered is-size-4">Ungrouped notes</h3>
+    }
+
+    @foreach (RetrospectiveNote note in this.Contents.Notes)
+    {
+        <Note @key="@("n" + note.Id)" Data="@note" />
+    }
+
+    @if (this.Contents.Notes.Count == 0)
+    {
+        <div class="box">
+            <p>
+                All notes in this lane have been grouped.
+            </p>
+        </div>
+    }
+}
+
+@* Action section *@
 @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
 {
     @if (this.ShowErrorMessage)
@@ -36,13 +84,27 @@
     <p class="has-text-centered">
         <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
             Add a note
-        </button>    
+        </button>
     </p>
 }
- 
+
+@if (IsGroupingAllowed())
+{
+    @if (this.ShowErrorMessage)
+    {
+        <ErrorMessage />
+    }
+
+    <p class="has-text-centered">
+        <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
+            Add a group
+        </button>
+    </p>
+}
+
 @code {
 
-    #nullable disable
+#nullable disable
 
     [Parameter]
     public RetrospectiveLane Lane { get; set; }
@@ -69,6 +131,22 @@
         this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId.StringId, this.Lane?.Id ?? 0));
     }
 
+    protected override void OnInitialized()
+    {
+        this.NoteLaneUpdatedSubscription.Subscribe(this);
+        base.OnInitialized();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            this.NoteLaneUpdatedSubscription.Unsubscribe(this);
+        }
+
+        base.Dispose(disposing);
+    }
+
     private async Task Refresh()
     {
         await this.Load();
@@ -93,7 +171,7 @@
     /// </summary>
     private void HandleNoteChange()
     {
-        if (this._isShowingNotes != null && ( this.RetrospectiveStatus.IsViewingOtherNotesAllowed != this._isShowingNotes ))
+        if (this._isShowingNotes != null && (this.RetrospectiveStatus.IsViewingOtherNotesAllowed != this._isShowingNotes))
         {
             this.InvokeAsync(this.Refresh);
         }
@@ -117,6 +195,25 @@
         }
     }
 
+    private async Task AddNoteGroup()
+    {
+        try
+        {
+            this.ShowErrorMessage = false;
+            this._skipFirstUpdate.Set();
+
+            RetrospectiveNoteGroup result = await this.Mediator.Send(new AddNoteGroupCommand(this.RetroId.StringId, this.Lane.Id));
+
+            this.Contents.Groups.Add(result);
+        }
+        catch (Exception ex)
+        {
+            this.ShowErrorMessage = true;
+
+            this.Logger.LogError(ex, $"Unable to add note group for {this.RetroId} in lane {this.Lane?.Id}");
+        }
+    }
+
     public Task OnNoteAdded(NoteAddedNotification notification)
     {
         if (notification.LaneId != this.Lane?.Id ||
@@ -133,8 +230,26 @@
         return this.InvokeAsync(() =>
         {
             this.Contents.Notes.Add(notification.Note);
-            
+
             this.StateHasChanged();
         });
     }
+
+    public Task OnNoteLaneUpdated(NoteLaneUpdatedNotification note)
+    {
+        if (this.RetroId?.StringId != note.RetroId ||
+            this.Lane?.Id != note.LaneId ||
+            this.Contents?.Groups.Exists(g => g.Id == note.GroupId) == true && this._skipFirstUpdate.GetValue())
+        {
+            return Task.CompletedTask;
+        }
+
+        // Prevent deadlock
+        this.InvokeAsync(this.Refresh);
+        return Task.CompletedTask;
+    }
+
+    private AutoResettingBoolean _skipFirstUpdate = new AutoResettingBoolean(false);
+    private bool IsGroupingAllowed() => this.RetrospectiveStatus?.IsGroupingAllowed(this.CurrentParticipant.IsManager) == true;
+    private bool DisplayGroupHeaders() => this.Contents?.Groups.Count > 0 || IsGroupingAllowed();
 }

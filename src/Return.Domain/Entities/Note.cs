@@ -31,5 +31,6 @@ namespace Return.Domain.Entities {
 
 #nullable enable
         public NoteGroup? Group { get; set; }
+        public int? GroupId { get; set; }
     }
 }

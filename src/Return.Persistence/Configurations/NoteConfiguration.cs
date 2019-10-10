@@ -24,7 +24,7 @@ namespace Return.Persistence.Configurations {
 
             builder.HasOne(e => e.Participant).WithMany().OnDelete(DeleteBehavior.Restrict).HasForeignKey(n => n.ParticipantId);
 
-            builder.HasOne(e => e.Group).WithMany().IsRequired(false).OnDelete(DeleteBehavior.SetNull);
+            builder.HasOne(e => e.Group).WithMany().HasForeignKey(x => x.GroupId).IsRequired(false).OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

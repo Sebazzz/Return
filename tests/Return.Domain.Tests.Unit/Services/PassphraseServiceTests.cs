@@ -52,16 +52,17 @@ namespace Return.Domain.Tests.Unit.Services {
         }
 
         [Test]
-        public void PassphraseService_Passphrase_CreatesValidPassphrase([Random(10, Distinct = true)] int randomInit) {
+        [Repeat(10)]
+        public void PassphraseService_Passphrase_CreatesValidPassphrase() {
             // Given
-            string passphrase = new Random(randomInit).Next(0x13371337, Int32.MaxValue).ToString("x4", Culture.Invariant);
+            string passphrase = TestContext.CurrentContext.Random.NextGuid() + "_" + TestContext.CurrentContext.Random.NextGuid();
 
             // When
             string hashed = this._passphraseService.CreateHashedPassphrase(passphrase);
 
             // Then
             Assert.That(hashed, Is.Not.EqualTo(passphrase));
-            Assert.That(this._passphraseService.ValidatePassphrase(passphrase, hashed), Is.True, "Unable to validate passphrase");
+            Assert.That(this._passphraseService.ValidatePassphrase(passphrase, hashed), Is.True, $"Unable to validate passphrase [{passphrase}]");
         }
     }
 }

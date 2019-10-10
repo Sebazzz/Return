@@ -15,6 +15,7 @@ namespace Return.Application.Common.Abstractions {
     public interface IReturnDbContext : IReturnDbContextFactory, IDisposable {
         DbSet<PredefinedParticipantColor> PredefinedParticipantColors { get; set; }
         DbSet<Note> Notes { get; set; }
+        DbSet<NoteGroup> NoteGroups { get; set; }
         DbSet<NoteLane> NoteLanes { get; set; }
         DbSet<Retrospective> Retrospectives { get; set; }
         DbSet<Participant> Participants { get; set; }

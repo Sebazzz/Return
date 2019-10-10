@@ -46,7 +46,7 @@ namespace Return.Application.Notes.Commands.UpdateNote {
             }
 
             // Validate operation
-            this._securityValidator.EnsureAddOrUpdate(note.Retrospective, note);
+            await this._securityValidator.EnsureAddOrUpdate(note.Retrospective, note);
 
             // Update the note
             note.Text = request.Text ?? String.Empty;

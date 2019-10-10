@@ -1,14 +1,46 @@
+@using Return.Application.RetrospectiveWorkflows.Commands
+@using Return.Domain.ValueObjects
+@inherits MediatorComponent
+
 <RetrospectiveRolePanel>
     <Manager>
         <p>
+            The next step is to group the written notes so they can be grouped. 
+            Click the button below to start grouping the notes. This will only
+            be possible by you or anyone else logged in as manager.
+        </p>
+
+        <p class="has-text-centered">
+            <button class="button is-primary is-large" type="button" @onclick="@Continue">
+                <span class="far fa-object-group"></span> &nbsp;
+                Continue
+            </button>
         </p>
     </Manager>
     <Participant>
         <p>
+
         </p>
     </Participant>
 </RetrospectiveRolePanel>
 
-@code {
+<WorkflowStatusTimer />
 
+@code
+{
+    [CascadingParameter]
+    public RetroIdentifier? RetroId { get; set; }
+
+    private Task Continue()
+    {
+        if (this.RetroId == null)
+        {
+            return Task.CompletedTask;  // Shouldn't happen, but ignore
+        }
+
+        return this.Mediator.Send(new InitiateGroupingStageCommand
+        {
+            RetroId = this.RetroId.StringId
+        });
+    }
 }
