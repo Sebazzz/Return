@@ -8,12 +8,17 @@
 <div class="box">
     @if (this.CanEdit)
     {
-        <div class="field">
-            <div class="control">
-                <input class="input is-large is-size-5 has-text-centered @(this.ShowError ? "is-danger" : (this.ShowWarning ? "is-warning" : null))" 
+        <div class="field has-addons" style="width: 100%">
+            <div class="control is-expanded">
+                <input class="input note-group__title-input has-text-centered @(this.ShowError ? "is-danger" : (this.ShowWarning ? "is-warning" : null))" 
                        type="text" 
                        placeholder="Enter a title for the group" 
                        @bind="@this.DataTitle" />
+            </div>
+            <div class="control">
+                <button class="button is-danger is-outlined" @onclick="@DeleteNoteGroup">
+                    <i class="fas fa-trash is-danger"></i>
+                </button>
             </div>
         </div>
 
@@ -75,8 +80,19 @@
             this.Logger.LogError(ex,"Unable to save note group title of #" + this.Data.Id);
             this.ShowError = true;
         }
+    }
 
-        this.StateHasChanged();
+    private async Task DeleteNoteGroup()
+    {
+        try
+        {
+            await this.Mediator.Send(new DeleteNoteGroupCommand(this.RetroId.StringId, this.Data.Id));
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogError(ex,"Unable to delete note group #" + this.Data.Id);
+            this.ShowError = true;
+        }
     }
 
     private bool ShowWarning { get; set; }
