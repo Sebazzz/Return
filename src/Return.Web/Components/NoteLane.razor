@@ -60,9 +60,43 @@
 
     private bool ShowErrorMessage { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private bool? _isShowingNotes;
+
+    protected override Task OnInitializedAsync() => this.Load();
+
+    private async Task Load()
     {
         this.Contents = await this.Mediator.Send(new GetRetrospectiveLaneContentQuery(this.RetroId.StringId, this.Lane?.Id ?? 0));
+    }
+
+    private async Task Refresh()
+    {
+        await this.Load();
+        this.StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (this.RetrospectiveStatus != null)
+        {
+            HandleNoteChange();
+
+            this._isShowingNotes = this.RetrospectiveStatus.IsViewingOtherNotesAllowed;
+        }
+    }
+
+    /// <summary>
+    /// When the notes were not revealed they actually contain garbage data. It has the same length of the words,
+    /// but isn't the words. We need to reveal the notes by re-issuing a renew.
+    /// </summary>
+    private void HandleNoteChange()
+    {
+        if (this._isShowingNotes != null && ( this.RetrospectiveStatus.IsViewingOtherNotesAllowed != this._isShowingNotes ))
+        {
+            this.InvokeAsync(this.Refresh);
+        }
     }
 
     private async Task AddNote()
