@@ -1,4 +1,4 @@
-# Return
+# ![Icon](src/Return.Web/wwwroot/images/logo/return.svg) Return
 
 Retrospective tool built in ASP.NET Core + Blazor
 
