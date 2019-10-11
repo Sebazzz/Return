@@ -10,14 +10,15 @@ namespace Return.Web.Components {
 
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Threading.Tasks;
     using Application.Common.Models;
     using Application.NoteGroups.Commands;
     using Application.Notes.Commands.AddNote;
+    using Application.Notes.Commands.MoveNote;
     using Application.Notifications;
     using Application.Notifications.NoteAdded;
     using Application.Notifications.NoteLaneUpdated;
+    using Application.Notifications.NoteMoved;
     using Application.RetrospectiveLanes.Queries;
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Domain.ValueObjects;
@@ -29,7 +30,7 @@ namespace Return.Web.Components {
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by framework")]
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We catch, log and display.")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Needed for DI")]
-    public abstract class NoteLaneBase : MediatorComponent, IDisposable, ISubscriber, INoteAddedSubscriber, INoteLaneUpdatedSubscriber {
+    public abstract class NoteLaneBase : MediatorComponent, IDisposable, ISubscriber, INoteAddedSubscriber, INoteLaneUpdatedSubscriber, INoteMovedSubscriber {
         [Inject]
         public INotificationSubscription<INoteAddedSubscriber> NoteAddedSubscription { get; set; }
 
@@ -37,16 +38,18 @@ namespace Return.Web.Components {
         public INotificationSubscription<INoteLaneUpdatedSubscriber> NoteLaneUpdatedSubscription { get; set; }
 
         [Inject]
+        public INotificationSubscription<INoteMovedSubscriber> NoteMovedSubscription { get; set; }
+
+        [Inject]
         public ILogger<NoteLane> Logger { get; set; }
 
         public Guid UniqueId { get; } = Guid.NewGuid();
-
-        [Parameter] public EventCallback<RetrospectiveNote> OnStatusUpdated { get; set; }
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
                 this.NoteAddedSubscription?.Unsubscribe(this);
                 this.NoteLaneUpdatedSubscription.Unsubscribe(this);
+                this.NoteMovedSubscription.Unsubscribe(this);
             }
 
             // Release the subscription reference
@@ -90,6 +93,8 @@ namespace Return.Web.Components {
         protected override void OnInitialized() {
             this.NoteLaneUpdatedSubscription.Subscribe(this);
             this.NoteAddedSubscription.Subscribe(this);
+            this.NoteMovedSubscription.Subscribe(this);
+
             base.OnInitialized();
         }
 
@@ -98,58 +103,98 @@ namespace Return.Web.Components {
                 return;
             }
 
+            int noteToMoveId = this.Payload.Id;
+
+            if (!this.ExecuteNoteMove(noteId: noteToMoveId, newGroupId: groupId)) return;
+
+            await this.Mediator.Send(new MoveNoteCommand(noteToMoveId, groupId));
+
+            this.StateHasChanged();
+        }
+
+        private bool ExecuteNoteMove(int noteId, int? newGroupId)
+        {
             // Find the source group, target group and the note
             RetrospectiveNoteGroup sourceGroup = null, targetGroup = null;
             RetrospectiveNote note = null;
-            foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups) {
-                if (noteGroup.Id == groupId) {
+            foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+            {
+                if (noteGroup.Id == newGroupId)
+                {
                     targetGroup = noteGroup;
                 }
 
-                foreach (RetrospectiveNote groupNote in noteGroup.Notes) {
-                    if (groupNote.Id == this.Payload.Id) {
+                foreach (RetrospectiveNote groupNote in noteGroup.Notes)
+                {
+                    if (groupNote.Id == noteId)
+                    {
                         sourceGroup = noteGroup;
                         note = groupNote;
                     }
                 }
 
-                if (sourceGroup != null && targetGroup != null) {
+                if (sourceGroup != null && targetGroup != null)
+                {
                     break;
                 }
             }
 
-            foreach (RetrospectiveNote noGroupNote in this.Contents.Notes) {
-                if (noGroupNote.Id == this.Payload.Id) {
+            foreach (RetrospectiveNote noGroupNote in this.Contents.Notes)
+            {
+                if (noGroupNote.Id == noteId)
+                {
                     sourceGroup = null;
                     note = noGroupNote;
                 }
             }
 
             // No need to do anything or can't do anything
-            if (sourceGroup == targetGroup || note == null) {
-                return;
+            if (sourceGroup == targetGroup || note == null)
+            {
+                return false;
             }
 
             // Update state
-            if (sourceGroup == null) {
+            if (sourceGroup == null)
+            {
                 this.Contents.Notes.Remove(note);
                 targetGroup.Notes.Add(note);
                 note.GroupId = targetGroup.Id;
             }
-            else if (targetGroup == null) {
+            else if (targetGroup == null)
+            {
                 sourceGroup.Notes.Remove(note);
                 this.Contents.Notes.Add(note);
                 note.GroupId = null;
             }
-            else {
+            else
+            {
                 sourceGroup.Notes.Remove(note);
                 targetGroup.Notes.Add(note);
                 note.GroupId = targetGroup.Id;
             }
 
-            await Task.Delay(10);
+            return true;
+        }
 
-            this.StateHasChanged();
+        public Task OnNoteMoved(NoteMovedNotification notification)
+        {
+            // Filter out irrelevant notifications
+            if (notification.LaneId != this.Lane.Id ||
+                notification.RetroId != this.RetroId.StringId)
+            {
+                return Task.CompletedTask;
+            }
+
+            this.InvokeAsync(() =>
+            {
+                if (this.ExecuteNoteMove(notification.NoteId, notification.GroupId))
+                {
+                    this.StateHasChanged();
+                }
+            });
+
+            return Task.CompletedTask;
         }
 
         private async Task Refresh() {

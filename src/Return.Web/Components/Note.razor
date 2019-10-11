@@ -3,6 +3,7 @@
 <div class="box draggable @(this.CanView() ? "" : "box--blurred")" 
      draggable="@(this.Container.IsGroupingAllowed() ? "true" : null)"
      @ondragstart="@(() => HandleDragStart(this.Data))"
+     @ondragend="@(() => HandleDragEnd())"
      style="background-color: #@this.Data.ParticipantColor.HexString">
     @if (this.CanEdit())
     {

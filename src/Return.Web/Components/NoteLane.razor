@@ -50,7 +50,7 @@
             <Note @key="@("n" + note.Id)" Data="@note" />
         }
 
-        @if (this.Contents.Notes.Count == 0)
+        @if (this.Contents.Notes.Count == 0 && DisplayGroupHeaders())
         {
             <div class="box">
                 <p>

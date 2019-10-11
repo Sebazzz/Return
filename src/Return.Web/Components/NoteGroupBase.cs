@@ -75,7 +75,7 @@ namespace Return.Web.Components {
             if (this.Data.Id == this.Container.Payload.GroupId) return;
 
             // TODO: check lane ID "no-drop"
-            this.DropClass = "can-drop";
+            this.DropClass = this.Container.Payload == null ? "no-drop": "can-drop";
         }
 
         protected void HandleDragLeave() {
@@ -85,7 +85,7 @@ namespace Return.Web.Components {
         protected async Task HandleDrop() {
             this.DropClass = "";
 
-            // TODO: check lane ID
+            if (this.Container.Payload == null) return;
             if (this.GroupId == this.Container.Payload.GroupId) return;
 
             await this.Container.UpdateGroupAsync(this.Data.Id);
