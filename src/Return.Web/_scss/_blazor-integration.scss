@@ -1,0 +1,14 @@
+.invalid {
+    @extend .is-danger;
+}
+
+/*
+.valid {
+    @extend .is-success;
+}
+*/
+
+.validation-message {
+    @extend .help;
+    @extend .is-danger;
+}

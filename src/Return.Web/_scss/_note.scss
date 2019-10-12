@@ -1,0 +1,42 @@
+@mixin box-textarea {
+    color: #fafafa;
+    text-shadow: 1px 1px 2px #000;
+    border: none;
+}
+
+.note {
+    padding: 0.5rem;
+    font-size: $size-7;
+    filter: grayscale(25%);
+
+    &__content {
+        background-color: inherit;
+        @include box-textarea;
+
+        &::placeholder {
+            @include box-textarea;
+        }
+
+        &::-moz-placeholder {
+            @include box-textarea;
+        }
+
+        &::-webkit-input-placeholder {
+            @include box-textarea;
+        }
+
+        &:-moz-placeholder {
+            @include box-textarea;
+        }
+
+        &:-ms-input-placeholder {
+            @include box-textarea;
+        }
+    }
+
+    &--blurred &__content {
+        filter: blur(2px);
+        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        color: transparent;
+    }
+}

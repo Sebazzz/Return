@@ -1,0 +1,7 @@
+.online-list {
+    &__item {
+        &--is-self {
+            font-style: italic;
+        }
+    }
+}

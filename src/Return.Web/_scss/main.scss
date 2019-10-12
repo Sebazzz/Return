@@ -1,31 +1,5 @@
 @charset "utf-8";
 
-// Customization
-
-// You can easily customize Bulma with your own variables.
-// Just uncomment the following block to see the result.
-
-/*
-// 1. Import the initial variables
-@import "../node_modules/bulma/sass/utilities/initial-variables";
-
-// 2. Set your own initial variables
-// Update the blue shade, used for links
-$blue: #06bcef;
-// Add pink and its invert
-$pink: #ff8080;
-$pink-invert: #fff;
-// Update the sans-serif font family
-$family-sans-serif: "Helvetica", "Arial", sans-serif;
-
-// 3. Set the derived variables
-// Use the new pink as the primary color
-$primary: $pink;
-$primary-invert: $pink-invert;
-
-// 4. Import the rest of Bulma
-*/
-
 // Import font awesome
 $fa-font-path: '/build/fonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
@@ -34,111 +8,20 @@ $fa-font-path: '/build/fonts';
 
 // Import bulma
 @import '../node_modules/bulma/bulma';
+
+// Vars
+$reveal-shadow-color: yellow;
+$reveal-shadow-size: 5px;
+$reveal-shadow-spread: 20px;
+
+// App imports
+// ... General components
+@import 'common';
 @import 'circle-progress/circle';
+@import 'reveal';
+@import 'blazor-integration';
 
-// App rules
-.navbar-brand > .navbar-item {
-    font-weight: bold;
-}
-
-.retro-qrcode {
-    width: auto;
-    height: auto;
-}
-
-.form-explanation {
-    margin-bottom: 1.5em;
-}
-
-.invalid {
-    @extend .is-danger;
-}
-
-/*
-.valid {
-    @extend .is-success;
-}
-*/
-
-.validation-message {
-    @extend .help;
-    @extend .is-danger;
-}
-
-.hero,
-p {
-    margin-bottom: 1em;
-}
-
-@mixin box-textarea {
-    color: #fafafa;
-    text-shadow: 1px 1px 2px #000;
-}
-
-.box {
-    &__content {
-        background-color: inherit;
-        @include box-textarea;
-
-        &::placeholder {
-            @include box-textarea;
-        }
-
-        &::-moz-placeholder {
-            @include box-textarea;
-        }
-
-        &::-webkit-input-placeholder {
-            @include box-textarea;
-        }
-
-        &:-moz-placeholder {
-            @include box-textarea;
-        }
-
-        &:-ms-input-placeholder {
-            @include box-textarea;
-        }
-    }
-
-    &--blurred &__content {
-        filter: blur(2px);
-        text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        color: transparent;
-    }
-}
-
-.online-list {
-    &__item {
-        &--is-self {
-            font-style: italic;
-        }
-    }
-}
-
-.note-group {
-    &__title-input {
-        font-weight: bold;
-    }
-}
-
-// drag&drop
-.no-drop {
-    border: 2px dashed red;
-}
-
-.can-drop {
-    border: 2px dashed green;
-}
-
-.draggable {
-    cursor: grab;
-}
-
-.draggable:active {
-    cursor: grabbing;
-}
-
-.dragging {
-    cursor: grabbing;
-}
+// ... Specific
+@import 'note';
+@import 'note-group';
+@import 'online-list';

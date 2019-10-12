@@ -1,6 +1,6 @@
 @inherits NoteBase
 
-<div class="box draggable @(this.CanView() ? "" : "box--blurred")" 
+<div class="box note draggable @(this.CanView() ? "" : "note--blurred")" 
      draggable="@(this.Container.IsGroupingAllowed() ? "true" : null)"
      @ondragstart="@(() => HandleDragStart(this.Data))"
      @ondragend="@(() => HandleDragEnd())"
@@ -12,7 +12,7 @@
             <p class="has-text-warning has-text-centered">Couldn't save, please try again!</p>
         }
 
-        <textarea class="textarea box__content is-small has-fixed-size"
+        <textarea class="textarea note__content is-small has-fixed-size"
                   rows="2"
                   placeholder="Enter your text here" 
                   @bind-value="@TextData" 
@@ -20,7 +20,7 @@
     }
     else
     {
-        <p class="box__content">
+        <p class="note__content">
             @Data.Text
         </p>
     }

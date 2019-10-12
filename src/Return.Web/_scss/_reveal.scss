@@ -1,0 +1,48 @@
+.reveal {
+    animation: 1s ease 0s 1 normal forwards running reveal-anim;
+
+    &:not(:last-child) .box {
+        margin-bottom: 1.5rem;
+    }
+}
+
+.reveal__contents {
+    opacity: 0;
+    animation: 1s ease 0s 1 normal forwards running reveal-contents-anim;
+}
+
+@keyframes reveal-anim {
+    0% {
+        box-shadow: 0px 0px 0px $reveal-shadow-color;
+    }
+
+    25% {
+        box-shadow: 0px 0px $reveal-shadow-spread $reveal-shadow-size $reveal-shadow-color;
+    }
+
+    50% {
+        box-shadow: 0px 0px $reveal-shadow-spread $reveal-shadow-size $reveal-shadow-color;
+    }
+
+    100% {
+        box-shadow: 0px 0px 0px 0px $reveal-shadow-color;
+    }
+}
+
+@keyframes reveal-contents-anim {
+    0% {
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0;
+    }
+
+    80% {
+        opacity: 0.8;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

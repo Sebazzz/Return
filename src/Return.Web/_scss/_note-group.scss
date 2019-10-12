@@ -1,0 +1,24 @@
+.note-group {
+    margin-bottom: 2rem;
+
+    .box,
+    .reveal .box,
+    .reveal:not(:last-child) .box {
+        margin-bottom: 5px;
+    }
+
+    &__title-input {
+        font-weight: bold;
+    }
+
+    &__title,
+    &__title:not(:last-child) {
+        margin-bottom: 0.5rem;
+        font-weight: $weight-semibold;
+        text-align: center;
+
+        &--not-set {
+            color: $grey-light;
+        }
+    }
+}

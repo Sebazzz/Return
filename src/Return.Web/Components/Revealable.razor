@@ -1,0 +1,10 @@
+<div class="reveal">
+    <div class="reveal__contents">@ChildContent</div>
+</div>
+
+@code {
+    #nullable disable
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

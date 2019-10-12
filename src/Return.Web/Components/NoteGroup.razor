@@ -1,7 +1,7 @@
 @using Return.Application.Common.Models
 @inherits NoteGroupBase
 
-<div class="box dropzone"
+<div class="note-group dropzone"
      ondragover="event.preventDefault();"
      @ondrop="@HandleDrop"
      @ondragenter="@HandleDragEnter"
@@ -12,7 +12,7 @@
             <div class="control is-expanded">
                 <input class="input note-group__title-input has-text-centered @(this.ShowError ? "is-danger" : (this.ShowWarning ? "is-warning" : null))" 
                        type="text" 
-                       placeholder="Enter a title for the group" 
+                       placeholder="Group name" 
                        @bind="@this.DataTitle" />
             </div>
             <div class="control">
@@ -25,12 +25,14 @@
     }
     else
     {
-        <h4 class="title has-text-centered is-size-5">@this.Data.Title</h4>
+        <h4 class="is-size-5 note-group__title @(String.IsNullOrEmpty(this.Data.Title) ? "note-group__title--not-set" : "")">@(String.IsNullOrEmpty(this.Data.Title) ? "Group name" : this.Data.Title)</h4>
     }
 
     @foreach (RetrospectiveNote note in this.Data.Notes)
     {
-        <Note @key="note.Id" Data="@note" />
+        <Revealable @key="note.Id">
+            <Note Data="@note" />
+        </Revealable>
     }
 
     @if (this.Data.Notes.Count == 0)
