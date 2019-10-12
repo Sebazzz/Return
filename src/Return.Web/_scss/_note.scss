@@ -11,6 +11,8 @@
 
     &__content {
         background-color: inherit;
+        margin: 0;
+
         @include box-textarea;
 
         &::placeholder {

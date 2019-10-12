@@ -14,6 +14,46 @@
         return;
     }
 
+     @* Action section *@
+    @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
+    {
+        @if (this.ShowErrorMessage)
+        {
+            <ErrorMessage />
+        }
+
+        <p class="has-text-centered">
+            <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
+                <span class="icon">
+                    <span class="fas fa-plus-square"></span>
+                </span>
+                <span>
+                    Create a note
+                </span>
+            </button>
+        </p>
+    }
+
+    @if (IsGroupingAllowed())
+    {
+        @if (this.ShowErrorMessage)
+        {
+            <ErrorMessage/>
+        }
+
+        <p class="has-text-centered">
+            <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
+                <span class="icon">
+                    <span class="fas fa-plus-square"></span>
+                </span>
+                <span>
+                    Create a group
+                </span>
+            </button>
+        </p>
+    }
+
+
     @* Note groups section *@
     @if (DisplayGroupHeaders())
     {
@@ -34,6 +74,11 @@
         }
     }
 
+    @if (IsGroupingAllowed())
+    {
+        <NoteUngroupDropzone/>
+    }
+
     @* Notes section *@
     @if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
     {
@@ -52,37 +97,6 @@
                 </p>
             </div>
         }
-    }
-
-    @* Action section *@
-    @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
-    {
-        @if (this.ShowErrorMessage)
-        {
-            <ErrorMessage />
-        }
-
-        <p class="has-text-centered">
-            <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
-                Add a note
-            </button>
-        </p>
-    }
-
-    @if (IsGroupingAllowed())
-    {
-        @if (this.ShowErrorMessage)
-        {
-            <ErrorMessage />
-        }
-
-        <NoteUngroupDropzone/>
-
-        <p class="has-text-centered">
-            <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
-                Add a group
-            </button>
-        </p>
     }
 
 </CascadingValue>
