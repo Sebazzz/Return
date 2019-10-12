@@ -97,6 +97,16 @@
                 </p>
             </div>
         }
+    } 
+    
+    @if (this.Contents.Notes.Count == 0)
+    {
+        <div class="box">
+            <p>
+                It is empty here.
+            </p>
+        </div>
     }
+
 
 </CascadingValue>
