@@ -12,6 +12,7 @@
     &__content {
         background-color: inherit;
         margin: 0;
+        box-shadow: none;
 
         @include box-textarea;
 
@@ -40,5 +41,21 @@
         filter: blur(2px);
         text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         color: transparent;
+    }
+
+    &__delete-icon {
+        color: white;
+
+        display: inline-block;
+        position: absolute;
+        top: 1px;
+        right: 2px;
+
+        cursor: pointer;
+        z-index: 1;
+
+        &:hover {
+            color: $red;
+        }
     }
 }

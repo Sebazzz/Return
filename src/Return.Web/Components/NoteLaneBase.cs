@@ -17,6 +17,7 @@ namespace Return.Web.Components {
     using Application.Notes.Commands.MoveNote;
     using Application.Notifications;
     using Application.Notifications.NoteAdded;
+    using Application.Notifications.NoteDeleted;
     using Application.Notifications.NoteLaneUpdated;
     using Application.Notifications.NoteMoved;
     using Application.RetrospectiveLanes.Queries;
@@ -30,7 +31,7 @@ namespace Return.Web.Components {
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by framework")]
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We catch, log and display.")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Needed for DI")]
-    public abstract class NoteLaneBase : MediatorComponent, IDisposable, ISubscriber, INoteAddedSubscriber, INoteLaneUpdatedSubscriber, INoteMovedSubscriber {
+    public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedSubscriber, INoteLaneUpdatedSubscriber, INoteMovedSubscriber, INoteDeletedSubscriber {
         [Inject]
         public INotificationSubscription<INoteAddedSubscriber> NoteAddedSubscription { get; set; }
 
@@ -41,15 +42,19 @@ namespace Return.Web.Components {
         public INotificationSubscription<INoteMovedSubscriber> NoteMovedSubscription { get; set; }
 
         [Inject]
+        public INotificationSubscription<INoteDeletedSubscriber> NoteDeletedSubscription { get; set; }
+
+        [Inject]
         public ILogger<NoteLane> Logger { get; set; }
 
         public Guid UniqueId { get; } = Guid.NewGuid();
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.NoteAddedSubscription?.Unsubscribe(this);
+                this.NoteAddedSubscription.Unsubscribe(this);
                 this.NoteLaneUpdatedSubscription.Unsubscribe(this);
                 this.NoteMovedSubscription.Unsubscribe(this);
+                this.NoteDeletedSubscription.Unsubscribe(this);
             }
 
             // Release the subscription reference
@@ -93,6 +98,7 @@ namespace Return.Web.Components {
         protected override void OnInitialized() {
             this.NoteLaneUpdatedSubscription.Subscribe(this);
             this.NoteAddedSubscription.Subscribe(this);
+            this.NoteDeletedSubscription.Subscribe(this);
             this.NoteMovedSubscription.Subscribe(this);
 
             base.OnInitialized();
@@ -112,63 +118,51 @@ namespace Return.Web.Components {
             this.StateHasChanged();
         }
 
-        private bool ExecuteNoteMove(int noteId, int? newGroupId)
-        {
+        private bool ExecuteNoteMove(int noteId, int? newGroupId) {
             // Find the source group, target group and the note
             RetrospectiveNoteGroup sourceGroup = null, targetGroup = null;
             RetrospectiveNote note = null;
-            foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
-            {
-                if (noteGroup.Id == newGroupId)
-                {
+            foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups) {
+                if (noteGroup.Id == newGroupId) {
                     targetGroup = noteGroup;
                 }
 
-                foreach (RetrospectiveNote groupNote in noteGroup.Notes)
-                {
-                    if (groupNote.Id == noteId)
-                    {
+                foreach (RetrospectiveNote groupNote in noteGroup.Notes) {
+                    if (groupNote.Id == noteId) {
                         sourceGroup = noteGroup;
                         note = groupNote;
                     }
                 }
 
-                if (sourceGroup != null && targetGroup != null)
-                {
+                if (sourceGroup != null && targetGroup != null) {
                     break;
                 }
             }
 
-            foreach (RetrospectiveNote noGroupNote in this.Contents.Notes)
-            {
-                if (noGroupNote.Id == noteId)
-                {
+            foreach (RetrospectiveNote noGroupNote in this.Contents.Notes) {
+                if (noGroupNote.Id == noteId) {
                     sourceGroup = null;
                     note = noGroupNote;
                 }
             }
 
             // No need to do anything or can't do anything
-            if (sourceGroup == targetGroup || note == null)
-            {
+            if (sourceGroup == targetGroup || note == null) {
                 return false;
             }
 
             // Update state
-            if (sourceGroup == null)
-            {
+            if (sourceGroup == null) {
                 this.Contents.Notes.Remove(note);
                 targetGroup.Notes.Add(note);
                 note.GroupId = targetGroup.Id;
             }
-            else if (targetGroup == null)
-            {
+            else if (targetGroup == null) {
                 sourceGroup.Notes.Remove(note);
                 this.Contents.Notes.Add(note);
                 note.GroupId = null;
             }
-            else
-            {
+            else {
                 sourceGroup.Notes.Remove(note);
                 targetGroup.Notes.Add(note);
                 note.GroupId = targetGroup.Id;
@@ -177,19 +171,15 @@ namespace Return.Web.Components {
             return true;
         }
 
-        public Task OnNoteMoved(NoteMovedNotification notification)
-        {
+        public Task OnNoteMoved(NoteMovedNotification notification) {
             // Filter out irrelevant notifications
             if (notification.LaneId != this.Lane.Id ||
-                notification.RetroId != this.RetroId.StringId)
-            {
+                notification.RetroId != this.RetroId.StringId) {
                 return Task.CompletedTask;
             }
 
-            this.InvokeAsync(() =>
-            {
-                if (this.ExecuteNoteMove(notification.NoteId, notification.GroupId))
-                {
+            this.InvokeAsync(() => {
+                if (this.ExecuteNoteMove(notification.NoteId, notification.GroupId)) {
                     this.StateHasChanged();
                 }
             });
@@ -281,6 +271,27 @@ namespace Return.Web.Components {
             // Prevent deadlock
             this.InvokeAsync(this.Refresh);
             return Task.CompletedTask;
+        }
+
+        public Task OnNoteDeleted(NoteDeletedNotification notification) {
+            if (notification.RetroId != this.RetroId.StringId ||
+                notification.LaneId != this.Lane.Id) {
+                return Task.CompletedTask;
+            }
+
+            this.InvokeAsync(() => {
+                int num = this.Contents.Notes.RemoveAll(n => n.Id == notification.NoteId);
+
+                if (num > 0) {
+                    this.StateHasChanged();
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+
+        protected void OnNoteDeletedCallback(RetrospectiveNote note) {
+            this.Contents.Notes.RemoveAll(n => n.Id == note.Id);
         }
 
         private readonly AutoResettingBoolean _skipFirstUpdate = new AutoResettingBoolean(false);

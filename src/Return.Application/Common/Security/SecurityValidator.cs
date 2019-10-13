@@ -35,7 +35,7 @@ namespace Return.Application.Common.Security {
 
             CurrentParticipantModel participant = await this.GetAuthenticatedParticipant(operation, entity.GetType());
 
-            if (operation == SecurityOperation.AddOrUpdate) {
+            if (operation == SecurityOperation.AddOrUpdate || operation == SecurityOperation.Delete) {
                 this.EnsureOperationSecurity(operation, entity, participant);
             }
 

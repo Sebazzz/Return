@@ -22,11 +22,15 @@ namespace Return.Application.Common.Security.TypeHandling {
                 case SecurityOperation.AddOrUpdate:
                     this.HandleAddOrUpdate(retrospective, entity, currentParticipant);
                     break;
+                case SecurityOperation.Delete:
+                    this.HandleDelete(retrospective, entity, currentParticipant);
+                    break;
                 default:
                     throw new NotImplementedException(operation.ToString());
             }
         }
 
         protected abstract void HandleAddOrUpdate(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
+        protected abstract void HandleDelete(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
     }
 }

@@ -21,6 +21,21 @@ namespace Return.Application.Common.Security.TypeHandling {
                     throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
             }
         }
+
+        protected override void HandleDelete(
+            Retrospective retrospective,
+            Note entity,
+            in CurrentParticipantModel currentParticipant
+        )
+        {
+            switch (retrospective.CurrentStage)
+            {
+                case RetrospectiveStage.Writing:
+                    break;
+                default:
+                    throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
+            }
+        }
     }
 }
 

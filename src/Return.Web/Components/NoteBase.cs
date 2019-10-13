@@ -10,6 +10,7 @@ namespace Return.Web.Components {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Application.Common.Models;
+    using Application.Notes.Commands.DeleteNote;
     using Application.Notes.Commands.UpdateNote;
     using Application.Notifications.NoteUpdated;
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
@@ -37,6 +38,9 @@ namespace Return.Web.Components {
         public RetrospectiveNote Data { get; set; } = new RetrospectiveNote();
 
         public UpdateNoteCommand Model { get; } = new UpdateNoteCommand();
+
+        [Parameter]
+        public EventCallback<RetrospectiveNote> OnDeleted { get; set; }
 
         protected bool ShowErrorMessage { get; private set; }
         private readonly AutoResettingBoolean _shouldRenderValue = new AutoResettingBoolean(true);
@@ -104,5 +108,18 @@ namespace Return.Web.Components {
 
         protected void HandleDragStart(RetrospectiveNote selectedNote) => this.Container.Payload = selectedNote;
         protected void HandleDragEnd() => this.Container.Payload = null;
+
+        protected async Task Delete() {
+            try {
+                await this.Mediator.Send(new DeleteNoteCommand(this.RetrospectiveStatus.RetroId, this.Data.Id));
+            }
+            catch (Exception ex) {
+                this.Logger.LogError(ex, $"Delete note #{this.Data.Id} failed");
+                this.ShowErrorMessage = true;
+                return;
+            }
+
+            await this.OnDeleted.InvokeAsync(this.Data);
+        }
     }
 }

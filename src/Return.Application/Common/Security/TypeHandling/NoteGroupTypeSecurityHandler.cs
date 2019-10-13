@@ -13,10 +13,10 @@ namespace Return.Application.Common.Security.TypeHandling {
     [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Instantiated by reflection")]
     [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Dynamically instantiated")]
     internal sealed class NoteGroupTypeSecurityHandler : AbstractTypeSecurityHandler<NoteGroup> {
-        protected override void HandleAddOrUpdate(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel unused) {
+        protected override void HandleAddOrUpdate(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel currentParticipant) {
             switch (retrospective.CurrentStage) {
                 case RetrospectiveStage.Grouping:
-                    if (!unused.IsManager) {
+                    if (!currentParticipant.IsManager) {
                         throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by manager role");
 
                     }
@@ -25,5 +25,18 @@ namespace Return.Application.Common.Security.TypeHandling {
                     throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
             }
         }
+
+        protected override void HandleDelete(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel currentParticipant) {
+            switch (retrospective.CurrentStage) {
+            case RetrospectiveStage.Grouping:
+            if (!currentParticipant.IsManager) {
+                throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by manager role");
+
+            }
+            break;
+            default:
+            throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
+        }
+    }
     }
 }

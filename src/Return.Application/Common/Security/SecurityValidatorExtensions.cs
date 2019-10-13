@@ -15,5 +15,10 @@ namespace Return.Application.Common.Security {
             if (securityValidator == null) throw new ArgumentNullException(nameof(securityValidator));
             return securityValidator.EnsureOperation(retrospective, SecurityOperation.AddOrUpdate, entity);
         }
+        public static ValueTask EnsureDelete(this ISecurityValidator securityValidator, Retrospective retrospective, object entity) {
+            if (securityValidator == null) throw new ArgumentNullException(nameof(securityValidator));
+            return securityValidator.EnsureOperation(retrospective, SecurityOperation.Delete, entity);
+        }
+
     }
 }

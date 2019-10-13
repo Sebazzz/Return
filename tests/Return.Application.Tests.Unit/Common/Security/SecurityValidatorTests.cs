@@ -30,21 +30,25 @@ namespace Return.Application.Tests.Unit.Common.Security {
         public void SetUp() => this._currentParticipantService.Reset();
 
         [Test]
-        public void SecurityValidator_DisallowsOperationOnNote_WrongParticipant() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNote_WrongParticipant(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Writing);
             var note = new Note { ParticipantId = 1 };
             this._currentParticipantService.SetParticipant(new CurrentParticipantModel(2, String.Empty, false));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, note).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, note).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
         [Test]
-        public void SecurityValidator_DisallowsOperationOnNote_UnauthenticatedParticipant() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNote_UnauthenticatedParticipant(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Writing);
             var note = new Note { ParticipantId = 1 };
@@ -52,21 +56,23 @@ namespace Return.Application.Tests.Unit.Common.Security {
             Assume.That(this._currentParticipantService.GetParticipant().Result, Is.EqualTo(default(CurrentParticipantModel)));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, note).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, note).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
         [Test]
-        public void SecurityValidator_AllowsOperationOnNote_CorrectParticipant() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_AllowsOperationOnNote_CorrectParticipant(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Writing);
             var note = new Note { ParticipantId = 212 };
             this._currentParticipantService.SetParticipant(new CurrentParticipantModel(212, String.Empty, false));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, note).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, note).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.Nothing);
@@ -92,21 +98,25 @@ namespace Return.Application.Tests.Unit.Common.Security {
         }
 
         [Test]
-        public void SecurityValidator_DisallowsOperationOnNoteGroup_NotManager() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNoteGroup_NotManager(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
             var noteGroup = new NoteGroup { Title = "G" };
             this._currentParticipantService.SetParticipant(new CurrentParticipantModel(2, String.Empty, false));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteGroup).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
         [Test]
-        public void SecurityValidator_DisallowsOperationOnNoteGroup_UnauthenticatedParticipant() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNoteGroup_UnauthenticatedParticipant(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
             var noteGroup = new NoteGroup { Title = "G" };
@@ -114,21 +124,23 @@ namespace Return.Application.Tests.Unit.Common.Security {
             Assume.That(this._currentParticipantService.GetParticipant().Result, Is.EqualTo(default(CurrentParticipantModel)));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteGroup).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
         [Test]
-        public void SecurityValidator_AllowsOperationOnNote_IsManager() {
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_AllowsOperationOnNote_IsManager(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
             var noteGroup = new NoteGroup { Title = "G" };
             this._currentParticipantService.SetParticipant(new CurrentParticipantModel(212, String.Empty, true));
 
             // When
-            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteGroup).GetAwaiter().GetResult();
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteGroup).GetAwaiter().GetResult();
 
             // Then
             Assert.That(action, Throws.Nothing);

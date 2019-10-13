@@ -17,6 +17,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
 
         public bool IsViewingOtherNotesAllowed => this.Stage >= RetrospectiveStage.Discuss;
         public bool IsEditingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
+        public bool IsDeletingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
         public bool IsGroupingAllowed(bool isManager) => this.Stage == RetrospectiveStage.Grouping && isManager;
 
         public RetrospectiveWorkflowStatus WorkflowStatus { get; }
