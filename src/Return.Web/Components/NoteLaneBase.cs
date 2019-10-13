@@ -218,7 +218,7 @@ namespace Return.Web.Components {
 
                 RetrospectiveNote result = await this.Mediator.Send(new AddNoteCommand(this.RetroId.StringId, this.Lane.Id));
 
-                this.Contents.Notes.Add(result);
+                this.Contents.Notes.Insert(0, result);
             }
             catch (Exception ex) {
                 this.ShowErrorMessage = true;
@@ -255,7 +255,7 @@ namespace Return.Web.Components {
             }
 
             return this.InvokeAsync(() => {
-                this.Contents.Notes.Add(notification.Note);
+                this.Contents.Notes.Insert(0, notification.Note);
 
                 this.StateHasChanged();
             });
