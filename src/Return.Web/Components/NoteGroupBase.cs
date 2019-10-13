@@ -38,6 +38,11 @@ namespace Return.Web.Components {
         [CascadingParameter]
         public NoteLane Container { get; set; }
 
+        private bool IsExpanded { get; set; }
+
+        protected string Classes =>
+            (this.IsExpanded ? "note-group--expanded" : "note-group--collapsed");
+
         public string DataTitle {
             get => this.Data.Title;
             set {
@@ -75,7 +80,7 @@ namespace Return.Web.Components {
             if (this.Data.Id == this.Container.Payload.GroupId) return;
 
             // TODO: check lane ID "no-drop"
-            this.DropClass = this.Container.Payload == null ? "no-drop": "can-drop";
+            this.DropClass = this.Container.Payload == null ? "no-drop" : "can-drop";
         }
 
         protected void HandleDragLeave() {
@@ -90,6 +95,8 @@ namespace Return.Web.Components {
 
             await this.Container.UpdateGroupAsync(this.Data.Id);
         }
+
+        protected void ToggleExpand() => this.IsExpanded = !this.IsExpanded;
 
         protected bool ShowWarning { get; private set; }
         protected bool ShowError { get; private set; }

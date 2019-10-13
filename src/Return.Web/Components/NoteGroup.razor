@@ -1,7 +1,8 @@
 @using Return.Application.Common.Models
 @inherits NoteGroupBase
 
-<div class="note-group dropzone"
+<div class="note-group dropzone @(this.Classes)"
+     @onclick="@ToggleExpand"
      ondragover="event.preventDefault();"
      @ondrop="@HandleDrop"
      @ondragenter="@HandleDragEnter"
@@ -28,12 +29,16 @@
         <h4 class="is-size-5 note-group__title @(String.IsNullOrEmpty(this.Data.Title) ? "note-group__title--not-set" : "")">@(String.IsNullOrEmpty(this.Data.Title) ? "Group name" : this.Data.Title)</h4>
     }
 
-    @foreach (RetrospectiveNote note in this.Data.Notes)
-    {
-        <Revealable @key="note.Id">
-            <Note Data="@note" />
-        </Revealable>
-    }
+    <div class="note-group-item-list">
+        @foreach (RetrospectiveNote note in this.Data.Notes)
+        {
+            <div class="note-group__item" @key="note.Id">
+                <Revealable>
+                    <Note Data="@note" />
+                </Revealable>
+            </div>
+        }
+    </div>
 
     @if (this.Data.Notes.Count == 0)
     {

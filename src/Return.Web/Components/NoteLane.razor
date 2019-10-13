@@ -88,18 +88,9 @@
                 <Note Data="@note" />
             </Revealable>
         }
-
-        @if (this.Contents.Notes.Count == 0 && DisplayGroupHeaders())
-        {
-            <div class="box">
-                <p>
-                    All notes in this lane have been grouped.
-                </p>
-            </div>
-        }
     } 
     
-    @if (this.Contents.Notes.Count == 0)
+    @if (this.Contents.Notes.Count == 0 && this.Contents.Groups.Count == 0)
     {
         <div class="box">
             <p>

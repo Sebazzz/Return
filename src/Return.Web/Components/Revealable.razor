@@ -1,4 +1,4 @@
-<div class="reveal">
+<div class="reveal @CssClass">
     <div class="reveal__contents">@ChildContent</div>
 </div>
 
@@ -7,4 +7,7 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+    
+    [Parameter]
+    public string CssClass { get; set; }
 }

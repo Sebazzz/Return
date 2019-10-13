@@ -21,4 +21,42 @@
             color: $grey-light;
         }
     }
+
+    &__item {
+        transition-property: margin-top, transform;
+        transition-timing-function: ease;
+        transition-duration: 1s;
+    }
+    // 20 notes per group ought to be enough for everyone
+    $max-notes-count: 30;
+
+    @for $idx from 1 through $max-notes-count {
+        $idx-scale: 1 - (($idx - 1) / 10);
+        $z-index: $max-notes-count - $idx;
+
+        &__item:nth-child(#{$idx}) {
+            z-index: $z-index;
+        }
+
+        &--expanded &__item:nth-child(#{$idx}) {
+            margin-top: 0;
+            transform: scale(1);
+        }
+
+        &--collapsed &__item:nth-child(#{$idx}) {
+            @if ($idx != 1) {
+                margin-top: -1.5rem;
+            }
+
+            @if ($idx == 1) {
+                margin-top: 0;
+            }
+
+            transform: scale($idx-scale);
+        }
+    }
+
+    &__item:nth-child(1) {
+        margin-top: 0;
+    }
 }
