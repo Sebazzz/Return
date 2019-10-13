@@ -9,6 +9,11 @@
     font-size: $size-7;
     filter: grayscale(25%);
 
+    &:focus-within,
+    &--editable:hover {
+        box-shadow: 2px 2px 15px rgba(10, 10, 10, 0.5);
+    }
+
     &__content {
         background-color: inherit;
         margin: 0;
@@ -45,12 +50,10 @@
 
     &__delete-icon {
         color: white;
-
         display: inline-block;
         position: absolute;
         top: 1px;
         right: 2px;
-
         cursor: pointer;
         z-index: 1;
 
