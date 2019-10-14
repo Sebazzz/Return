@@ -32,7 +32,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
             if (retrospective == null) throw new ArgumentNullException(nameof(retrospective));
 
             var workflowStatus = RetrospectiveWorkflowStatus.FromDomainWorkflowData(retrospective.WorkflowData);
-            var retrospectiveStatus = new RetrospectiveStatus(retrospective.UrlId.StringId, retrospective.Title, retrospective.CurrentStage, workflowStatus);
+            var retrospectiveStatus = new RetrospectiveStatus(retrospective.UrlId.StringId, retrospective.Title, retrospective.CurrentStage, workflowStatus, retrospective.Options.MaximumNumberOfVotes);
 
             retrospectiveStatus.Lanes.AddRange(await this._returnDbContext.NoteLanes.AsNoTracking().ProjectTo<RetrospectiveLane>(this._mapper.ConfigurationProvider).ToListAsync(cancellationToken));
 

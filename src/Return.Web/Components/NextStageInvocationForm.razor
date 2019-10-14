@@ -18,6 +18,8 @@
 <EditForm Model="@Model" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
     <FluentValidation.FluentValidator />
 
+    @this.ChildContent
+
     <div class="field">
         <label class="label">@TimeLabelText</label>
         
@@ -53,6 +55,9 @@
 
     [CascadingParameter]
     public RetroIdentifier RetroId { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     [Parameter]
     public EventCallback<TModel> OnContinue { get; set; }

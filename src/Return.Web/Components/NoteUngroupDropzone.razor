@@ -34,8 +34,7 @@
     {
         this.DropClass = "";
 
-        // TODO: check lane ID
-        if (null == this.Container.Payload.GroupId) return;
+        if (null == this.Container.Payload?.GroupId) return;
 
         await this.Container.UpdateGroupAsync(null);
     }

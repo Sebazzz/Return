@@ -7,7 +7,6 @@
 
 namespace Return.Application.Common.Security {
     using System;
-    using System.Security;
     using System.Threading.Tasks;
     using Abstractions;
     using Domain.Abstractions;

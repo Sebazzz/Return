@@ -165,6 +165,78 @@ namespace Return.Application.Tests.Unit.Common.Security {
             Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
         }
 
+
+
+        // ----
+
+        [Test]
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNoteVote_WrongParticipant(SecurityOperation securityOperation) {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Voting);
+            var noteVote = new NoteVote { ParticipantId = 1 };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(2, String.Empty, false));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteVote).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
+        [Test]
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_DisallowsOperationOnNoteVote_UnauthenticatedParticipant(SecurityOperation securityOperation) {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Voting);
+            var noteVote = new NoteVote { ParticipantId = 1 };
+            this._currentParticipantService.Reset();
+            Assume.That(this._currentParticipantService.GetParticipant().Result, Is.EqualTo(default(CurrentParticipantModel)));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteVote).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
+        [Test]
+        [TestCase(SecurityOperation.AddOrUpdate)]
+        [TestCase(SecurityOperation.Delete)]
+        public void SecurityValidator_AllowsOperationOnNoteVote_CorrectParticipant(SecurityOperation securityOperation) {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Voting);
+            var noteVote = new NoteVote { ParticipantId = 212 };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(212, String.Empty, false));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, securityOperation, noteVote).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.Nothing);
+        }
+
+        [Test]
+        [TestCase(RetrospectiveStage.NotStarted)]
+        [TestCase(RetrospectiveStage.Writing)]
+        [TestCase(RetrospectiveStage.Discuss)]
+        [TestCase(RetrospectiveStage.Grouping)]
+        [TestCase(RetrospectiveStage.Finished)]
+        public void SecurityValidator_DisallowsOperationsOnNoteVote_InStages(RetrospectiveStage stage) {
+            // Given
+            Retrospective retro = GetRetrospectiveInStage(stage);
+            var noteVote = new NoteVote { ParticipantId = 252 };
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(252, String.Empty, false));
+
+            // When
+            TestDelegate action = () => this._securityValidator.EnsureOperation(retro, SecurityOperation.AddOrUpdate, noteVote).GetAwaiter().GetResult();
+
+            // Then
+            Assert.That(action, Throws.InstanceOf<OperationSecurityException>());
+        }
+
         private static Retrospective GetRetrospectiveInStage(RetrospectiveStage retrospectiveStage) {
             return new Retrospective {
                 CurrentStage = retrospectiveStage

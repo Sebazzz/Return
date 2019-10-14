@@ -1,5 +1,9 @@
 @inherits NoteBase
 
+@if (this.Data.GroupId == null) {
+    <VoteList Note="@this.Data"/>
+}
+
 <div class="box note draggable @(this.CanView() ? "" : "note--blurred") @(this.CanEdit() ? "note--editable" : "")" 
      draggable="@(this.Container.IsGroupingAllowed() ? "true" : null)"
      @ondragstart="@(() => HandleDragStart(this.Data))"
@@ -12,9 +16,11 @@
             <p class="has-text-warning has-text-centered">Couldn't save, please try again!</p>
         }
 
-        <div class="note__delete-icon" @onclick="@this.Delete">
-            <i class="fas fa-trash"></i>
-        </div>
+        @if (this.RetrospectiveStatus.IsDeletingNotesAllowed) {
+            <div class="note__delete-icon" @onclick="@this.Delete">
+                <i class="fas fa-trash"></i>
+            </div>
+        }
 
         <textarea class="textarea note__content is-small has-fixed-size"
                   rows="1"

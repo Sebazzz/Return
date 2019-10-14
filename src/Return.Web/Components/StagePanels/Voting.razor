@@ -1,14 +1,54 @@
+@inherits MediatorComponent
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Application.RetrospectiveWorkflows.Commands
 <RetrospectiveRolePanel>
     <Manager>
+        <VoteStatusPanel />
+
+        <WorkflowStatusTimer />
+
         <p>
+            Votes are now being cast, a maximum of @this.RetrospectiveStatus.VotesPerLane votes per lane per participant. You can end the voting session with the button below.
+        </p>
+
+        <p>
+            After ending the retrospective you can review the results.
+        </p>
+
+        <p class="has-text-centered">
+            <button class="button is-danger is-large" type="button" @onclick="@Continue">
+                <span class="fas fa-stop"></span> &nbsp;
+                End the retrospective
+            </button>
         </p>
     </Manager>
     <Participant>
         <p>
+            Please cast your votes now. You can vote @this.RetrospectiveStatus.VotesPerLane times per lane.
         </p>
+
+        <VoteStatusPanel />
+
+        <WorkflowStatusTimer />
     </Participant>
 </RetrospectiveRolePanel>
 
 @code {
+    #nullable disable
 
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; }
+
+    private Task Continue()
+    {
+        if (this.RetrospectiveStatus == null)
+        {
+            return Task.CompletedTask;  // Shouldn't happen, but ignore
+        }
+
+        return this.Mediator.Send(new InitiateFinishStageCommand
+        {
+            RetroId = this.RetrospectiveStatus.RetroId
+        });
+    }
 }

@@ -1,0 +1,86 @@
+@using Return.Application.Common.Models
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Application.Votes.Commands
+@inherits MediatorComponent
+@using Return.Application.Votes.Queries
+
+@if (!this.RetrospectiveStatus.IsVotingAllowed && !this.RetrospectiveStatus.IsViewingVotesAllowed)
+{
+    return;
+}
+
+<div class="@this.CssClass">
+    @if (this.RetrospectiveStatus.IsVotingAllowed)
+    {
+        if (this.Votes.CanCastVote(this.CurrentParticipant.Id, this.Lane.Id) && !this.IsSaving) {
+            <span class="vote-list__vote-button" @onclick="@DoVote">
+                      <i class="fas fa-thumbs-up"></i>
+                  </span>
+        } else {
+            <span class="vote-list__vote-button vote-list__vote-button--disabled">
+                <i class="far fa-thumbs-up"></i>
+            </span>
+        }
+    }
+
+    <ul class="vote-list__list">
+        @foreach (VoteModel vote in this.TheVotes)
+        {
+            <li><Vote Color="@vote.ParticipantColor" IsCast="@vote.IsCast" /></li>
+        }
+    </ul>
+</div>
+
+
+@code {
+    [Parameter]
+    public RetrospectiveNote? Note { get; set; }
+
+    [Parameter]
+    public RetrospectiveNoteGroup? NoteGroup { get; set; }
+
+#nullable disable
+    [CascadingParameter]
+    public RetrospectiveLane Lane { get; set; }
+
+    [CascadingParameter]
+    public RetrospectiveVoteStatus Votes { get; set; }
+
+    [CascadingParameter]
+    public CurrentParticipantModel CurrentParticipant { get; set;  }
+
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; }
+#nullable restore
+
+    // Considered using generic instead, but this is more simple.
+    private int ItemId => this.GetItem(this.Note?.Id, this.NoteGroup?.Id) ?? 0;
+    private VoteLookup Lookup => this.GetItem(this.Votes.VotesByNote, this.Votes.VotesByNoteGroup);
+    private IEnumerable<VoteModel> TheVotes => this.Lookup.Get(this.ItemId).Where(x => x.IsCast);
+    private string CssClass => this.GetItem("note__vote-list vote-list", "note-group__vote-list vote-list");
+    private bool IsSaving { get; set; }
+
+    private T GetItem<T>(T ifNote, T ifGroup)
+    {
+        if (this.Note != null)
+        {
+            return ifNote;
+        }
+
+        if (this.NoteGroup != null)
+        {
+            return ifGroup;
+        }
+
+        throw new InvalidOperationException("Component not initialized");
+    }
+
+    private async Task DoVote()
+    {
+        CastVoteCommand voteCommand = GetItem(CastVoteCommand.ForNote(this.ItemId), CastVoteCommand.ForNoteGroup(this.ItemId));
+
+        this.IsSaving = true;
+        await this.Mediator.Send(voteCommand);
+        this.IsSaving = false;
+    }
+}

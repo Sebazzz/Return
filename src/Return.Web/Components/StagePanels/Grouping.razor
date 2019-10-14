@@ -1,14 +1,40 @@
+@using Return.Application.RetrospectiveWorkflows.Commands
+@inherits MediatorComponent
+
 <RetrospectiveRolePanel>
     <Manager>
         <p>
+            You can start the voting with the button below.
         </p>
+
+        <NextStageInvocationForm TModel="InitiateVotingStageCommand"
+                                 Model="@this.Model" 
+                                 OnContinue="@this.OnInvokeContinueToNextStage"
+                                 ButtonText="Start voting phase"
+                                 TimeLabelText="Number of minutes of voting time">
+            <div class="field">
+                <label class="label">Number of votes per lane</label>
+                <div class="control">
+                    <div class="control has-icons-left">
+                        <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.VotesPerGroup" style="width: 8em" />
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-poll"></i>
+                        </span>
+                     </div>
+                    <ValidationMessage For="() => this.Model.VotesPerGroup" />
+                </div>
+            </div>
+        </NextStageInvocationForm>
     </Manager>
     <Participant>
         <p>
+            Please wait while the manager groups the items in the retrospective.
         </p>
     </Participant>
 </RetrospectiveRolePanel>
 
 @code {
+    private InitiateVotingStageCommand Model { get; } = new InitiateVotingStageCommand();
 
+    private Task OnInvokeContinueToNextStage(InitiateVotingStageCommand command) => this.Mediator.Send(this.Model);
 }

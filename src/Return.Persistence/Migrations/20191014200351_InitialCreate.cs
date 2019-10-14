@@ -155,25 +155,38 @@ namespace Return.Persistence.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    NoteId = table.Column<int>(nullable: false),
-                    ParticipantId = table.Column<int>(nullable: false),
-                    VoteCount = table.Column<int>(nullable: false)
+                    NoteId = table.Column<int>(nullable: true),
+                    NoteGroupId = table.Column<int>(nullable: true),
+                    RetrospectiveId = table.Column<int>(nullable: false),
+                    ParticipantId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NoteVote", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_NoteVote_NoteGroup_NoteGroupId",
+                        column: x => x.NoteGroupId,
+                        principalTable: "NoteGroup",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_NoteVote_Note_NoteId",
                         column: x => x.NoteId,
                         principalTable: "Note",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_NoteVote_Participant_ParticipantId",
                         column: x => x.ParticipantId,
                         principalTable: "Participant",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_NoteVote_Retrospective_RetrospectiveId",
+                        column: x => x.RetrospectiveId,
+                        principalTable: "Retrospective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -207,6 +220,11 @@ namespace Return.Persistence.Migrations
                 column: "RetrospectiveId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_NoteVote_NoteGroupId",
+                table: "NoteVote",
+                column: "NoteGroupId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_NoteVote_NoteId",
                 table: "NoteVote",
                 column: "NoteId");
@@ -215,6 +233,11 @@ namespace Return.Persistence.Migrations
                 name: "IX_NoteVote_ParticipantId",
                 table: "NoteVote",
                 column: "ParticipantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_NoteVote_RetrospectiveId",
+                table: "NoteVote",
+                column: "RetrospectiveId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Participant_RetrospectiveId",

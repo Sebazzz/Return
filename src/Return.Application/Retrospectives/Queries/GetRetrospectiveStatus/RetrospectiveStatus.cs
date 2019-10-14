@@ -16,21 +16,26 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
         public string Title { get; }
 
         public bool IsViewingOtherNotesAllowed => this.Stage >= RetrospectiveStage.Discuss;
+        public bool IsViewingVotesAllowed => this.Stage >= RetrospectiveStage.Voting;
+        public bool IsVotingAllowed => this.Stage == RetrospectiveStage.Voting;
         public bool IsEditingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
         public bool IsDeletingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
         public bool IsGroupingAllowed(bool isManager) => this.Stage == RetrospectiveStage.Grouping && isManager;
 
         public RetrospectiveWorkflowStatus WorkflowStatus { get; }
 
+        public int VotesPerLane { get; }
+
         public RetrospectiveStage Stage { get; }
 
         public List<RetrospectiveLane> Lanes { get; } = new List<RetrospectiveLane>();
 
-        public RetrospectiveStatus(string retroId, string title, RetrospectiveStage retrospectiveStage, RetrospectiveWorkflowStatus workflowStatus) {
+        public RetrospectiveStatus(string retroId, string title, RetrospectiveStage retrospectiveStage, RetrospectiveWorkflowStatus workflowStatus, int votesPerLane) {
             this.RetroId = retroId;
             this.Title = title;
             this.Stage = retrospectiveStage;
             this.WorkflowStatus = workflowStatus;
+            this.VotesPerLane = votesPerLane;
         }
 
         public RetrospectiveStatus() {
@@ -38,6 +43,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
             this.Title = String.Empty;
             this.Stage = RetrospectiveStage.NotStarted;
             this.WorkflowStatus = new RetrospectiveWorkflowStatus();
+            this.VotesPerLane = -1;
         }
     }
 

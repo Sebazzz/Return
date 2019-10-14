@@ -108,20 +108,27 @@ namespace Return.Persistence.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("NoteId")
+                    b.Property<int?>("NoteGroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("NoteId")
                         .HasColumnType("int");
 
                     b.Property<int>("ParticipantId")
                         .HasColumnType("int");
 
-                    b.Property<int>("VoteCount")
+                    b.Property<int>("RetrospectiveId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("NoteGroupId");
+
                     b.HasIndex("NoteId");
 
                     b.HasIndex("ParticipantId");
+
+                    b.HasIndex("RetrospectiveId");
 
                     b.ToTable("NoteVote");
                 });
@@ -247,16 +254,26 @@ namespace Return.Persistence.Migrations
 
             modelBuilder.Entity("Return.Domain.Entities.NoteVote", b =>
                 {
+                    b.HasOne("Return.Domain.Entities.NoteGroup", "NoteGroup")
+                        .WithMany()
+                        .HasForeignKey("NoteGroupId")
+                        .OnDelete(DeleteBehavior.ClientCascade);
+
                     b.HasOne("Return.Domain.Entities.Note", "Note")
                         .WithMany()
                         .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientCascade);
 
                     b.HasOne("Return.Domain.Entities.Participant", "Participant")
                         .WithMany()
                         .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Return.Domain.Entities.Retrospective", "Retrospective")
+                        .WithMany("NoteVotes")
+                        .HasForeignKey("RetrospectiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

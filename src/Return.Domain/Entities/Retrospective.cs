@@ -20,7 +20,8 @@ namespace Return.Domain.Entities {
     public class Retrospective {
         private ICollection<Note>? _notes;
         private ICollection<NoteGroup>? _noteGroups;
-        private Collection<Participant>? _participants;
+        private ICollection<NoteVote>? _noteVotes;
+        private ICollection<Participant>? _participants;
 
         private readonly RetroIdentifier _urlId = RetroIdentifierService.CreateNewInternal();
         private RetrospectiveOptions? _options;
@@ -57,6 +58,8 @@ namespace Return.Domain.Entities {
         public ICollection<Note> Notes => this._notes ??= new Collection<Note>();
         public ICollection<Participant> Participants => this._participants ??= new Collection<Participant>();
         public ICollection<NoteGroup> NoteGroup => this._noteGroups ??= new Collection<NoteGroup>();
+        public ICollection<NoteVote> NoteVotes => this._noteVotes ??= new Collection<NoteVote>();
+
 
         public DateTimeOffset CreationTimestamp { get; set; }
 

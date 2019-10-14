@@ -7,97 +7,99 @@
 }
 
 <CascadingValue Value="this">
-    <h2 class="title has-text-centered">@Lane.Name</h2>
+    <CascadingValue Value="this.Lane">
+        <h2 class="title has-text-centered">@Lane.Name</h2>
 
-    @if (this.Contents == null)
-    {
-        return;
-    }
-
-     @* Action section *@
-    @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
-    {
-        @if (this.ShowErrorMessage)
+        @if (this.Contents == null)
         {
-            <ErrorMessage />
+            return;
         }
 
-        <p class="has-text-centered">
-            <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
-                <span class="icon">
-                    <span class="fas fa-plus-square"></span>
-                </span>
-                <span>
-                    Create a note
-                </span>
-            </button>
-        </p>
-    }
-
-    @if (IsGroupingAllowed())
-    {
-        @if (this.ShowErrorMessage)
+         @* Action section *@
+        @if (this.RetrospectiveStatus?.IsEditingNotesAllowed == true)
         {
-            <ErrorMessage/>
+            @if (this.ShowErrorMessage)
+            {
+                <ErrorMessage />
+            }
+
+            <p class="has-text-centered">
+                <button type="button" class="button is-link is-outlined" @onclick="@AddNote">
+                    <span class="icon">
+                        <span class="fas fa-plus-square"></span>
+                    </span>
+                    <span>
+                        Create a note
+                    </span>
+                </button>
+            </p>
         }
 
-        <p class="has-text-centered">
-            <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
-                <span class="icon">
-                    <span class="fas fa-plus-square"></span>
-                </span>
-                <span>
-                    Create a group
-                </span>
-            </button>
-        </p>
-    }
-
-
-    @* Note groups section *@
-    @if (DisplayGroupHeaders())
-    {
-        @foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+        @if (IsGroupingAllowed())
         {
-            <Revealable @key="@("ng" + noteGroup.Id)">
-                <NoteGroup Data="@noteGroup" CanEdit="@IsGroupingAllowed()" />
-            </Revealable>
+            @if (this.ShowErrorMessage)
+            {
+                <ErrorMessage/>
+            }
+
+            <p class="has-text-centered">
+                <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup">
+                    <span class="icon">
+                        <span class="fas fa-plus-square"></span>
+                    </span>
+                    <span>
+                        Create a group
+                    </span>
+                </button>
+            </p>
         }
 
-        @if (this.Contents.Groups.Count == 0)
+
+        @* Note groups section *@
+        @if (DisplayGroupHeaders())
+        {
+            @foreach (RetrospectiveNoteGroup noteGroup in this.Contents.Groups)
+            {
+                <Revealable @key="@("ng" + noteGroup.Id)">
+                    <NoteGroup Data="@noteGroup" CanEdit="@IsGroupingAllowed()" />
+                </Revealable>
+            }
+
+            @if (this.Contents.Groups.Count == 0)
+            {
+                <div class="box">
+                    <p>
+                        No notes have been grouped.
+                    </p>
+                </div>
+            }
+        }
+
+        @if (IsGroupingAllowed())
+        {
+            <NoteUngroupDropzone/>
+        }
+
+        @* Notes section *@
+        @if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
+        {
+            @foreach (RetrospectiveNote note in this.Contents.Notes)
+            {
+                <Revealable @key="@("n" + note.Id)">
+                    <Note Data="@note" OnDeleted="@(r => this.OnNoteDeletedCallback(r))" />
+                </Revealable>
+            }
+        } 
+    
+        @if (this.Contents.Notes.Count == 0 && this.Contents.Groups.Count == 0)
         {
             <div class="box">
                 <p>
-                    No notes have been grouped.
+                    It is empty here.
                 </p>
             </div>
         }
-    }
-
-    @if (IsGroupingAllowed())
-    {
-        <NoteUngroupDropzone/>
-    }
-
-    @* Notes section *@
-    @if (DisplayGroupHeaders() == false || IsGroupingAllowed() || this.Contents.Notes.Count > 0)
-    {
-        @foreach (RetrospectiveNote note in this.Contents.Notes)
-        {
-            <Revealable @key="@("n" + note.Id)">
-                <Note Data="@note" OnDeleted="@(r => this.OnNoteDeletedCallback(r))" />
-            </Revealable>
-        }
-    } 
-    
-    @if (this.Contents.Notes.Count == 0 && this.Contents.Groups.Count == 0)
-    {
-        <div class="box">
-            <p>
-                It is empty here.
-            </p>
-        </div>
-    }
 
 
+    </CascadingValue>
 </CascadingValue>

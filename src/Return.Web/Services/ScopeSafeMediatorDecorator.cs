@@ -10,13 +10,16 @@ namespace Return.Web.Services {
     using System.Threading;
     using System.Threading.Tasks;
     using MediatR;
+    using Microsoft.Extensions.Logging;
 
     public sealed class ScopeSafeMediatorDecorator : IMediator, IDisposable {
         private readonly IMediator _mediator;
         private readonly SemaphoreSlim _lock;
+        private readonly ILogger<ScopeSafeMediatorDecorator> _logger;
 
-        public ScopeSafeMediatorDecorator(IMediator mediator) {
+        public ScopeSafeMediatorDecorator(IMediator mediator, ILogger<ScopeSafeMediatorDecorator> logger) {
             this._mediator = mediator;
+            this._logger = logger;
             this._lock = new SemaphoreSlim(1, 1);
         }
 
@@ -30,7 +33,13 @@ namespace Return.Web.Services {
                 return await this._mediator.Send(request, cancellationToken).ConfigureAwait(false);
             }
             finally {
-                this._lock.Release();
+                try
+                {
+                    this._lock.Release();
+                } catch (ObjectDisposedException ex)
+                {
+                    this._logger.LogWarning(ex, "Semaphore was already disposed - this may happen after a crash.");
+                }
             }
         }
 

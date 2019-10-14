@@ -77,7 +77,7 @@ namespace Return.Web.Components {
 
         protected void HandleDragEnter() {
             // Ignore drag to self
-            if (this.Data.Id == this.Container.Payload.GroupId) return;
+            if (this.Data.Id == this.Container.Payload?.GroupId) return;
 
             // TODO: check lane ID "no-drop"
             this.DropClass = this.Container.Payload == null ? "no-drop" : "can-drop";
@@ -91,7 +91,7 @@ namespace Return.Web.Components {
             this.DropClass = "";
 
             if (this.Container.Payload == null) return;
-            if (this.GroupId == this.Container.Payload.GroupId) return;
+            if (this.GroupId == this.Container.Payload?.GroupId) return;
 
             await this.Container.UpdateGroupAsync(this.Data.Id);
         }

@@ -13,9 +13,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
     using Application.Common.Security;
     using Application.Notes.Commands.MoveNote;
     using Application.Notifications.NoteMoved;
-    using Application.Notifications.NoteUpdated;
     using Domain.Entities;
-    using Domain.Services;
     using MediatR;
     using NSubstitute;
     using NUnit.Framework;
@@ -81,8 +79,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
                 Lane = this.Context.NoteLanes.FirstOrDefault(),
                 Text = "Derp"
             };
-            var noteGroup = new NoteGroup
-            {
+            var noteGroup = new NoteGroup {
                 Lane = note.Lane,
                 Retrospective = note.Retrospective,
                 Title = "G1"
@@ -125,8 +122,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
                 Lane = this.Context.NoteLanes.FirstOrDefault(),
                 Text = "Derp"
             };
-            var noteGroup = new NoteGroup
-            {
+            var noteGroup = new NoteGroup {
                 Lane = note.Lane,
                 Retrospective = note.Retrospective,
                 Title = "G1"

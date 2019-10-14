@@ -137,6 +137,84 @@ namespace Return.Application.Tests.Unit {
         }
 
         [Test]
+        public void ShouldMap_NoteVoteWithNote_ToVoteModel() {
+            // Given
+            var entity = new NoteVote
+            {
+                Id = 342,
+                Note = new Note
+                {
+                    Id = 49,
+                    Lane = new NoteLane
+                    {
+                        Id = KnownNoteLane.Stop
+                    }
+                },
+                Participant = new Participant
+                {
+                    Id = 43,
+                    Color = Color.Aqua,
+                    Name = "Hans"
+                }
+            };
+
+            // When
+            var mapped = this.Mapper.Map<VoteModel>(entity);
+
+            // Then
+            Assert.That(mapped, Is.Not.Null);
+
+            Assert.That(mapped.Id, Is.EqualTo(entity.Id));
+            Assert.That(mapped.ParticipantId, Is.EqualTo(entity.Participant.Id));
+            Assert.That(mapped.ParticipantName, Is.EqualTo(entity.Participant.Name));
+            Assert.That(mapped.ParticipantColor.G, Is.EqualTo(entity.Participant.Color.G));
+
+            Assert.That(mapped.LaneId, Is.EqualTo((int) KnownNoteLane.Stop));
+            Assert.That(mapped.NoteId, Is.EqualTo(entity.Note.Id));
+            Assert.That(mapped.NoteGroupId, Is.EqualTo(null));
+            Assert.That(mapped.IsCast, Is.True);
+        }
+
+        [Test]
+        public void ShouldMap_NoteVoteWithNoteGroup_ToVoteModel() {
+            // Given
+            var entity = new NoteVote
+            {
+                Id = 342,
+                NoteGroup = new NoteGroup
+                {
+                    Id = 49,
+                    Lane = new NoteLane
+                    {
+                        Id = KnownNoteLane.Stop
+                    }
+                },
+                Participant = new Participant
+                {
+                    Id = 43,
+                    Color = Color.Aqua,
+                    Name = "Hans"
+                }
+            };
+
+            // When
+            var mapped = this.Mapper.Map<VoteModel>(entity);
+
+            // Then
+            Assert.That(mapped, Is.Not.Null);
+
+            Assert.That(mapped.Id, Is.EqualTo(entity.Id));
+            Assert.That(mapped.ParticipantId, Is.EqualTo(entity.Participant.Id));
+            Assert.That(mapped.ParticipantName, Is.EqualTo(entity.Participant.Name));
+            Assert.That(mapped.ParticipantColor.G, Is.EqualTo(entity.Participant.Color.G));
+
+            Assert.That(mapped.LaneId, Is.EqualTo((int) KnownNoteLane.Stop));
+            Assert.That(mapped.NoteGroupId, Is.EqualTo(entity.NoteGroup.Id));
+            Assert.That(mapped.NoteId, Is.EqualTo(null));
+            Assert.That(mapped.IsCast, Is.True);
+        }
+
+        [Test]
         public void ShouldMap_NoteCollection_ToGroups() {
             RetrospectiveNoteGroup Group(int id) => new RetrospectiveNoteGroup { Id = id };
             RetrospectiveNote Note(int id, int? groupId) => new RetrospectiveNote { Id = id, GroupId = groupId };

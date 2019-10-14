@@ -45,6 +45,7 @@ namespace Return.Persistence {
         public DbSet<PredefinedParticipantColor> PredefinedParticipantColors { get; set; }
         public DbSet<Note> Notes { get; set; }
         public DbSet<NoteGroup> NoteGroups { get; set; }
+        public DbSet<NoteVote> NoteVotes { get; set; }
         public DbSet<NoteLane> NoteLanes { get; set; }
         public DbSet<Participant> Participants { get; set; }
         public DbSet<Retrospective> Retrospectives { get; set; }

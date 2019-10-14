@@ -14,7 +14,6 @@ namespace Return.Application.Tests.Unit.NoteGroups.Commands {
     using Application.Common.Models;
     using Application.Common.Security;
     using Application.NoteGroups.Commands;
-    using Application.Notifications.NoteAdded;
     using Application.Notifications.NoteLaneUpdated;
     using Domain.Entities;
     using MediatR;

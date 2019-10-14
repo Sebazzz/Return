@@ -1,0 +1,33 @@
+@using Return.Application.Common.Models
+@using Return.Application.Votes.Queries
+
+<div class="vote-status-panel">
+    <h3 class="title vote-status-panel__title">Vote status</h3>
+
+    <ul class="vote-status-panel__list">
+        @foreach (int participantId in this.Votes.VotesByParticipant.Keys)
+        {
+            List<VoteModel> participantVotes = this.Votes.VotesByParticipant.Get(participantId);
+            VoteModel participantVote = participantVotes[0];
+            bool isDone = participantVotes.All(v => v.IsCast);
+            string faClass = isDone ? "fas" : "far";
+
+            <li>
+                <span style="color: #@participantVote.ParticipantColor.HexString" 
+                      class="@faClass fa-user-circle"
+                      title="@participantVote.ParticipantName"></span>
+                @foreach (VoteModel vote in participantVotes)
+                {
+                    <Vote Color="@vote.ParticipantColor" IsCast="@vote.IsCast" />
+                }
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    #nullable disable
+
+    [CascadingParameter]
+    public RetrospectiveVoteStatus Votes { get; set; }
+}

@@ -14,7 +14,7 @@ namespace Return.Application.PredefinedParticipantColors.Queries.GetAvailablePre
 
 #nullable disable
 
-    public class AvailableParticipantColorModel : ColorModel, IMapFrom<PredefinedParticipantColor> {
+    public class AvailableParticipantColorModel : ColorModel {
         public string Name { get; set; }
 
         public override void Mapping(Profile profile) {

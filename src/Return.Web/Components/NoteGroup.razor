@@ -1,6 +1,8 @@
 @using Return.Application.Common.Models
 @inherits NoteGroupBase
 
+<VoteList NoteGroup="@this.Data"/>
+
 <div class="note-group dropzone @(this.Classes)"
      @onclick="@ToggleExpand"
      ondragover="event.preventDefault();"

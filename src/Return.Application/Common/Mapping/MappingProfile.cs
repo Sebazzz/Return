@@ -17,17 +17,26 @@ namespace Return.Application.Common.Mapping {
             this.ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        private void ApplyMappingsFromAssembly(Assembly assembly) {
+        private void ApplyMappingsFromAssembly(Assembly assembly)
+        {
+            Type mapFromType = typeof(IMapFrom<>);
             List<Type> types = assembly.GetExportedTypes().
                 Where(predicate: t => t.GetInterfaces().
                     Any(predicate: i =>
-                        i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMapFrom<>))).
+                        i.IsGenericType && i.GetGenericTypeDefinition() == mapFromType)).
                 ToList();
 
             foreach (Type type in types) {
                 object? instance = Activator.CreateInstance(type: type);
-                MethodInfo? methodInfo = type.GetMethod(name: "Mapping");
-                methodInfo?.Invoke(obj: instance, new object[] { this });
+
+                foreach (Type interfaceType in type.GetInterfaces())
+                {
+                    if (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == mapFromType)
+                    {
+                        MethodInfo? methodInfo = interfaceType.GetMethod(name: "Mapping");
+                        methodInfo?.Invoke(obj: instance, new object[] { this });
+                    }
+                }
             }
         }
     }

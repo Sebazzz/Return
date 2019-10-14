@@ -1,17 +1,13 @@
 @page "/retrospective/{retroId}/lobby"
-@using Return.Application.Common
-@using Return.Application.Common.Abstractions
-@using Return.Application.Common.Models
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
-@using Return.Domain.ValueObjects
-@inherits SubscribingComponent<Return.Application.Notifications.RetrospectiveStatusUpdated.IRetrospectiveStatusUpdatedSubscriber>
-@implements Return.Application.Notifications.RetrospectiveStatusUpdated.IRetrospectiveStatusUpdatedSubscriber
-@inject ICurrentParticipantService CurrentParticipantService
-@inject NavigationManager NavigationManager
+@inherits RetrospectiveLobbyBase
 
 @if (this.RetrospectiveStatus == null)
 {
-    <ErrorMessage Text="This retrospective cannot be found!" />
+    @if (this.HasLoaded) {
+        <ErrorMessage Text="This retrospective cannot be found!" />
+    }
+
     return;
 }
 
@@ -20,83 +16,26 @@
 <CascadingValue Value=@this.RetroIdObject IsFixed="true">
     <CascadingValue Value=@this.CurrentParticipant IsFixed="true">
         <CascadingValue Value=@this.RetrospectiveStatus>
-            <div class="columns">
-                <div class="column is-three-quarters">
-                    <div class="columns">
-                        @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
-                        {
-                            <div class="column">
-                                <NoteLane @key="lane.Id" Lane="@lane" />
-                            </div>
-                        }
+            <CascadingValue Value=@this.Votes>
+                <div class="columns">
+                    <div class="column is-three-quarters">
+                        <div class="columns">
+                            @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+                            {
+                                <div class="column">
+                                    <NoteLane @key="lane.Id" Lane="@lane" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
+
+                        <RetrospectiveStatusPanel />
                     </div>
                 </div>
-
-                <div class="column">
-                    <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
-
-                    <RetrospectiveStatusPanel />
-                </div>
-            </div>
+            </CascadingValue>
         </CascadingValue>
     </CascadingValue>
 </CascadingValue>
-
-
-@code {
-#nullable disable
-
-    [Parameter]
-    public string RetroId { get; set; }
-
-    [Parameter]
-    public CurrentParticipantModel CurrentParticipant { get; set; }
-
-    public RetrospectiveStatus RetrospectiveStatus { get; set; } = null;
-
-    public RetroIdentifier RetroIdObject { get; set; }
-
-    protected override void OnInitialized()
-    {
-        this.RetroIdObject = new RetroIdentifier(this.RetroId);
-        base.OnInitialized();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        CurrentParticipantModel currentParticipant = await this.CurrentParticipantService.GetParticipant();
-
-        if (!currentParticipant.IsAuthenticated)
-        {
-            this.NavigationManager.NavigateTo("/retrospective/" + this.RetroId + "/join");
-            return;
-        }
-
-        this.CurrentParticipant = currentParticipant;
-
-        try
-        {
-            this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
-
-            this.StateHasChanged();
-        }
-        catch (NotFoundException)
-        {
-            this.RetrospectiveStatus = null;
-        }
-    }
-
-    public Task OnRetrospectiveStatusUpdated(RetrospectiveStatus retrospectiveStatus)
-    {
-        if (this.RetrospectiveStatus?.RetroId != this.RetroId)
-        {
-            return Task.CompletedTask;
-        }
-
-        return this.InvokeAsync(() =>
-        {
-            this.RetrospectiveStatus = retrospectiveStatus;
-            this.StateHasChanged();
-        });
-    }
-}

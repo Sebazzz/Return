@@ -12,6 +12,7 @@ namespace Return.Web.Tests.Unit.Services {
     using System.Threading;
     using System.Threading.Tasks;
     using MediatR;
+    using Microsoft.Extensions.Logging.Abstractions;
     using NUnit.Framework;
     using Web.Services;
 
@@ -22,7 +23,7 @@ namespace Return.Web.Tests.Unit.Services {
         [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         public async Task ScopeSafeMediatorDecoratorTest_OnlyAllowsOneThread() {
             // Given
-            using var mediator = new ScopeSafeMediatorDecorator(new MediatorWorker());
+            using var mediator = new ScopeSafeMediatorDecorator(new MediatorWorker(), new NullLogger<ScopeSafeMediatorDecorator>());
 
             // When
             Task CreateTasks() {
