@@ -24,8 +24,8 @@
 
     &__item {
         transition-property: margin-top, transform;
-        transition-timing-function: ease;
-        transition-duration: 1s;
+        transition-timing-function: ease-in-out;
+        transition-duration: 750ms;
     }
     // 20 notes per group ought to be enough for everyone
     $max-notes-count: 30;
