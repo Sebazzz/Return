@@ -26,7 +26,8 @@
                   rows="1"
                   placeholder="Enter your text here" 
                   @bind-value="@TextData" 
-                  @bind-value:event="oninput"></textarea>
+                  @bind-value:event="oninput"
+                  @ref="this.TextBoxReference"></textarea>
     }
     else
     {

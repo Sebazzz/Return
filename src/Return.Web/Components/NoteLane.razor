@@ -86,7 +86,7 @@
             @foreach (RetrospectiveNote note in this.Contents.Notes)
             {
                 <Revealable @key="@("n" + note.Id)">
-                    <Note Data="@note" OnDeleted="@(r => this.OnNoteDeletedCallback(r))" />
+                    <Note Data="@note" OnDeleted="@(r => this.OnNoteDeletedCallback(r))" IsLastAddedNote="@(note == this.LastAddedNote)" />
                 </Revealable>
             }
         } 

@@ -84,9 +84,15 @@ namespace Return.Web.Components {
         [CascadingParameter]
         public RetroIdentifier RetroId { get; set; }
 
+        /// <summary>
+        /// Used for drag and drop
+        /// </summary>
         internal RetrospectiveNote Payload { get; set; }
 
         protected RetrospectiveLaneContent Contents { get; private set; }
+
+        protected RetrospectiveNote LastAddedNote { get; private set; }
+
         protected bool ShowErrorMessage { get; private set; }
 
         private bool? _isShowingNotes;
@@ -219,6 +225,7 @@ namespace Return.Web.Components {
                 RetrospectiveNote result = await this.Mediator.Send(new AddNoteCommand(this.RetroId.StringId, this.Lane.Id));
 
                 this.Contents.Notes.Insert(0, result);
+                this.LastAddedNote = result;
             }
             catch (Exception ex) {
                 this.ShowErrorMessage = true;

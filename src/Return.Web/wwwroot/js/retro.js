@@ -58,3 +58,13 @@ document.addEventListener('drop', function(ev) {
         subtree: true
     });
 })();
+
+// JSInterop functions
+(function(retro) {
+    retro.focusNoteElement = function(element) {
+        if (element && typeof element.focus === 'function') {
+            console.log('Focusing text input');
+            element.focus();
+        }
+    };
+})((window.retro = window.retro || {}));

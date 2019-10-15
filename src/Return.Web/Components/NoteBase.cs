@@ -16,6 +16,7 @@ namespace Return.Web.Components {
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Microsoft.AspNetCore.Components;
     using Microsoft.Extensions.Logging;
+    using Microsoft.JSInterop;
     using Services;
 
 #nullable disable
@@ -27,6 +28,9 @@ namespace Return.Web.Components {
     public abstract class NoteBase : SubscribingComponent<Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber>, Return.Application.Notifications.NoteUpdated.INoteUpdatedSubscriber {
         [Inject]
         public ILogger<Note> Logger { get; set; }
+
+        [Inject]
+        public IJSRuntime JSInterop { get; set; }
 
         [CascadingParameter]
         public RetrospectiveStatus RetrospectiveStatus { get; set; } = new RetrospectiveStatus();
@@ -42,7 +46,13 @@ namespace Return.Web.Components {
         [Parameter]
         public EventCallback<RetrospectiveNote> OnDeleted { get; set; }
 
+        [Parameter]
+        public bool IsLastAddedNote { get; set; }
+
         protected bool ShowErrorMessage { get; private set; }
+
+        protected ElementReference TextBoxReference { get; set; }
+
         private readonly AutoResettingBoolean _shouldRenderValue = new AutoResettingBoolean(true);
 
         protected string TextData {
@@ -75,6 +85,16 @@ namespace Return.Web.Components {
 
                 this.StateHasChanged();
             });
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender) {
+            if (this.IsLastAddedNote && this.CanEdit()) {
+                await this.JSInterop.InvokeVoidAsync("retro.focusNoteElement", this.TextBoxReference);
+
+                this.IsLastAddedNote = false;
+            }
+
+            await base.OnAfterRenderAsync(firstRender);
         }
 
         protected void OnHandleNoteUpdateTyping() {
