@@ -49,7 +49,7 @@
         }
 
         <p>
-            To start the retrospective, you need to enter the following password: <code>@Model.ManagerPassphrase</code>.
+            To start the retrospective, you need to enter the following password: <code>@Model.FacilitatorPassphrase</code>.
         </p>
 
         <p>
@@ -84,12 +84,12 @@ else
         </div>
 
         <div class="field">
-            <label class="label" for="retro-manager-passphrase">Manager passphrase</label>
+            <label class="label" for="retro-facilitator-passphrase">Facilitator passphrase</label>
             <div class="control">
-                <InputText id="retro-manager-passphrase" class="input" type="text" @bind-Value="@Model.ManagerPassphrase" placeholder="" />
+                <InputText id="retro-facilitator-passphrase" class="input" type="text" @bind-Value="@Model.FacilitatorPassphrase" placeholder="" />
             </div>
 
-            <ValidationMessage For="() => Model.ManagerPassphrase"></ValidationMessage>
+            <ValidationMessage For="() => Model.FacilitatorPassphrase"></ValidationMessage>
             <p class="help">This is the password you need to start and control the progress of the retrospective.</p>
         </div>
 

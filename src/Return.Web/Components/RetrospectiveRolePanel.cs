@@ -18,7 +18,7 @@ namespace Return.Web.Components {
     /// </summary>
     public sealed class RetrospectiveRolePanel : ComponentBase {
         [Parameter]
-        public RenderFragment Manager { get; set; }
+        public RenderFragment Facilitator { get; set; }
 
         [Parameter]
         public RenderFragment Participant { get; set; }
@@ -28,7 +28,7 @@ namespace Return.Web.Components {
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Framework infrastructure provides argument")]
         protected override void BuildRenderTree(RenderTreeBuilder builder) {
-            RenderFragment applicableRenderFragment = this.CurrentParticipantInfo.IsManager ? this.Manager : this.Participant;
+            RenderFragment applicableRenderFragment = this.CurrentParticipantInfo.IsFacilitator ? this.Facilitator : this.Participant;
 
             applicableRenderFragment.Invoke(builder);
         }

@@ -53,7 +53,7 @@ namespace Return.Application.Tests.Unit.NoteGroups.Commands {
 
             var retro = new Retrospective {
                 CurrentStage = RetrospectiveStage.Grouping,
-                ManagerHashedPassphrase = "whatever",
+                FacilitatorHashedPassphrase = "whatever",
                 Title = TestContext.CurrentContext.Test.FullName,
                 CreationTimestamp = DateTimeOffset.Now,
                 Participants = { new Participant { Name = "John" } }
@@ -86,7 +86,7 @@ namespace Return.Application.Tests.Unit.NoteGroups.Commands {
 
             var retro = new Retrospective {
                 CurrentStage = RetrospectiveStage.Writing,
-                ManagerHashedPassphrase = "whatever",
+                FacilitatorHashedPassphrase = "whatever",
                 Title = TestContext.CurrentContext.Test.FullName,
                 CreationTimestamp = DateTimeOffset.Now,
                 Participants = { new Participant { Name = "John" } }

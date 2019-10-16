@@ -15,7 +15,7 @@ namespace Return.Persistence {
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-    public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateManager {
+    public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateFacilitator {
         private readonly DbContextOptions _options;
         private readonly IDatabaseOptions? _databaseOptions;
 

@@ -82,7 +82,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             var command = new JoinRetrospectiveCommand {
                 RetroId = retro.UrlId.StringId,
                 Color = "ABCDEF",
-                JoiningAsManager = true,
+                JoiningAsFacilitator = true,
                 Name = "The BOSS",
                 Passphrase = "Not relevant"
             };
@@ -124,7 +124,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             var command = new JoinRetrospectiveCommand {
                 RetroId = retro.UrlId.StringId,
                 Color = "ABCDEF",
-                JoiningAsManager = true,
+                JoiningAsFacilitator = true,
                 Name = "Duplicate joiner",
                 Passphrase = "Not relevant"
             };

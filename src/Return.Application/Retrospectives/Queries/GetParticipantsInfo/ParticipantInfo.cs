@@ -19,7 +19,7 @@ namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
         public string Id { get; set; }
         public string Name { get; set; }
         public ColorModel Color { get; set; }
-        public bool IsManager { get; set; }
+        public bool IsFacilitator { get; set; }
 
         public void Mapping(Profile profile) {
             if (profile == null) throw new ArgumentNullException(nameof(profile));

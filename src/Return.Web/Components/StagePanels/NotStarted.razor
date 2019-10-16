@@ -2,7 +2,7 @@
 @inherits MediatorComponent
 
 <RetrospectiveRolePanel>
-    <Manager>
+    <Facilitator>
         <p>
             You can start the retrospective with the button below. Participants can still join after the retrospective has started.
         </p>
@@ -12,10 +12,10 @@
                                  OnContinue="@this.OnInvokeContinueToNextStage"
                                  ButtonText="Start retrospective"
                                  TimeLabelText="Number of minutes of write time"/>
-    </Manager>
+    </Facilitator>
     <Participant>
         <p>
-            Please wait while the manager starts the retrospective.
+            Please wait while the facilitator starts the retrospective.
         </p>
     </Participant>
 </RetrospectiveRolePanel>

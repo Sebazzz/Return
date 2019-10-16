@@ -34,7 +34,7 @@ namespace Return.Application.Tests.Unit.Votes.Queries {
             };
 
             var retro = new Retrospective {
-                ManagerHashedPassphrase = "whatever",
+                FacilitatorHashedPassphrase = "whatever",
                 CurrentStage = RetrospectiveStage.Voting,
                 Title = this.GetType().FullName,
                 Participants = { p1, p2 },

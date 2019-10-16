@@ -8,7 +8,7 @@
 namespace Return.Domain.Entities {
     public enum RetrospectiveStage {
         /// <summary>
-        /// The retrospective is not started yet and waiting for a manager to appear
+        /// The retrospective is not started yet and waiting for a facilitator to appear
         /// </summary>
         NotStarted,
 
@@ -23,7 +23,7 @@ namespace Return.Domain.Entities {
         Discuss,
 
         /// <summary>
-        /// The retrospective is underway: notes are currently being grouped by the manager.
+        /// The retrospective is underway: notes are currently being grouped by the facilitator.
         /// </summary>
         Grouping,
 

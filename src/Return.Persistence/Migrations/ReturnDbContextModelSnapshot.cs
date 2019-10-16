@@ -140,7 +140,7 @@ namespace Return.Persistence.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<bool>("IsManager")
+                    b.Property<bool>("IsFacilitator")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -194,7 +194,7 @@ namespace Return.Persistence.Migrations
                         .HasMaxLength(64)
                         .IsUnicode(false);
 
-                    b.Property<string>("ManagerHashedPassphrase")
+                    b.Property<string>("FacilitatorHashedPassphrase")
                         .IsRequired()
                         .HasColumnType("char(64)")
                         .IsFixedLength(true)

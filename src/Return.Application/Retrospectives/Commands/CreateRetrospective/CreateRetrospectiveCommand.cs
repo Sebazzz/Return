@@ -12,7 +12,7 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
 #nullable disable
         public string Title { get; set; }
 
-        public string ManagerPassphrase { get; set; }
+        public string FacilitatorPassphrase { get; set; }
 
 #nullable enable
         public string? Passphrase { get; set; }

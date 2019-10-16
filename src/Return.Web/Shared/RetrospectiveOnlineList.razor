@@ -56,7 +56,7 @@
 
     protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>
         @<span style="color: #@participantInfo.Color.HexString">
-            @if (participantInfo.IsManager) { <span class="fas fa-crown"></span> }
+            @if (participantInfo.IsFacilitator) { <span class="fas fa-crown"></span> }
             @participantInfo.Name
          </span>;
 

@@ -40,7 +40,7 @@ namespace Return.Application.Tests.Unit.Notes.Commands {
             // Given
             var note = new Note {
                 Retrospective = new Retrospective {
-                    ManagerHashedPassphrase = "whatever",
+                    FacilitatorHashedPassphrase = "whatever",
                     CurrentStage = RetrospectiveStage.Writing,
                     Title = this.GetType().FullName
                 },

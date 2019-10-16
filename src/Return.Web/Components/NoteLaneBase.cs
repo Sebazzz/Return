@@ -302,7 +302,7 @@ namespace Return.Web.Components {
         }
 
         private readonly AutoResettingBoolean _skipFirstUpdate = new AutoResettingBoolean(false);
-        protected internal bool IsGroupingAllowed() => this.RetrospectiveStatus?.IsGroupingAllowed(this.CurrentParticipant.IsManager) == true;
+        protected internal bool IsGroupingAllowed() => this.RetrospectiveStatus?.IsGroupingAllowed(this.CurrentParticipant.IsFacilitator) == true;
         protected bool DisplayGroupHeaders() => this.Contents?.Groups.Count > 0 || this.IsGroupingAllowed();
     }
 }

@@ -17,7 +17,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "This is a validation rule set.")]
     public sealed class JoinRetrospectiveCommandValidator : AbstractValidator<JoinRetrospectiveCommand> {
-        private static readonly Expression<Func<Retrospective, string?>> GetManagerHash = r => r.ManagerHashedPassphrase;
+        private static readonly Expression<Func<Retrospective, string?>> GetFacilitatorHash = r => r.FacilitatorHashedPassphrase;
         private static readonly Expression<Func<Retrospective, string?>> GetParticipantHash = r => r.HashedPassphrase;
 
         private readonly IReturnDbContextFactory _returnDbContext;
@@ -32,18 +32,18 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
             this.RuleFor(e => e.Passphrase)
                 .NotEmpty()
-                .When(x => x.JoiningAsManager);
+                .When(x => x.JoiningAsFacilitator);
 
             // Passphrase validation
             this.RuleFor(e => e.Passphrase).
-                Must((obj, passphrase) => this.MustBeAValidPassphrase(obj.RetroId, obj.JoiningAsManager, obj.Passphrase))
+                Must((obj, passphrase) => this.MustBeAValidPassphrase(obj.RetroId, obj.JoiningAsFacilitator, obj.Passphrase))
                 .WithMessage("This passphrase is not valid. Please try again.");
         }
 
-        private bool MustBeAValidPassphrase(string retroId, in bool isManagerRole, string passphrase) {
+        private bool MustBeAValidPassphrase(string retroId, in bool isFacilitatorRole, string passphrase) {
             using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
 
-            Expression<Func<Retrospective, string?>> property = isManagerRole ? GetManagerHash : GetParticipantHash;
+            Expression<Func<Retrospective, string?>> property = isFacilitatorRole ? GetFacilitatorHash : GetParticipantHash;
             string? hash = dbContext.Retrospectives.Where(x => x.UrlId.StringId == retroId).Select(property).FirstOrDefault();
 
             if (hash == null) {

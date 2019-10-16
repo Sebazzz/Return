@@ -20,7 +20,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
         public bool IsVotingAllowed => this.Stage == RetrospectiveStage.Voting;
         public bool IsEditingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
         public bool IsDeletingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
-        public bool IsGroupingAllowed(bool isManager) => this.Stage == RetrospectiveStage.Grouping && isManager;
+        public bool IsGroupingAllowed(bool isFacilitator) => this.Stage == RetrospectiveStage.Grouping && isFacilitator;
 
         public RetrospectiveWorkflowStatus WorkflowStatus { get; }
 

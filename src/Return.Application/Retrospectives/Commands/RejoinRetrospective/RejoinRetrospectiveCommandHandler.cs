@@ -39,7 +39,7 @@ namespace Return.Application.Retrospectives.Commands.RejoinRetrospective {
             }
 
             this._currentParticipantService.SetParticipant(
-                new CurrentParticipantModel(result.Id, result.Name, result.IsManager));
+                new CurrentParticipantModel(result.Id, result.Name, result.IsFacilitator));
 
             return Unit.Value;
         }

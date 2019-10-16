@@ -19,6 +19,6 @@ namespace Return.Domain.Entities {
 
         public string Name { get; set; }
 
-        public bool IsManager { get; set; }
+        public bool IsFacilitator { get; set; }
     }
 }

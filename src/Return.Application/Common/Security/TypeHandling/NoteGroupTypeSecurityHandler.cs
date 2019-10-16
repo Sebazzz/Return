@@ -16,8 +16,8 @@ namespace Return.Application.Common.Security.TypeHandling {
         protected override void HandleAddOrUpdate(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel currentParticipant) {
             switch (retrospective.CurrentStage) {
                 case RetrospectiveStage.Grouping:
-                    if (!currentParticipant.IsManager) {
-                        throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by manager role");
+                    if (!currentParticipant.IsFacilitator) {
+                        throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by facilitator role");
 
                     }
                     break;
@@ -28,15 +28,15 @@ namespace Return.Application.Common.Security.TypeHandling {
 
         protected override void HandleDelete(Retrospective retrospective, NoteGroup entity, in CurrentParticipantModel currentParticipant) {
             switch (retrospective.CurrentStage) {
-            case RetrospectiveStage.Grouping:
-            if (!currentParticipant.IsManager) {
-                throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by manager role");
+                case RetrospectiveStage.Grouping:
+                    if (!currentParticipant.IsFacilitator) {
+                        throw new OperationSecurityException($"Operation is allowed in retrospective stage {retrospective.CurrentStage} but only by facilitator role");
 
+                    }
+                    break;
+                default:
+                    throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
             }
-            break;
-            default:
-            throw new OperationSecurityException($"Operation not allowed in retrospective stage {retrospective.CurrentStage}");
         }
-    }
     }
 }

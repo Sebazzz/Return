@@ -100,7 +100,7 @@ namespace Return.Application.Tests.Unit.Common.Security {
         [Test]
         [TestCase(SecurityOperation.AddOrUpdate)]
         [TestCase(SecurityOperation.Delete)]
-        public void SecurityValidator_DisallowsOperationOnNoteGroup_NotManager(SecurityOperation securityOperation) {
+        public void SecurityValidator_DisallowsOperationOnNoteGroup_NotFacilitator(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
             var noteGroup = new NoteGroup { Title = "G" };
@@ -133,7 +133,7 @@ namespace Return.Application.Tests.Unit.Common.Security {
         [Test]
         [TestCase(SecurityOperation.AddOrUpdate)]
         [TestCase(SecurityOperation.Delete)]
-        public void SecurityValidator_AllowsOperationOnNote_IsManager(SecurityOperation securityOperation) {
+        public void SecurityValidator_AllowsOperationOnNote_IsFacilitator(SecurityOperation securityOperation) {
             // Given
             Retrospective retro = GetRetrospectiveInStage(RetrospectiveStage.Grouping);
             var noteGroup = new NoteGroup { Title = "G" };

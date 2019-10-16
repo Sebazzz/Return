@@ -45,7 +45,7 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
                 CreationTimestamp = this._systemClock.CurrentTimeOffset,
                 Title = request.Title,
                 HashedPassphrase = HashOptionalPassphrase(request.Passphrase),
-                ManagerHashedPassphrase = HashOptionalPassphrase(request.ManagerPassphrase) ?? throw new InvalidOperationException("No manager passphrase given"),
+                FacilitatorHashedPassphrase = HashOptionalPassphrase(request.FacilitatorPassphrase) ?? throw new InvalidOperationException("No facilitator passphrase given"),
             };
 
             this._logger.LogInformation($"Creating new retrospective with id {retrospective.UrlId}");

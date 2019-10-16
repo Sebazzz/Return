@@ -25,7 +25,7 @@ namespace Return.Application.Tests.Unit.PredefinedParticipantColors.Queries {
             // Given
             var retro = new Domain.Entities.Retrospective {
                 CreationTimestamp = DateTimeOffset.UtcNow,
-                ManagerHashedPassphrase = "xxx",
+                FacilitatorHashedPassphrase = "xxx",
                 Title = "xxx",
                 Participants = { new Participant { Name = "John", Color = Color.Gold } }
             };

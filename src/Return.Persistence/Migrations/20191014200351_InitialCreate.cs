@@ -45,7 +45,7 @@ namespace Return.Persistence.Migrations
                     CurrentStage = table.Column<int>(nullable: false),
                     HashedPassphrase = table.Column<string>(unicode: false, fixedLength: true, maxLength: 64, nullable: true),
                     Title = table.Column<string>(maxLength: 256, nullable: false),
-                    ManagerHashedPassphrase = table.Column<string>(unicode: false, fixedLength: true, maxLength: 64, nullable: false),
+                    FacilitatorHashedPassphrase = table.Column<string>(unicode: false, fixedLength: true, maxLength: 64, nullable: false),
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false),
                     Options_MaximumNumberOfVotes = table.Column<int>(nullable: true),
                     WorkflowData_CurrentWorkflowInitiationTimestamp = table.Column<DateTimeOffset>(nullable: true),
@@ -94,7 +94,7 @@ namespace Return.Persistence.Migrations
                     Color_B = table.Column<byte>(nullable: true),
                     RetrospectiveId = table.Column<int>(nullable: false),
                     Name = table.Column<string>(maxLength: 256, nullable: false),
-                    IsManager = table.Column<bool>(nullable: false)
+                    IsFacilitator = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

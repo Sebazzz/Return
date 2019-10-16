@@ -31,7 +31,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             var handler = new CreateRetrospectiveCommandHandler(this.Context, passphraseService, systemClock, urlGenerator, new NullLogger<CreateRetrospectiveCommandHandler>());
 
             passphraseService.CreateHashedPassphrase("anything").Returns("myhash");
-            passphraseService.CreateHashedPassphrase("manager password").Returns("managerhash");
+            passphraseService.CreateHashedPassphrase("facilitator password").Returns("facilitatorhash");
 
             urlGenerator.GenerateUrlToRetrospectiveLobby(Arg.Any<RetroIdentifier>()).Returns(new Uri("https://example.com/retro/1"));
 
@@ -39,7 +39,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
 
             var request = new CreateRetrospectiveCommand {
                 Passphrase = "anything",
-                ManagerPassphrase = "manager password",
+                FacilitatorPassphrase = "facilitator password",
                 Title = "Hello"
             };
 
@@ -49,7 +49,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
             // Then
             Assert.That(result.Identifier.StringId, Is.Not.Null);
             Assert.That(this.Context.Retrospectives.Any(), Is.True);
-            Assert.That(this.Context.Retrospectives.First().ManagerHashedPassphrase, Is.EqualTo("managerhash"));
+            Assert.That(this.Context.Retrospectives.First().FacilitatorHashedPassphrase, Is.EqualTo("facilitatorhash"));
             Assert.That(this.Context.Retrospectives.First().CreationTimestamp, Is.EqualTo(DateTimeOffset.UnixEpoch));
         }
     }

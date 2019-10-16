@@ -21,8 +21,8 @@ namespace Return.Web.Services {
     public class CurrentParticipantService : ICurrentParticipantService {
         private const string ParticipantClaimType = ClaimTypes.NameIdentifier;
         private const string ParticipantNameClaimType = ClaimTypes.Name;
-        private const string ManagerClaimType = ClaimTypes.Role;
-        private const string ManagerClaimContent = "Manager";
+        private const string FacilitatorClaimType = ClaimTypes.Role;
+        private const string FacilitatorClaimContent = "Facilitator";
         private HttpContext? _httpContext;
 
         private readonly AuthenticationStateProvider _authenticationStateProvider;
@@ -55,13 +55,13 @@ namespace Return.Web.Services {
                 return;
             }
 
-            ( int participantId, string? name, bool isManager ) = currentParticipant;
+            ( int participantId, string? name, bool isFacilitator ) = currentParticipant;
 
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ParticipantClaimType, participantId.ToString(Culture.Invariant), participantId.GetType().FullName));
             identity.AddClaim(new Claim(ParticipantNameClaimType, name, typeof(string).FullName));
-            if (isManager) {
-                identity.AddClaim(new Claim(ManagerClaimType, ManagerClaimContent, ManagerClaimContent.GetType().FullName));
+            if (isFacilitator) {
+                identity.AddClaim(new Claim(FacilitatorClaimType, FacilitatorClaimContent, FacilitatorClaimContent.GetType().FullName));
             }
 
             hostEnvProvider.SetAuthenticationState(
@@ -80,7 +80,7 @@ namespace Return.Web.Services {
             return new CurrentParticipantModel(
                 GetParticipantId(user),
                 GetNameLocal(user),
-                IsManager(user)
+                IsFacilitator(user)
             );
         }
 
@@ -109,15 +109,15 @@ namespace Return.Web.Services {
 
         private static string GetNameLocal(ClaimsPrincipal user) => user.FindFirstValue(ParticipantNameClaimType);
 
-        private static bool IsManager(ClaimsPrincipal user)
+        private static bool IsFacilitator(ClaimsPrincipal user)
         {
-            string? rawParticipantId = user.FindFirstValue(ManagerClaimType);
+            string? rawParticipantId = user.FindFirstValue(FacilitatorClaimType);
             if (String.IsNullOrEmpty(rawParticipantId))
             {
                 return default;
             }
 
-            return String.Equals(rawParticipantId, ManagerClaimContent, StringComparison.Ordinal);
+            return String.Equals(rawParticipantId, FacilitatorClaimContent, StringComparison.Ordinal);
         }
 
         private static int GetParticipantId(ClaimsPrincipal user)

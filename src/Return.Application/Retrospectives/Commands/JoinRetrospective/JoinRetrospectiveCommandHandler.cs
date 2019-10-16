@@ -47,7 +47,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             // Create domain object
             Participant participant = await this.GetOrCreateParticipantAsync(request.RetroId, request.Name, cancellationToken);
 
-            participant.IsManager = request.JoiningAsManager;
+            participant.IsFacilitator = request.JoiningAsFacilitator;
             participant.Name = request.Name;
             participant.Retrospective = retrospective;
             participant.Color = new ParticipantColor {
@@ -63,7 +63,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             await this._returnDbContext.SaveChangesAsync(cancellationToken);
 
             // Update auth info
-            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(participant.Id, participant.Name, request.JoiningAsManager));
+            this._currentParticipantService.SetParticipant(new CurrentParticipantModel(participant.Id, participant.Name, request.JoiningAsFacilitator));
 
             // Broadcast
             var participantInfo = this._mapper.Map<ParticipantInfo>(participant);

@@ -2,7 +2,7 @@
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @using Return.Application.RetrospectiveWorkflows.Commands
 <RetrospectiveRolePanel>
-    <Manager>
+    <Facilitator>
         <VoteStatusPanel />
 
         <WorkflowStatusTimer />
@@ -21,7 +21,7 @@
                 End the retrospective
             </button>
         </p>
-    </Manager>
+    </Facilitator>
     <Participant>
         <p>
             Please cast your votes now. You can vote @this.RetrospectiveStatus.VotesPerLane times per lane.

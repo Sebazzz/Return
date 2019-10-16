@@ -17,7 +17,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
         public string Passphrase { get; set; }
 
-        public bool JoiningAsManager { get; set; }
+        public bool JoiningAsFacilitator { get; set; }
         public string RetroId { get; set; }
     }
 }

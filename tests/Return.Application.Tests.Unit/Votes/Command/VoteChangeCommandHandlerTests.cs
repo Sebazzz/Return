@@ -31,7 +31,7 @@ namespace Return.Application.Tests.Unit.Votes.Command {
             this._currentParticipantService.GetParticipant().
                 Returns((ci) => {
                     Participant p = this.Context.Participants.Last();
-                    return new ValueTask<CurrentParticipantModel>(new CurrentParticipantModel(p.Id, p.Name, p.IsManager));
+                    return new ValueTask<CurrentParticipantModel>(new CurrentParticipantModel(p.Id, p.Name, p.IsFacilitator));
                 });
         }
 
@@ -200,7 +200,7 @@ namespace Return.Application.Tests.Unit.Votes.Command {
         private async Task<Retrospective> CreateRetrospectiveWithNoteGroup() {
             var retro = new Retrospective {
                 CurrentStage = RetrospectiveStage.Writing,
-                ManagerHashedPassphrase = "whatever",
+                FacilitatorHashedPassphrase = "whatever",
                 Title = TestContext.CurrentContext.Test.FullName,
                 CreationTimestamp = DateTimeOffset.Now,
                 Participants = { new Participant { Name = "John" } },
@@ -253,7 +253,7 @@ namespace Return.Application.Tests.Unit.Votes.Command {
         private async Task<Retrospective> CreateRetrospectiveWithNote() {
             var retro = new Retrospective {
                 CurrentStage = RetrospectiveStage.Writing,
-                ManagerHashedPassphrase = "whatever",
+                FacilitatorHashedPassphrase = "whatever",
                 Title = TestContext.CurrentContext.Test.FullName,
                 CreationTimestamp = DateTimeOffset.Now,
                 Participants = { new Participant { Name = "John" } },
