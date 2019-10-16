@@ -39,15 +39,15 @@ namespace Return.Application.Votes.Commands {
 
             switch (request.EntityType) {
                 case VoteEntityType.Note:
-                    return this.HandleNoteVote(request.Id, cancellationToken);
+                    return this.HandleNoteVote(request.Id, request.Mutation, cancellationToken);
                 case VoteEntityType.NoteGroup:
-                    return this.HandleNoteGroupVote(request.Id, cancellationToken);
+                    return this.HandleNoteGroupVote(request.Id, request.Mutation, cancellationToken);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(request));
             }
         }
 
-        private async Task<Unit> HandleNoteGroupVote(int noteGroupId, CancellationToken cancellationToken) {
+        private async Task<Unit> HandleNoteGroupVote(int noteGroupId, VoteMutationType mutationType, CancellationToken cancellationToken) {
             using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
 
             // Get
@@ -58,6 +58,47 @@ namespace Return.Application.Votes.Commands {
                 throw new NotFoundException(nameof(NoteGroup), noteGroupId);
             }
 
+            NoteVote vote = await (mutationType switch
+            {
+                VoteMutationType.Added => this.HandleNoteGroupVoteAdd(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
+                VoteMutationType.Removed => this.HandleNoteGroupVoteRemove(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
+                _ => throw new InvalidOperationException("Invalid vote mutation type: " + mutationType)
+            });
+
+            if (vote == null) {
+                return Unit.Value;
+            }
+
+            // Broadcast
+            await this.Broadcast(vote, mutationType, CancellationToken.None);
+
+            return Unit.Value;
+        }
+
+        private async Task<NoteVote?> HandleNoteGroupVoteRemove(NoteGroup noteGroup, IReturnDbContext dbContext, CancellationToken cancellationToken) {
+            // Find a vote
+            Participant owner = await this.GetParticipant(dbContext);
+            NoteVote vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv =>
+                nv.ParticipantId == owner.Id && nv.NoteGroup.Id == noteGroup.Id, cancellationToken);
+
+            if (vote == null) {
+                return null;
+            }
+
+            await this._securityValidator.EnsureDelete(noteGroup.Retrospective, vote);
+
+            // Save
+            dbContext.NoteVotes.Remove(vote);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return vote;
+        }
+
+        private async Task<NoteVote> HandleNoteGroupVoteAdd(
+            NoteGroup noteGroup,
+            IReturnDbContext dbContext,
+            CancellationToken cancellationToken
+        ) {
             // Validate
             var vote = new NoteVote {
                 NoteGroup = noteGroup,
@@ -69,14 +110,10 @@ namespace Return.Application.Votes.Commands {
             // Save
             dbContext.NoteVotes.Add(vote);
             await dbContext.SaveChangesAsync(cancellationToken);
-
-            // Broadcast
-            await this.Broadcast(vote, VoteMutationType.Added, CancellationToken.None);
-
-            return Unit.Value;
+            return vote;
         }
 
-        private async Task<Unit> HandleNoteVote(int noteId, CancellationToken cancellationToken) {
+        private async Task<Unit> HandleNoteVote(int noteId, VoteMutationType mutationType, CancellationToken cancellationToken) {
             using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
 
             // Get
@@ -86,6 +123,28 @@ namespace Return.Application.Votes.Commands {
                 throw new NotFoundException(nameof(Note), noteId);
             }
 
+            NoteVote vote = await (mutationType switch
+            {
+                VoteMutationType.Added => this.HandleNoteVoteAdd(note, dbContext: dbContext, cancellationToken: cancellationToken),
+                VoteMutationType.Removed => this.HandleNoteVoteRemove(note, dbContext: dbContext, cancellationToken: cancellationToken),
+                _ => throw new InvalidOperationException("Invalid vote mutation type: " + mutationType)
+            });
+
+            if (vote == null) {
+                return Unit.Value;
+            }
+
+            // Broadcast
+            await this.Broadcast(vote, mutationType, CancellationToken.None);
+
+            return Unit.Value;
+        }
+
+        private async Task<NoteVote> HandleNoteVoteAdd(
+            Note note,
+            IReturnDbContext dbContext,
+            CancellationToken cancellationToken
+        ) {
             // Validate
             var vote = new NoteVote {
                 Note = note,
@@ -97,11 +156,25 @@ namespace Return.Application.Votes.Commands {
             // Save
             dbContext.NoteVotes.Add(vote);
             await dbContext.SaveChangesAsync(cancellationToken);
+            return vote;
+        }
 
-            // Broadcast
-            await this.Broadcast(vote, VoteMutationType.Added, CancellationToken.None);
+        private async Task<NoteVote?> HandleNoteVoteRemove(Note note, IReturnDbContext dbContext, CancellationToken cancellationToken) {
+            // Find a vote
+            Participant owner = await this.GetParticipant(dbContext);
+            NoteVote vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv => nv.ParticipantId == owner.Id && nv.Note.Id == note.Id, cancellationToken);
 
-            return Unit.Value;
+            if (vote == null) {
+                return null;
+            }
+
+            await this._securityValidator.EnsureDelete(note.Retrospective, vote);
+
+            // Save
+            dbContext.NoteVotes.Remove(vote);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return vote;
         }
 
         private Task Broadcast(NoteVote vote, VoteMutationType mutation, CancellationToken cancellationToken) {

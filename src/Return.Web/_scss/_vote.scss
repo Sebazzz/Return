@@ -32,6 +32,16 @@
             transform: none;
         }
     }
+
+    &__vote-remove-button {
+        cursor: pointer;
+
+        &:hover {
+            opacity: 0.75;
+            color: $danger;
+            transform: scale(1.2);
+        }
+    }
 }
 
 .vote-status-panel {

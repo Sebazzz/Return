@@ -1,7 +1,10 @@
+@using Microsoft.Extensions.Logging
 @using Return.Application.Common.Models
+@using Return.Application.Notifications.VoteChanged
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @using Return.Application.Votes.Commands
 @inherits MediatorComponent
+@inject ILogger<VoteList> Logger
 @using Return.Application.Votes.Queries
 
 @if (!this.RetrospectiveStatus.IsVotingAllowed && !this.RetrospectiveStatus.IsViewingVotesAllowed)
@@ -26,7 +29,15 @@
     <ul class="vote-list__list">
         @foreach (VoteModel vote in this.TheVotes)
         {
-            <li><Vote Color="@vote.ParticipantColor" IsCast="@vote.IsCast" /></li>
+            if (vote.ParticipantId == this.CurrentParticipant.Id && !this.IsSaving && this.RetrospectiveStatus.IsVotingAllowed)
+            {
+                <li class="vote-list__vote-remove-button"
+                    @onclick="@this.RetractVote"><Vote Color="@vote.ParticipantColor" IsCast="@vote.IsCast" /></li>
+            }
+            else
+            {
+                <li><Vote Color="@vote.ParticipantColor" IsCast="@vote.IsCast" /></li>
+            }
         }
     </ul>
 </div>
@@ -75,12 +86,25 @@
         throw new InvalidOperationException("Component not initialized");
     }
 
-    private async Task DoVote()
-    {
-        CastVoteCommand voteCommand = GetItem(CastVoteCommand.ForNote(this.ItemId), CastVoteCommand.ForNoteGroup(this.ItemId));
+    private Task DoVote() => this.ExecuteVoteCommand(VoteMutationType.Added);
+    private Task RetractVote() => this.ExecuteVoteCommand(VoteMutationType.Removed);
+
+    private async Task ExecuteVoteCommand(VoteMutationType mutationType) {
+        CastVoteCommand voteCommand = GetItem(CastVoteCommand.ForNote(this.ItemId, mutationType), CastVoteCommand.ForNoteGroup(this.ItemId, mutationType));
 
         this.IsSaving = true;
-        await this.Mediator.Send(voteCommand);
-        this.IsSaving = false;
+        try
+        {
+            await this.Mediator.Send(voteCommand);
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogError(ex, $"Error casting vote {mutationType} for item #{this.ItemId} [{this.CssClass}]");
+        }
+        finally
+        {
+            this.IsSaving = false;
+        }
+        
     }
 }
