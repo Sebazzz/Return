@@ -12,7 +12,10 @@ namespace Return.Application.RetrospectiveWorkflows.Commands {
     public abstract class AbstractTimedStageCommandValidator<TCommand> : AbstractValidator<TCommand> where TCommand : AbstractTimedStageCommand {
         protected AbstractTimedStageCommandValidator() {
             this.RuleFor(x => x.RetroId).NotEmpty();
-            this.RuleFor(x => x.TimeInMinutes).GreaterThan(0);
+
+            this.RuleFor(x => x.TimeInMinutes)
+                .GreaterThan(0)
+                .WithName("Time in minutes");
         }
     }
 }

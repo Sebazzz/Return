@@ -13,7 +13,10 @@ namespace Return.Application.RetrospectiveWorkflows.Commands {
         Justification = "This is a validation rule set.")]
     public sealed class InitiateVotingStageCommandValidator : AbstractTimedStageCommandValidator<InitiateVotingStageCommand> {
         public InitiateVotingStageCommandValidator() {
-            this.RuleFor(x => x.TimeInMinutes).GreaterThan(0).LessThan(8);
+            this.RuleFor(x => x.VotesPerGroup)
+                .GreaterThan(0)
+                .LessThan(8)
+                .WithName("Number of votes per lane");
         }
     }
 }

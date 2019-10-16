@@ -84,19 +84,21 @@ else
                         <label class="label">Your color</label>
                         <div class="control">
                             <div class="field has-addons">
-                                <div class="select">
-                                    <InputSelect @bind-Value="@Model.Color">
-                                        <option value="">Select an option</option>
-                                        @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
-                                            <option style="color: #@color.HexString" value="#@color.HexString">@color.Name</option>
-                                        }
-                                    </InputSelect>
+                                <div class="control">
+                                    <div class="select">
+                                        <InputSelect @bind-Value="@Model.Color">
+                                            <option value="">Select an option</option>
+                                            @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
+                                                <option style="color: #@color.HexString" value="#@color.HexString">@color.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
                                 </div>
-                                <p class="control">
+                                <div class="control">
                                     <button type="button" class="button is-info" @onclick="@ChooseOwnColor">
                                         Custom color
                                     </button>
-                                </p>
+                                </div>
                             </div>
                         </div>
                     </div>

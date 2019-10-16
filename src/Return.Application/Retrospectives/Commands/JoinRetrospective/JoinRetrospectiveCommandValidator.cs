@@ -20,10 +20,10 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
         private static readonly Expression<Func<Retrospective, string?>> GetManagerHash = r => r.ManagerHashedPassphrase;
         private static readonly Expression<Func<Retrospective, string?>> GetParticipantHash = r => r.HashedPassphrase;
 
-        private readonly IReturnDbContext _returnDbContext;
+        private readonly IReturnDbContextFactory _returnDbContext;
         private readonly IPassphraseService _passphraseService;
 
-        public JoinRetrospectiveCommandValidator(IReturnDbContext returnDbContext, IPassphraseService passphraseService) {
+        public JoinRetrospectiveCommandValidator(IReturnDbContextFactory returnDbContext, IPassphraseService passphraseService) {
             this._returnDbContext = returnDbContext;
             this._passphraseService = passphraseService;
 
@@ -41,8 +41,10 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
         }
 
         private bool MustBeAValidPassphrase(string retroId, in bool isManagerRole, string passphrase) {
+            using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
+
             Expression<Func<Retrospective, string?>> property = isManagerRole ? GetManagerHash : GetParticipantHash;
-            string? hash = this._returnDbContext.Retrospectives.Where(x => x.UrlId.StringId == retroId).Select(property).FirstOrDefault();
+            string? hash = dbContext.Retrospectives.Where(x => x.UrlId.StringId == retroId).Select(property).FirstOrDefault();
 
             if (hash == null) {
                 return true;
