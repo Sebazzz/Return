@@ -1,5 +1,11 @@
 @charset "utf-8";
 
+// Common vars
+$beige-light: #d0d1cd;
+$beige-lighter: #eff0eb;
+$navbar-background-color: $beige-light;
+$body-background-color: $beige-lighter;
+
 // Import font awesome
 $fa-font-path: '/build/fonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
@@ -7,7 +13,13 @@ $fa-font-path: '/build/fonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
 
 // Import bulma
-@import '../node_modules/bulma/bulma';
+@import '../node_modules/bulma/sass/utilities/_all';
+@import '../node_modules/bulma/sass/base/_all';
+@import '../node_modules/bulma/sass/elements/_all';
+@import '../node_modules/bulma/sass/form/_all';
+@import '../node_modules/bulma/sass/components/_all';
+@import '../node_modules/bulma/sass/grid/_all';
+@import '../node_modules/bulma/sass/layout/_all';
 
 // Vars
 $reveal-shadow-color: yellow;

@@ -12,3 +12,7 @@
     @extend .help;
     @extend .is-danger;
 }
+
+.navbar-item.active {
+    @extend .navbar-item.is-active;
+}
