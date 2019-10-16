@@ -29,10 +29,10 @@
             <input class="input" type="text" readonly="readonly" value="@Result.Location">
         </div>
 
-        <div class="columns is-mobile is-centered">
-            <div class="column is-half">
+        <div>
+            <p>
                 <img src="@Result.QrCode.ToBase64()" class="retro-qrcode" />
-            </div>
+            </p>
         </div>
 
         if (!String.IsNullOrEmpty(Model.Passphrase))

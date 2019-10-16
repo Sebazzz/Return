@@ -6,6 +6,7 @@
 // ******************************************************************************
 
 namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
+    using System.Drawing;
     using Domain.ValueObjects;
     using QRCoder;
 
@@ -32,7 +33,7 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
         public string ToBase64() {
             using var base64QrCode = new Base64QRCode(this._qrCodeData);
 
-            return "data:image/png;base64," + base64QrCode.GetGraphic(5);
+            return "data:image/png;base64," + base64QrCode.GetGraphic(5, Color.Black, Color.Transparent);
         }
     }
 }
