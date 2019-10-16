@@ -15,3 +15,9 @@
 p {
     margin-bottom: 1em;
 }
+
+.input {
+    &--retro-color {
+        width: 5em;
+    }
+}

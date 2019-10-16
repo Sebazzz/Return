@@ -72,7 +72,7 @@ else
                     <div class="field">
                         <label class="label" for="retro-color">Your custom color</label>
                         <div class="control">
-                            <InputText id="retro-color" type="color" class="input" @bind-Value="@Model.Color" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
+                            <InputText id="retro-color" type="color" class="input input--retro-color" @bind-Value="@Model.Color" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
                         </div>
 
                         <ValidationMessage For="() => Model.Color"></ValidationMessage>
