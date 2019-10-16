@@ -7,9 +7,13 @@
 
 namespace Return.Application.Notifications.NoteAdded {
     using System.Threading.Tasks;
+    using Microsoft.Extensions.Logging;
 
-    public sealed class
-        NoteAddedNotificationDispatcher : NotificationDispatcher<NoteAddedNotification, INoteAddedSubscriber> {
+    public sealed class NoteAddedNotificationDispatcher : NotificationDispatcher<NoteAddedNotification, INoteAddedSubscriber> {
+        public NoteAddedNotificationDispatcher(ILogger<NotificationDispatcher<NoteAddedNotification, INoteAddedSubscriber>> logger) : base(logger)
+        {
+        }
+
         protected override Task DispatchCore(
             INoteAddedSubscriber subscriber,
             NoteAddedNotification notification

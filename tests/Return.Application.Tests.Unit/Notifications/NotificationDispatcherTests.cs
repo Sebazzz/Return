@@ -11,6 +11,8 @@ namespace Return.Application.Tests.Unit.Notifications {
     using System.Threading.Tasks;
     using Application.Notifications;
     using MediatR;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Logging.Abstractions;
     using NSubstitute;
     using NUnit.Framework;
 
@@ -19,7 +21,7 @@ namespace Return.Application.Tests.Unit.Notifications {
         [Test]
         public async Task NotificationDispatcher_DispatchesNotification() {
             // Given
-            using var dispatcher = new TestNotificationDispatcher();
+            using var dispatcher = new TestNotificationDispatcher(new NullLogger<NotificationDispatcher<TestNotification, ITestNotificationSubscriber>>());
             var subscriber = Substitute.For<ITestNotificationSubscriber>();
             subscriber.UniqueId.Returns(Guid.NewGuid());
             subscriber.Callback(Arg.Any<TestNotification>()).Returns(Task.CompletedTask);
@@ -35,7 +37,8 @@ namespace Return.Application.Tests.Unit.Notifications {
             dispatcher.Subscribe(subscriber2);
             GC.Collect();
 
-            await dispatcher.Dispatch(notification, CancellationToken.None);
+            dispatcher.Dispatch(notification, CancellationToken.None);
+            Thread.Yield();
 
             // Then
             await (subscriber.Received(1).Callback(notification) ?? Task.CompletedTask);
@@ -45,7 +48,7 @@ namespace Return.Application.Tests.Unit.Notifications {
         [Test]
         public async Task NotificationDispatcher_Unsubscribe_NotDispatchesNotification() {
             // Given
-            using var dispatcher = new TestNotificationDispatcher();
+            using var dispatcher = new TestNotificationDispatcher(new NullLogger<NotificationDispatcher<TestNotification, ITestNotificationSubscriber>>());
             var subscriber = Substitute.For<ITestNotificationSubscriber>();
             subscriber.UniqueId.Returns(Guid.NewGuid());
             subscriber.Callback(Arg.Any<TestNotification>()).Returns(Task.CompletedTask);
@@ -55,7 +58,8 @@ namespace Return.Application.Tests.Unit.Notifications {
             // When
             dispatcher.Subscribe(subscriber);
 
-            await dispatcher.Dispatch(notification, CancellationToken.None);
+            dispatcher.Dispatch(notification, CancellationToken.None);
+            Thread.Yield();
 
             dispatcher.Unsubscribe(subscriber);
 
@@ -65,6 +69,10 @@ namespace Return.Application.Tests.Unit.Notifications {
 
 
         private sealed class TestNotificationDispatcher : NotificationDispatcher<TestNotification, ITestNotificationSubscriber> {
+            public TestNotificationDispatcher(ILogger<NotificationDispatcher<TestNotification, ITestNotificationSubscriber>> logger) : base(logger)
+            {
+            }
+
             protected override Task DispatchCore(ITestNotificationSubscriber subscriber, TestNotification notification) => subscriber.Callback(notification);
         }
     }
