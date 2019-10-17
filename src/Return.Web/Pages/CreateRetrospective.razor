@@ -83,23 +83,28 @@ else
             <ValidationMessage For="() => Model.Title"></ValidationMessage>
         </div>
 
-        <div class="field">
-            <label class="label" for="retro-facilitator-passphrase">Facilitator passphrase</label>
-            <div class="control">
-                <InputText id="retro-facilitator-passphrase" class="input" type="text" @bind-Value="@Model.FacilitatorPassphrase" placeholder="" />
-            </div>
+        <div class="columns">
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="retro-facilitator-passphrase">Facilitator passphrase</label>
+                    <div class="control">
+                        <InputText id="retro-facilitator-passphrase" class="input" type="text" @bind-Value="@Model.FacilitatorPassphrase" placeholder="" />
+                    </div>
 
-            <ValidationMessage For="() => Model.FacilitatorPassphrase"></ValidationMessage>
-            <p class="help">This is the password you need to start and control the progress of the retrospective.</p>
-        </div>
-
-        <div class="field">
-            <label class="label" for="retro-passphrase">Participant passphrase</label>
-            <div class="control">
-                <InputText id="retro-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
+                    <ValidationMessage For="() => Model.FacilitatorPassphrase"></ValidationMessage>
+                    <p class="help">This is the password you need to start and control the progress of the retrospective.</p>
+                </div>
             </div>
-            <ValidationMessage For="() => Model.Passphrase"></ValidationMessage>
-            <p class="help">Optional passphrase required for participants to enter the lobby.</p>
+            <div class="column">
+                <div class="field">
+                    <label class="label" for="retro-passphrase">Participant passphrase</label>
+                    <div class="control">
+                        <InputText id="retro-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
+                    </div>
+                    <ValidationMessage For="() => Model.Passphrase"></ValidationMessage>
+                    <p class="help">Optional passphrase required for participants to enter the lobby.</p>
+                </div>
+            </div>
         </div>
 
         <div class="field is-grouped">
