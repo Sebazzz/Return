@@ -1,4 +1,4 @@
-# ![Icon](src/Return.Web/wwwroot/images/logo/return.svg) Return
+# ![Icon](doc/logo.png) Return
 
 Retrospective tool built in ASP.NET Core and Blazor
 
@@ -49,6 +49,6 @@ Application icon:
 
 Built on:
 
--   [Bulma](https://bulma.io) \_CSS framework\_\_;
+-   [Bulma](https://bulma.io) _CSS framework_;
 -   [Fontawesome](http://fontawesome.io/) as _icon framework_;
 -   [ASP.NET Core 3.0](https://dot.net) (Blazor Server) with [Entity Framework Core](https://docs.microsoft.com/en-us/ef/core/) for _server side logic and data persistence_;
