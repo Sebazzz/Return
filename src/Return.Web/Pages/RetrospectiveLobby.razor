@@ -29,11 +29,11 @@
                     </div>
 
                     <div class="column">
-                        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
-
                         <CascadingValue TValue="@IRetrospectiveLobby" Value=@this IsFixed="true">
                             <RetrospectiveStatusPanel />
                         </CascadingValue>
+
+                        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
                     </div>
                 </div>
             </CascadingValue>
