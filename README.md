@@ -5,8 +5,18 @@ Retrospective tool built in ASP.NET Core and Blazor
 Licensed: GNU GPL v3.0
 
 [![Build status](https://ci.appveyor.com/api/projects/status/7bjrmgtek7j080d7?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return)
-[![CircleCI](https://circleci.com/gh/Sebazzz/Return.svg?style=svg)](https://circleci.com/gh/Sebazzz/Return)
 [![Github CI](https://github.com/sebazzz/Return/workflows/Continuous%20integration/badge.svg)](https://github.com/Sebazzz/Return/actions?workflow=Continuous+integration)
+
+## Features
+
+-   Realtime retrospective app, ideal for remote teams
+-   Create password protected retrospectives
+-   As facilitator, manage the retrospective through the writing, grouping and voting phase.
+-   Overview with highest voted items
+
+## Download
+
+Download the release for your OS from the [releases tab](https://github.com/Sebazzz/Return/releases) or download the cutting edge builds from [AppVeyor](https://ci.appveyor.com/project/Sebazzz/Return).
 
 ## Screenshots
 
