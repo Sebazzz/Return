@@ -5,7 +5,7 @@
 }
 
 <div class="box note draggable @(this.CanView() ? "" : "note--blurred") @(this.CanEdit() ? "note--editable" : "")" 
-     draggable="@(this.Container.IsGroupingAllowed() ? "true" : null)"
+     draggable="@(this.Container?.IsGroupingAllowed() == true ? "true" : null)"
      @ondragstart="@(() => HandleDragStart(this.Data))"
      @ondragend="@(() => HandleDragEnd())"
      style="background-color: #@this.Data.ParticipantColor.HexString">

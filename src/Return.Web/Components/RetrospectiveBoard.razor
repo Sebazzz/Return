@@ -1,0 +1,16 @@
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+<div class="columns">
+    @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
+    {
+        <div class="column">
+            <NoteLane @key="lane.Id" Lane="@lane" />
+        </div>
+    }
+</div>
+
+@code {
+    #nullable disable
+
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; }
+}

@@ -9,6 +9,7 @@ namespace Return.Web.Services {
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common.Behaviours;
     using MediatR;
     using Microsoft.Extensions.Logging;
 
@@ -23,21 +24,28 @@ namespace Return.Web.Services {
             this._lock = new SemaphoreSlim(1, 1);
         }
 
-        public async Task<TResponse> Send<TResponse>(
+        public Task<TResponse> Send<TResponse>(
             IRequest<TResponse> request,
             CancellationToken cancellationToken = new CancellationToken()
         ) {
+            if (request is ILockFreeRequest) {
+                return this._mediator.Send(request, cancellationToken);
+            }
+
+            return this.SendWithRequestLock(request: request, cancellationToken: cancellationToken);
+        }
+
+        private async Task<TResponse> SendWithRequestLock<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken) {
             try {
                 await this._lock.WaitAsync(cancellationToken).ConfigureAwait(false);
 
                 return await this._mediator.Send(request, cancellationToken).ConfigureAwait(false);
             }
             finally {
-                try
-                {
+                try {
                     this._lock.Release();
-                } catch (ObjectDisposedException ex)
-                {
+                }
+                catch (ObjectDisposedException ex) {
                     this._logger.LogWarning(ex, "Semaphore was already disposed - this may happen after a crash.");
                 }
             }

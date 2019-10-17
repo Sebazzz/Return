@@ -1,5 +1,4 @@
 @page "/retrospective/{retroId}/lobby"
-@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @inherits RetrospectiveLobbyBase
 
 @if (this.RetrospectiveStatus == null)
@@ -19,20 +18,22 @@
             <CascadingValue Value=@this.Votes>
                 <div class="columns">
                     <div class="column is-three-quarters">
-                        <div class="columns">
-                            @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
-                            {
-                                <div class="column">
-                                    <NoteLane @key="lane.Id" Lane="@lane" />
-                                </div>
-                            }
-                        </div>
+                        @if (this.ShowShowcase == false)
+                        {
+                            <RetrospectiveBoard />
+                        }
+                        else
+                        {
+                            <Showcase />
+                        }
                     </div>
 
                     <div class="column">
                         <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
 
-                        <RetrospectiveStatusPanel />
+                        <CascadingValue TValue="@IRetrospectiveLobby" Value=@this IsFixed="true">
+                            <RetrospectiveStatusPanel />
+                        </CascadingValue>
                     </div>
                 </div>
             </CascadingValue>

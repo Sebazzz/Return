@@ -1,0 +1,49 @@
+@inherits ShowcaseBase
+
+@if (this.Data == null)
+{
+    if (this.ShowErrorMessage)
+    {
+        <ErrorMessage />
+    }
+    else
+    {
+        <div class="notification is-info">
+            <strong>Hold on!</strong> Crunching the data...
+        </div>
+    }
+} else {
+    <div class="showcase">
+        <div class="showcase__button-container showcase__button-container--previous">
+            <button type="button"
+                    class="button @(this.HasPreviousItem ? "is-dark" : "is-light") is-inverted"
+                    @onclick="@this.ShowPreviousItem">
+                <span class="icon">
+                    <span class="fas fa-arrow-left"></span>
+                </span>
+            </button>
+        </div>
+
+        @for (int index = 0; index < this.Data.Items.Count; index++)
+        {
+            <ShowcaseItemDisplay @key="@index" 
+                                  Data="@(this.Data.Items[index])"
+                                  ItemIndex="@index" 
+                                  VisibleItemIndex="@this.VisibleItemIndex"/>
+        }
+
+        <div class="showcase__button-container showcase__button-container--next">
+            <button type="button"
+                    class="button @(this.HasNextItem ? "is-link" : "is-light") is-inverted"
+                    @onclick="@this.ShowNextItem">
+                <span class="icon">
+                    <span class="fas fa-arrow-right"></span>
+                </span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    
+}

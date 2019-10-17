@@ -18,14 +18,23 @@ namespace Return.Web.Pages {
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Application.Votes.Queries;
     using Components;
+    using Domain.Entities;
     using Domain.ValueObjects;
     using Microsoft.AspNetCore.Components;
+
+    public interface IRetrospectiveLobby {
+        bool ShowShowcase { get; }
+
+        void ShowShowcaseDisplay();
+
+        void ShowBoardDisplay();
+    }
 
     [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "In-app callbacks")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by framework")]
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We catch, log and display.")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Needed for DI")]
-    public abstract class RetrospectiveLobbyBase : MediatorComponent, IRetrospectiveStatusUpdatedSubscriber, IVoteChangeSubscriber, IDisposable {
+    public abstract class RetrospectiveLobbyBase : MediatorComponent, IRetrospectiveStatusUpdatedSubscriber, IVoteChangeSubscriber, IRetrospectiveLobby, IDisposable {
         public Guid UniqueId { get; } = Guid.NewGuid();
 
 #nullable disable
@@ -57,6 +66,20 @@ namespace Return.Web.Pages {
         public RetrospectiveVoteStatus Votes { get; set; }
 
         protected bool HasLoaded { get; private set; }
+
+        public bool ShowShowcase { get; private set; }
+
+        public void ShowShowcaseDisplay() {
+            this.ShowShowcase = true;
+
+            this.StateHasChanged();
+        }
+
+        public void ShowBoardDisplay() {
+            this.ShowShowcase = false;
+
+            this.StateHasChanged();
+        }
 
 #nullable restore
 
@@ -94,6 +117,10 @@ namespace Return.Web.Pages {
             try {
                 this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
 
+                if (this.RetrospectiveStatus.Stage == RetrospectiveStage.Finished) {
+                    this.ShowShowcase = true;
+                }
+
                 this.Votes = (await this.Mediator.Send(new GetVotesQuery(this.RetroId))).VoteStatus;
             }
             catch (NotFoundException) {
@@ -111,6 +138,11 @@ namespace Return.Web.Pages {
 
             return this.InvokeAsync(() => {
                 this.RetrospectiveStatus = retrospectiveStatus;
+
+                if (retrospectiveStatus.Stage == RetrospectiveStage.Finished) {
+                    this.ShowShowcase = true;
+                }
+
                 this.StateHasChanged();
             });
         }

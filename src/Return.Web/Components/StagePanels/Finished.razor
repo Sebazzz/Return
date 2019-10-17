@@ -1,3 +1,5 @@
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Web.Pages
 <RetrospectiveRolePanel>
     <Facilitator>
         <p>
@@ -15,3 +17,26 @@
         </p>
     </Participant>
 </RetrospectiveRolePanel>
+
+@if (this.RetrospectiveLobby != null) {
+    if (this.RetrospectiveLobby.ShowShowcase)
+    {
+        <button type="button"
+                class="button is-link is-outlined full-width"
+                @onclick="@(() => this.RetrospectiveLobby.ShowBoardDisplay())">
+            <span class="icon"><span class="fas fa-columns"></span></span><span>Show full board</span>
+        </button>
+    } else {
+        <button type="button"
+                class="button is-link is-outlined full-width"
+                @onclick="@(() => this.RetrospectiveLobby.ShowShowcaseDisplay())">
+            <span class="icon"><span class="fas fa-list-ol"></span></span><span>Show top items</span>
+        </button>
+    }
+}
+
+@code {
+    #nullable disable
+    [CascadingParameter]
+    public IRetrospectiveLobby RetrospectiveLobby { get; set; }
+}

@@ -1,0 +1,44 @@
+@using Return.Application.Showcase.Queries
+
+<div class="showcase-item @this.CssClass">
+    <h3 class="showcase-item__title">@this.Data.Lane.Name</h3>
+
+     <CascadingValue Value="@this.Data.Lane" IsFixed="true">
+         @if (this.Data.Note != null)
+         {
+             <Note Data="@this.Data.Note"/>
+         }
+
+         @if (this.Data.NoteGroup != null)
+         {
+             <NoteGroup Data="@this.Data.NoteGroup" IsExpanded="@this.IsShown"/>
+         }
+     </CascadingValue>
+</div>
+
+@code {
+    #nullable disable
+    [Parameter]
+    public ShowcaseItem Data { get; set; }
+
+    [Parameter]
+    public int ItemIndex { get; set; }
+
+    [Parameter]
+    public int VisibleItemIndex { get; set; }
+
+    private bool IsShown => this.ItemIndex == this.VisibleItemIndex;
+
+    private string CssClass
+    {
+        get
+        {
+            if (this.IsShown)
+            {
+                return "showcase-item--current";
+            }
+
+            return this.ItemIndex < this.VisibleItemIndex ? "showcase-item--previous" : "showcase-item--next";
+        }
+    }
+}

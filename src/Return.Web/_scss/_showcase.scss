@@ -1,0 +1,57 @@
+.showcase {
+    position: relative;
+
+    &__button-container {
+        z-index: 2;
+        position: absolute;
+        top: 0;
+
+        &--previous {
+            left: 0;
+        }
+
+        &--next {
+            right: 0;
+        }
+    }
+}
+
+.showcase-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 25%;
+    transition-property: transform, opacity;
+    transition-timing-function: ease;
+    transition-duration: 1s;
+
+    .vote-list {
+        text-align: center;
+    }
+
+    &__title {
+        @extend .title;
+
+        text-align: center;
+        font-size: $size-4;
+    }
+
+    &--previous,
+    &--next {
+        opacity: 0.5;
+    }
+
+    &--previous {
+        transform: translateX(-100%);
+    }
+
+    &--current {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    &--next {
+        transform: translateX(150%);
+    }
+}

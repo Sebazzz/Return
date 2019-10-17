@@ -38,7 +38,8 @@ namespace Return.Web.Components {
         [CascadingParameter]
         public NoteLane Container { get; set; }
 
-        private bool IsExpanded { get; set; }
+        [Parameter]
+        public bool IsExpanded { get; set; }
 
         protected string Classes =>
             (this.IsExpanded ? "note-group--expanded" : "note-group--collapsed");
