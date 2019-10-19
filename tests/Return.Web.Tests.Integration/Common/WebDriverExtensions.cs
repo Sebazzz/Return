@@ -45,7 +45,12 @@ namespace Return.Web.Tests.Integration.Common {
                     typeof(NoSuchFrameException),
                     typeof(NoSuchWindowException),
                     typeof(StaleElementReferenceException));
-                return wait.Until(callback);
+                wait.Timeout = TimeSpan.FromSeconds(15);
+                wait.PollingInterval = TimeSpan.FromSeconds(1.5);
+                return wait.Until(wd => {
+                    TestContext.WriteLine($"Attempting to run Retry<{typeof(T)}> operation ({callback.Method.DeclaringType}.{callback.Method.Name})");
+                    return callback(wd);
+                });
             }
             catch (Exception ex) {
                 TestContext.WriteLine($"Exception while waiting on Retry<{typeof(T)}> operation: {ex}");
