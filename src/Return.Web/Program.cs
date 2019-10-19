@@ -18,7 +18,6 @@ namespace Return.Web {
     using MediatR;
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
@@ -31,7 +30,7 @@ namespace Return.Web {
     public static class Program {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public static async Task Main(string[] args) {
-            IWebHost host = CreateHostBuilder(args: args).Build();
+            IWebHost host = CreateWebHostBuilder(args: args).Build();
 
             using (IServiceScope scope = host.Services.CreateScope()) {
                 IServiceProvider services = scope.ServiceProvider;
@@ -56,7 +55,8 @@ namespace Return.Web {
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and exit instead of crash")]
-        private static IWebHostBuilder CreateHostBuilder(string[] args) =>
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Global for testing")]
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args: args)
                 .ConfigureServices(ConfigureServerOptions)
                 .ConfigureAppConfiguration(cfg => {

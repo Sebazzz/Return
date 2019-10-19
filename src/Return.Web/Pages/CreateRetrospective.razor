@@ -26,7 +26,7 @@
         </p>
 
         <div class="control">
-            <input class="input" type="text" readonly="readonly" value="@Result.Location">
+            <input class="input" id="retro-location" type="text" readonly="readonly" value="@Result.Location">
         </div>
 
         <div>
@@ -37,18 +37,18 @@
 
         if (!String.IsNullOrEmpty(Model.Passphrase))
         {
-            <p>
-                To enter the retrospective, the participants need to enter the following password: <code>@Model.Passphrase</code>.
+            <p data-test-element-id="participator instructions">
+                To enter the retrospective, the participants need to enter the following password: <code >@Model.Passphrase</code>.
             </p>
         }
         else
         {
-            <p>
+            <p data-test-element-id="participator instructions">
                 To enter the retrospective no password is required.
             </p>
         }
 
-        <p>
+        <p data-test-element-id="facilitator instructions">
             To start the retrospective, you need to enter the following password: <code>@Model.FacilitatorPassphrase</code>.
         </p>
 
@@ -109,7 +109,7 @@ else
 
         <div class="field is-grouped">
             <div class="control">
-                <button class="button is-link">Submit</button>
+                <button class="button is-link" id="create-retro-button">Submit</button>
             </div>
         </div>
     </EditForm>
