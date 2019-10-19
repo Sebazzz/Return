@@ -13,9 +13,10 @@ jobs:
                       - yarn-packages-{{ checksum "src/App/yarn.lock" }}
 
             - run:
-                  name: Install Firefox
+                  name: Install Chrome and Firefox
                   command: |
-                      echo "deb http://deb.debian.org/debian stretch contrib non-free" | tee -a /etc/apt/sources.list
+                      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+                      dpkg -i google-chrome-stable_current_amd64.deb; apt-get -fy install
                       echo "deb http://deb.debian.org/debian-security/ stretch/updates contrib non-free" | tee -a /etc/apt/sources.list
                       echo "deb http://deb.debian.org/debian stretch-updates contrib non-free" | tee -a /etc/apt/sources.list
                       echo "deb http://archive.ubuntu.com/ubuntu/ bionic main restricted" | tee -a /etc/apt/sources.list
