@@ -35,30 +35,7 @@ namespace Return.Web.Tests.Integration.Common {
             timeouts.ImplicitWait = TimeSpan.FromSeconds(10);
             timeouts.PageLoad = TimeSpan.FromSeconds(10);
 
-            void TryLogContext() {
-                try {
-                    TestContext.WriteLine($"Current URL: {webDriver.Url}");
-                    TestContext.WriteLine($"Current HTML: {webDriver.PageSource}");
-                }
-                catch (Exception ex) {
-                    TestContext.WriteLine($"Unable to log contextual info: {ex}");
-                }
 
-                try {
-                    ILogs logs = webDriver.Manage().Logs;
-
-                    foreach (string logType in logs.AvailableLogTypes) {
-                        TestContext.WriteLine($"Browser log: {logType}");
-
-                        foreach (LogEntry logEntry in logs.GetLog(logType)) {
-                            TestContext.WriteLine($"\t[{logEntry.Level}] [{logEntry.Timestamp:s}] {logEntry.Message}");
-                        }
-                    }
-                }
-                catch (Exception ex) {
-                    TestContext.WriteLine($"Unable to log browser log info: {ex}");
-                }
-            }
 
             void WrapLoggerAction<TArgs>(TArgs args, Action act) {
                 try {
@@ -75,7 +52,7 @@ namespace Return.Web.Tests.Integration.Common {
 
             wrapper.ExceptionThrown += (_, args) => {
                 TestContext.WriteLine($"WebDriver: exception - {args.ThrownException}");
-                TryLogContext();
+                webDriver.TryLogContext();
             };
 
             wrapper.FindingElement += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element - {args.FindMethod}"));

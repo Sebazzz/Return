@@ -72,7 +72,7 @@ namespace Return.Web.Tests.Integration.Pages {
         public void Navigate(ReturnAppFactory app) => this.WebDriver.NavigateToBlazorPage(app.CreateUri("create-retro"));
         public void Submit() => this.SubmitButton.Click();
 
-        public string GetUrlShown() => new DefaultWait<CreateRetrospectivePage>(this).Until(p => p.UrlLocationInput.GetAttribute("value"));
+        public string GetUrlShown() => this.WebDriver.Retry(_ => this.UrlLocationInput.GetAttribute("value"));
         public ReadOnlyCollection<IWebElement> GetValidationMessages() => this.WebDriver.FindElements(By.ClassName("validation-message"));
     }
 }
