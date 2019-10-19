@@ -328,14 +328,17 @@ Task("Publish")
     .IsDependentOn("Publish-Windows")
     .IsDependentOn("Publish-Ubuntu");
 	
-void TestTask(string name, string projectName) {
+void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	CreateDirectory(testResultsDir);
 
+	criteria = criteria ?? new Func<bool>(() => true);
+	
 	Task($"Test-CS-{name}")
 		.IsDependentOn("Restore-NuGet-Packages")
 		.IsDependentOn("Set-HeadlessEnvironment")
 		.IsDependentOn("Run-FrontendBuild")
 		.IsDependeeOf("Test-CS")
+		.WithCriteria(criteria)
 		.Does(() => {
 			var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
 
@@ -365,7 +368,7 @@ void TestTask(string name, string projectName) {
 TestTask("Unit-Application", "Return.Application.Tests.Unit");
 TestTask("Unit-Domain", "Return.Domain.Tests.Unit");
 TestTask("Unit-Web", "Return.Web.Tests.Unit");
-TestTask("Integration-Web", "Return.Web.Tests.Integration");
+TestTask("Integration-Web", "Return.Web.Tests.Integration", () => HasEnvironmentVariable("CIRCLECI") == false /* Headless tests are unstable on CircleCI*/);
 
 Task("Test-CS")
     .Description("Test backend-end compiled code");
