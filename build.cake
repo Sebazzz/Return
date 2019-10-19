@@ -15,7 +15,8 @@ var verbosity = Argument<Verbosity>("verbosity", Verbosity.Minimal);
 //////////////////////////////////////////////////////////////////////
 
 var baseName = "Return";
-var buildDir = Directory("./build") + Directory(configuration);
+var buildDir = Directory("./build");
+var testResultsDir = buildDir + Directory("./testresults");
 var publishDir = Directory("./build/publish");
 var assemblyInfoFile = Directory($"./src/{baseName}/Properties") + File("AssemblyInfo.cs");
 var nodeEnv = configuration == "Release" ? "production" : "development";
@@ -326,14 +327,47 @@ UbuntuPublishTask("18.04-x64", "ubuntu.18.04-x64", "Ubuntu 18.04 64-bit");
 Task("Publish")
     .IsDependentOn("Publish-Windows")
     .IsDependentOn("Publish-Ubuntu");
+	
+void TestTask(string name, string projectName) {
+	CreateDirectory(testResultsDir);
+
+	Task($"Test-CS-{name}")
+		.IsDependentOn("Restore-NuGet-Packages")
+		.IsDependentOn("Set-HeadlessEnvironment")
+		.IsDependentOn("Run-FrontendBuild")
+		.IsDependeeOf("Test-CS")
+		.Does(() => {
+			var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
+
+			Information($"Running tests for {projectName} - logging to {logFilePath}");
+
+			try {
+				DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
+					ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
+				});
+			} finally {
+				if (AppVeyor.IsRunningOnAppVeyor && FileExists(logFilePath)) {
+					var jobId = EnvironmentVariable("APPVEYOR_JOB_ID");
+					var resultsType = "mstest"; // trx is vstest format
+					
+					var wc = new System.Net.WebClient();
+					var url = $"https://ci.appveyor.com/api/testresults/{resultsType}/{jobId}";
+					var fullTestResultsPath = logFilePath.FullPath;
+					
+					Information("Uploading test results from {0} to {1}", fullTestResultsPath, url);
+					wc.UploadFile(url, fullTestResultsPath);
+				}
+			}
+		});
+}
+
+TestTask("Unit-Application", "Return.Application.Tests.Unit");
+TestTask("Unit-Domain", "Return.Domain.Tests.Unit");
+TestTask("Unit-Web", "Return.Web.Tests.Unit");
+TestTask("Integration-Web", "Return.Web.Tests.Integration");
 
 Task("Test-CS")
-	.IsDependentOn("Restore-NuGet-Packages")
-	.IsDependentOn("Set-HeadlessEnvironment")
-    .Description("Test backend-end compiled code")
-	.Does(() => {
-		DotNetCoreTest($"./Return.sln");
-	});
+    .Description("Test backend-end compiled code");
 
 Task("Test")
     .IsDependentOn("Test-CS")

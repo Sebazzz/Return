@@ -54,3 +54,10 @@ jobs:
                   MOZ_HEADLESS: 1
                   CIRCLECI: 1
               run: ${{ matrix.script_name }} --target=test --verbosity=verbose
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v1
+              continue-on-error: true
+              with:
+                  name: logs
+                  path: build/testresults
