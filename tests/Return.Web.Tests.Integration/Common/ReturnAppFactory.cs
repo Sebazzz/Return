@@ -8,6 +8,9 @@
 namespace Return.Web.Tests.Integration.Common {
     using System;
     using System.Linq;
+    using Application.Common.Abstractions;
+    using Microsoft.Data.Sqlite;
+    using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
@@ -34,8 +37,6 @@ namespace Return.Web.Tests.Integration.Common {
             ITimeouts timeouts = webDriver.Manage().Timeouts();
             timeouts.ImplicitWait = TimeSpan.FromSeconds(10);
             timeouts.PageLoad = TimeSpan.FromSeconds(10);
-
-
 
             void WrapLoggerAction<TArgs>(TArgs args, Action act) {
                 try {
@@ -73,5 +74,15 @@ namespace Return.Web.Tests.Integration.Common {
         }
 
         public Uri CreateUri(string path) => new Uri(this.Server.BaseAddress, path);
+
+        public IServiceScope CreateTestServiceScope() => this.Services.CreateScope();
+
+        protected override string ConnectionString { get; } = (new SqliteConnectionStringBuilder {
+            BrowsableConnectionString = true,
+            Cache = SqliteCacheMode.Shared,
+            Mode = SqliteOpenMode.Memory,
+            ForeignKeys = true,
+            DataSource = "testdb1"
+        }).ToString();
     }
 }

@@ -7,16 +7,19 @@
 
 namespace Return.Web.Tests.Integration.Common {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using Application.App.Commands.SeedBaseData;
     using Application.Common.Abstractions;
+    using Configuration;
     using MediatR;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Server.Features;
     using Microsoft.AspNetCore.Mvc.Testing;
     using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +29,23 @@ namespace Return.Web.Tests.Integration.Common {
     using Persistence;
     using Return.Common;
 
-    public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class {
 
+    public abstract class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class {
         private IWebHost _webHost;
+        protected abstract string ConnectionString { get; }
+
+        /// <summary>
+        /// Sqlite in-memory databases are killed as soon as the last referencing connection is killed. Therefore we always
+        /// want to hold on while the server might be used. In practice, this is per test fixture.
+        /// </summary>
+        private SqliteConnection _sqliteConnection;
+
+        [SuppressMessage("ReSharper", "VirtualMemberCallInConstructor", Justification = "Constant config")]
+        protected CustomWebApplicationFactory() {
+
+            this._sqliteConnection = new SqliteConnection(this.ConnectionString);
+            this._sqliteConnection.Open();
+        }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Not necessary for tests")]
         protected override void ConfigureWebHost(IWebHostBuilder builder) {
@@ -52,7 +69,7 @@ namespace Return.Web.Tests.Integration.Common {
 
                     services.AddScoped(sp => {
                         DbContextOptions<ReturnDbContext> options = new DbContextOptionsBuilder<ReturnDbContext>()
-                            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                            .UseSqlite(this.ConnectionString)
                             .Options;
 
                         var context = new ReturnDbContext(options);
@@ -61,6 +78,10 @@ namespace Return.Web.Tests.Integration.Common {
                     });
                     services.ChainInterfaceImplementation<IReturnDbContext, ReturnDbContext>();
                     services.ChainInterfaceImplementation<IReturnDbContextFactory, ReturnDbContext>();
+
+                    services.Configure<ServerOptions>(s => {
+                        s.BaseUrl = "http://localhost:" + endPoint.Port + "/";
+                    });
                 })
                 .UseKestrel(k => k.Listen(endPoint))
                 .UseEnvironment(environment: "Test");
@@ -84,8 +105,8 @@ namespace Return.Web.Tests.Integration.Common {
                 var currentParticipantService = scopedServices.GetRequiredService<ICurrentParticipantService>();
                 currentParticipantService.SetNoHttpContext();
 
-                var returnDbContext = scopedServices.GetRequiredService<ReturnDbContext>();
-                returnDbContext.Database.Migrate();
+                //var returnDbContext = scopedServices.GetRequiredService<ReturnDbContext>();
+                //returnDbContext.Database.Migrate();
 
                 var mediator = scopedServices.GetRequiredService<IMediator>();
                 mediator.Send(new SeedBaseDataCommand()).ConfigureAwait(false).GetAwaiter().GetResult();
@@ -152,6 +173,8 @@ namespace Return.Web.Tests.Integration.Common {
 
             if (disposing) {
                 this._webHost?.Dispose();
+                this._sqliteConnection?.Dispose();
+                this._sqliteConnection = null;
             }
         }
     }

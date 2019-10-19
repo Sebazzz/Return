@@ -27,7 +27,7 @@ namespace Return.Web.Tests.Integration.Pages {
             // Then
             string[] messages = new DefaultWait<CreateRetrospectivePage>(this.Page)
                 .Until(p => {
-                    var collection = p.GetValidationMessages();
+                    ReadOnlyCollection<IWebElement> collection = p.GetValidationMessages();
                     if (collection.Count == 0) return null;
                     return collection;
                 })
@@ -39,7 +39,7 @@ namespace Return.Web.Tests.Integration.Pages {
         }
 
         [Test]
-        public void CreateRetrospective_SubmitValid_ShowQrCodeAndLink() {
+        public void CreateRetrospective_SubmitValidWithBothPassphrases_ShowQrCodeAndLink() {
             // Given
             this.Page.Navigate(this.App);
 
@@ -51,10 +51,28 @@ namespace Return.Web.Tests.Integration.Pages {
             this.Page.Submit();
 
             // Then
-            Assert.That(this.Page.GetUrlShown(), Contains.Substring(this.App.Server.BaseAddress.ToString()));
+            Assert.That(this.Page.GetUrlShown(), Does.Match(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
 
             Assert.That(this.Page.FacilitatorInstructions.Text, Contains.Substring("my secret facilitator password"));
             Assert.That(this.Page.ParticipatorInstructions.Text, Contains.Substring("the participator password"));
+        }
+
+        [Test]
+        public void CreateRetrospective_SubmitValidWithOnlyFacilitatorPassphrase_ShowQrCodeAndLink() {
+            // Given
+            this.Page.Navigate(this.App);
+
+            // When
+            this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
+            this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+
+            this.Page.Submit();
+
+            // Then
+            Assert.That(this.Page.GetUrlShown(), Does.Match(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
+
+            Assert.That(this.Page.FacilitatorInstructions.Text, Contains.Substring("my secret facilitator password"));
+            Assert.That(this.Page.ParticipatorInstructions.Text, Contains.Substring("no password is required"));
         }
     }
 

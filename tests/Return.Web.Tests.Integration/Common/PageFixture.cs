@@ -7,18 +7,14 @@
 
 namespace Return.Web.Tests.Integration.Common {
     using System;
+    using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
-    using OpenQA.Selenium;
 
-    [UseRunningApp]
-    public abstract class PageFixture<TPageObject> : IDisposable, IAppFixture where TPageObject : IPageObject, new() {
-        public ReturnAppFactory App { get; set; }
-        public IWebDriver WebDriver { get; set; }
+    public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable where TPageObject : IPageObject, new() {
 
         protected TPageObject Page { get; private set; }
 
-        public void OnInitialized() => this.Page = this.App.CreatePageObject<TPageObject>();
-
+        public override void OnInitialized() => this.Page = this.App.CreatePageObject<TPageObject>();
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
                 this.Page?.Dispose();
@@ -28,6 +24,22 @@ namespace Return.Web.Tests.Integration.Common {
         public void Dispose() {
             this.Dispose(true);
             GC.SuppressFinalize(this);
+        }
+    }
+
+    [UseRunningApp]
+    public abstract class ScopedFixture : IAppFixture {
+        public ReturnAppFactory App { get; set; }
+        public virtual void OnInitialized() { }
+
+        protected IServiceScope ServiceScope { get; private set; }
+
+        [SetUp] public void SetUpServiceScope() => this.ServiceScope = this.App.Services.CreateScope();
+
+        [TearDown]
+        public void KillServiceScope() {
+            this.ServiceScope?.Dispose();
+            this.ServiceScope = null;
         }
     }
 }

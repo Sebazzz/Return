@@ -6,6 +6,8 @@
 // ******************************************************************************
 
 namespace Return.Web.Tests.Integration.Common {
+    using Microsoft.Extensions.DependencyInjection;
+
     public interface IAppFixture {
         ReturnAppFactory App { get; set; }
         void OnInitialized() { }
