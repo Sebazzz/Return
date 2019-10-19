@@ -230,6 +230,13 @@ IEnumerable<string> GetModifiedFilePaths() {
 		yield return fileName;
 	}
 }
+
+Task("Set-HeadlessEnvironment")
+	.Does(() => {
+		Information("Setting MOZ_HEADLESS to 1");
+		
+		System.Environment.SetEnvironmentVariable("MOZ_HEADLESS", "1");
+	});
 	
 Task("Run-Precommit-Tasks")
 	.Does(() => {
@@ -322,6 +329,7 @@ Task("Publish")
 
 Task("Test-CS")
 	.IsDependentOn("Restore-NuGet-Packages")
+	.IsDependentOn("Set-HeadlessEnvironment")
     .Description("Test backend-end compiled code")
 	.Does(() => {
 		DotNetCoreTest($"./Return.sln");

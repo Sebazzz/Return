@@ -18,10 +18,18 @@ namespace Return.Web.Tests.Integration.Common {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
         public IWebDriver CreateWebDriver() {
-            var webDriver = new ChromeDriver(new ChromeOptions {
+            var webDriverOptions = new ChromeOptions {
                 PageLoadStrategy = PageLoadStrategy.Normal,
                 AcceptInsecureCertificates = true,
-            });
+            };
+
+
+            if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
+                TestContext.WriteLine("Going to run Chrome headless");
+                webDriverOptions.AddArguments("--headless");
+            }
+
+            var webDriver = new ChromeDriver(webDriverOptions);
 
             ITimeouts timeouts = webDriver.Manage().Timeouts();
             timeouts.ImplicitWait = TimeSpan.FromSeconds(10);
