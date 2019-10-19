@@ -344,6 +344,7 @@ void TestTask(string name, string projectName) {
 			try {
 				DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
 					ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
+					                                      .Append("--logger:\"console;verbosity=normal;noprogress=true\"")
 				});
 			} finally {
 				if (AppVeyor.IsRunningOnAppVeyor && FileExists(logFilePath)) {

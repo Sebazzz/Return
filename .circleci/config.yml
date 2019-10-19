@@ -71,7 +71,7 @@ jobs:
                   command: |
                       export MOZ_HEADLESS=1
                       export CIRCLECI=1
-                      ./build.sh --target=test --verbosity=verbose
+                      ./build.sh --target=test --verbosity=verbose < /dev/null
 
             - save_cache:
                   name: Save Yarn Package Cache
