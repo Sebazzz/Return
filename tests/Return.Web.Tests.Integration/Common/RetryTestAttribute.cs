@@ -80,7 +80,8 @@ namespace Return.Web.Tests.Integration.Common {
                         context.OutWriter.WriteLine($"[{nameof(RetryAttribute)}] Error executing test: {ex}");
                     }
 
-                    if (context.CurrentResult.ResultState == ResultState.Success) {
+                    // In general we want to break on certain conditions, but general failures (even if not assertion failures), should be retried
+                    if (context.CurrentResult.ResultState != ResultState.Failure && context.CurrentResult.ResultState.Status != ResultState.Error.Status) {
                         break;
                     }
 
