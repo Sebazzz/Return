@@ -7,17 +7,20 @@
 
 namespace Return.Web.Tests.Integration.Pages {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Application.Retrospectives.Commands.CreateRetrospective;
     using Application.Retrospectives.Queries.GetParticipantsInfo;
     using Common;
     using Components;
     using Domain.Entities;
     using Domain.Services;
+    using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
@@ -58,6 +61,7 @@ namespace Return.Web.Tests.Integration.Pages {
 
             Assert.That(messages, Has.One.Contain("'Name' must not be empty"));
             Assert.That(messages, Has.One.Contain("This passphrase is not valid. Please try again"));
+            Assert.That(messages, Has.One.Contain("Please select a color"));
         }
 
         [Test]
@@ -121,6 +125,38 @@ namespace Return.Web.Tests.Integration.Pages {
 
             // Then
             Assert.That(() => secondInstance.OnlineList.OnlineListItems.Select(x => x.Text), Has.One.Contains(myName));
+        }
+
+        [Test]
+        public async Task JoinRetrospectivePage_KnownRetrospective_JoinParticipantUpdatesColorListInRealtime() {
+            // Given
+            string retroId = await this.CreateRetrospective("scrummaster", "secret");
+            string myName = Name.Create();
+            this.Page.Navigate(this.App, retroId);
+
+            JoinRetrospectivePage secondInstance = this.App.CreatePageObject<JoinRetrospectivePage>().RegisterAsTestDisposable();
+            secondInstance.Navigate(this.App, retroId);
+
+            IList<AvailableParticipantColorModel> availableColors;
+            {
+                using IServiceScope scope = this.App.CreateTestServiceScope();
+                scope.SetNoAuthenticationInfo();
+                availableColors = await scope.Send(new GetAvailablePredefinedParticipantColorsQuery(retroId));
+            }
+            AvailableParticipantColorModel colorToSelect = availableColors[TestContext.CurrentContext.Random.Next(0, availableColors.Count)];
+
+            // When
+            var selectList = new SelectElement(this.Page.ColorSelect);
+            Assert.That(() => selectList.Options.Select(x => x.GetProperty("value")).Where(x => !String.IsNullOrEmpty(x)), Is.EquivalentTo(availableColors.Select(x => "#" + x.HexString)).Retry(),
+                "Cannot find all available colors in the selection list");
+            selectList.SelectByValue("#" + colorToSelect.HexString);
+
+            this.Page.NameInput.SendKeys(myName);
+            this.Page.ParticipantPassphraseInput.SendKeys("secret");
+            this.Page.Submit();
+
+            // Then
+            Assert.That(() => new SelectElement(secondInstance.ColorSelect).Options.Select(x => x.GetAttribute("value")), Does.Not.Contains("#" + colorToSelect.HexString).And.Not.EquivalentTo(availableColors.Select(x => "#" + x.HexString)).Retry());
         }
 
         [Test]

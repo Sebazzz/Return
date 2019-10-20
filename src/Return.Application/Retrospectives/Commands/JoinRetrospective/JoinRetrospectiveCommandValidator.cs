@@ -28,7 +28,10 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
             this._passphraseService = passphraseService;
 
             this.RuleFor(e => e.Name).NotEmpty().MaximumLength(256);
-            this.RuleFor(e => e.Color).NotEmpty().Matches("^#?([A-F0-9]{2}){3}$", RegexOptions.IgnoreCase);
+            this.RuleFor(e => e.Color).NotEmpty()
+                .WithMessage("Please select a color")
+                .Matches("^#?([A-F0-9]{2}){3}$", RegexOptions.IgnoreCase)
+                .WithMessage("Please select a color");
 
             this.RuleFor(e => e.Passphrase)
                 .NotEmpty()
