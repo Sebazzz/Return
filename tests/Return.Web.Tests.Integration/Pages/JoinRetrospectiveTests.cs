@@ -6,16 +6,17 @@
 // ******************************************************************************
 
 namespace Return.Web.Tests.Integration.Pages {
+    using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Retrospectives.Commands.CreateRetrospective;
-    using Application.Retrospectives.Queries.GetParticipant;
     using Application.Retrospectives.Queries.GetParticipantsInfo;
     using Common;
     using Components;
+    using Domain.Entities;
     using Domain.Services;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
@@ -57,6 +58,32 @@ namespace Return.Web.Tests.Integration.Pages {
 
             Assert.That(messages, Has.One.Contain("'Name' must not be empty"));
             Assert.That(messages, Has.One.Contain("This passphrase is not valid. Please try again"));
+        }
+
+        [Test]
+        public async Task JoinRetrospectivePage_KnownRetrospectiveAlreadyStarted_ShowMessage() {
+            // Given
+            string retroId = await this.CreateRetrospective("scrummaster", "secret");
+            await this.SetRetrospective(retroId, retro => retro.CurrentStage = RetrospectiveStage.Writing);
+
+            // When
+            this.Page.Navigate(this.App, retroId);
+
+            // Then
+            Assert.That(() => this.Page.WebDriver.FindElements(By.CssSelector(".notification.is-info")), Has.Count.EqualTo(1).Retry());
+        }
+
+        [Test]
+        public async Task JoinRetrospectivePage_KnownRetrospectiveFinished_ShowMessage() {
+            // Given
+            string retroId = await this.CreateRetrospective("scrummaster", "secret");
+            await this.SetRetrospective(retroId, retro => retro.CurrentStage = RetrospectiveStage.Finished);
+
+            // When
+            this.Page.Navigate(this.App, retroId);
+
+            // Then
+            Assert.That(() => this.Page.WebDriver.FindElements(By.CssSelector(".notification.is-warning")), Has.Count.EqualTo(1).Retry());
         }
 
         [Test]
@@ -128,7 +155,10 @@ namespace Return.Web.Tests.Integration.Pages {
             Assert.That(() => secondInstance.OnlineList.GetListItem(facilitator.Id).FindElements(By.ClassName("fa-crown")), Is.Not.Empty.Retry());
         }
 
-
+        private Task SetRetrospective(string retroId, Action<Retrospective> action) {
+            using IServiceScope scope = this.App.CreateTestServiceScope();
+            return scope.SetRetrospective(retroId, action);
+        }
         private async Task<string> CreateRetrospective(string facilitatorPassword, string password) {
             var command = new CreateRetrospectiveCommand {
                 Title = TestContext.CurrentContext.Test.FullName,

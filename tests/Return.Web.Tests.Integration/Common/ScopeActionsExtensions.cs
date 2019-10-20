@@ -6,8 +6,13 @@
 // ******************************************************************************
 
 namespace Return.Web.Tests.Integration.Common {
+    using System;
+    using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common.Abstractions;
     using Application.Retrospectives.Commands.CreateRetrospective;
+    using Application.Services;
+    using Domain.Entities;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
 
@@ -23,6 +28,14 @@ namespace Return.Web.Tests.Integration.Common {
             CreateRetrospectiveCommandResponse result = await scope.Send(command);
 
             return result.Identifier.StringId;
+        }
+
+        public static async Task SetRetrospective(this IServiceScope scope, string retroId, Action<Retrospective> action) {
+            var dbContext = scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
+
+            Retrospective retrospective = await dbContext.Retrospectives.FindByRetroId(retroId, CancellationToken.None);
+            action.Invoke(retrospective);
+            await dbContext.SaveChangesAsync(CancellationToken.None);
         }
     }
 }

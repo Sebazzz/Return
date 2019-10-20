@@ -55,13 +55,9 @@ namespace Return.Web.Tests.Integration.Pages {
                 Task.Run(() => WaitNavigatedToLobby(this.Client2))
             );
 
-        protected async Task SetRetrospective(Action<Retrospective> action) {
+        protected Task SetRetrospective(Action<Retrospective> action) {
             using IServiceScope scope = this.App.CreateTestServiceScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
-
-            var retrospective = await dbContext.Retrospectives.FindByRetroId(this.RetroId, CancellationToken.None);
-            action.Invoke(retrospective);
-            await dbContext.SaveChangesAsync(CancellationToken.None);
+            return scope.SetRetrospective(this.RetroId, action);
         }
 
         private static void WaitNavigatedToLobby(RetrospectiveLobby pageObject) {
