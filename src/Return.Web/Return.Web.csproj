@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Accelist.FluentValidation.Blazor" Version="1.0.0" />
+    <PackageReference Include="Accelist.FluentValidation.Blazor" Version="1.1.0" />
 
     <PackageReference Include="NReco.Logging.File" Version="1.0.4" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.5.0" />
