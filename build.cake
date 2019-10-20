@@ -17,6 +17,7 @@ var verbosity = Argument<Verbosity>("verbosity", Verbosity.Minimal);
 var baseName = "Return";
 var buildDir = Directory("./build");
 var testResultsDir = buildDir + Directory("./testresults");
+var testArtifactsDir = buildDir + Directory("./testresults/artifacts");
 var publishDir = Directory("./build/publish");
 var assemblyInfoFile = Directory($"./src/{baseName}/Properties") + File("AssemblyInfo.cs");
 var nodeEnv = configuration == "Release" ? "production" : "development";
@@ -330,6 +331,7 @@ Task("Publish")
 	
 void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	CreateDirectory(testResultsDir);
+	CreateDirectory(testArtifactsDir);
 
 	criteria = criteria ?? new Func<bool>(() => true);
 	
@@ -342,9 +344,10 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 		.Does(() => {
 			var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
 
-			Information($"Running tests for {projectName} - logging to {logFilePath}");
+			Information($"Running tests for {projectName} - logging to {logFilePath} - artifacts dumped to {testArtifactsDir}");
 
 			try {
+				System.Environment.SetEnvironmentVariable("TEST_ARTIFACT_DIR", MakeAbsolute(testArtifactsDir).ToString());
 				DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
 					ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
 					                                      .Append("--logger:\"console;verbosity=normal;noprogress=true\"")

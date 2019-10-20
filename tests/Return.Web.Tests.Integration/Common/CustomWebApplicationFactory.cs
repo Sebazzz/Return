@@ -8,13 +8,13 @@
 namespace Return.Web.Tests.Integration.Common {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using Application.App.Commands.SeedBaseData;
     using Application.Common.Abstractions;
     using Configuration;
-    using MediatR;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Server.Features;
     using Microsoft.AspNetCore.Mvc.Testing;
@@ -62,9 +62,15 @@ namespace Return.Web.Tests.Integration.Common {
             // Configure testing to use Kestel and test services
             builder
                 .ConfigureKestrel(k => k.Listen(new IPEndPoint(IPAddress.Loopback, 0)))
+                .ConfigureLogging(lb => {
+                    lb.SetMinimumLevel(LogLevel.Trace);
+                    lb.AddProvider(new TestContextLoggerProvider());
+
+                    string logFileName = (TestContext.CurrentContext?.Test.ClassName ?? "test-log") + ".log";
+                    lb.AddFile(Path.Join(Paths.TestArtifactDir, logFileName));
+                })
                 .ConfigureTestServices(services => {
-                    // Add a database context using an in-memory 
-                    // database for testing.
+                    // Add a database context using an in-memory database for testing.
                     services.RemoveAll<ReturnDbContext>();
 
                     services.AddScoped(sp => {
@@ -102,26 +108,12 @@ namespace Return.Web.Tests.Integration.Common {
 
             // ... Base seeding
             try {
-                var currentParticipantService = scopedServices.GetRequiredService<ICurrentParticipantService>();
-                currentParticipantService.SetNoHttpContext();
+                scope.SetNoAuthenticationInfo();
 
-                //var returnDbContext = scopedServices.GetRequiredService<ReturnDbContext>();
-                //returnDbContext.Database.Migrate();
-
-                var mediator = scopedServices.GetRequiredService<IMediator>();
-                mediator.Send(new SeedBaseDataCommand()).ConfigureAwait(false).GetAwaiter().GetResult();
+                scope.Send(new SeedBaseDataCommand()).ConfigureAwait(false).GetAwaiter().GetResult();
             }
             catch (Exception ex) {
                 logger.LogError(ex, "An error occurred while migrating or initializing the database.");
-            }
-
-            try {
-                // Seed the database with test data.
-                //Utilities.InitializeDbForTests(context);
-            }
-            catch (Exception ex) {
-                logger.LogError(exception: ex,
-                    $"An error occurred seeding the database with test messages. Error: {ex.Message}");
             }
         }
 

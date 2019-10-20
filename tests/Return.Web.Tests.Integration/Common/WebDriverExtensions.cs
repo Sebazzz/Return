@@ -7,9 +7,12 @@
 
 namespace Return.Web.Tests.Integration.Common {
     using System;
+    using System.Collections.ObjectModel;
+    using System.IO;
     using System.Threading;
     using NUnit.Framework;
     using OpenQA.Selenium;
+    using OpenQA.Selenium.Support.Extensions;
     using OpenQA.Selenium.Support.UI;
 
     public static class WebDriverExtensions {
@@ -18,6 +21,27 @@ namespace Return.Web.Tests.Integration.Common {
 
             By selector = By.CssSelector($"[data-test-element-id=\"{testElementId}\"]");
             return webDriver.FindVisibleElement(selector);
+        }
+
+        public static IWebElement FindElementByTestElementId(this ISearchContext webDriver, string testElementId) {
+            if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
+
+            By selector = By.CssSelector($"[data-test-element-id=\"{testElementId}\"]");
+            return webDriver.FindElement(selector);
+        }
+
+        public static IWebElement FindElementByTestElementId(this ISearchContext webDriver, string testElementId, int id) {
+            if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
+
+            By selector = By.CssSelector($"[data-test-element-id=\"{testElementId}\"][data-id=\"{id}\"]");
+            return webDriver.FindElement(selector);
+        }
+
+        public static ReadOnlyCollection<IWebElement> FindElementsByTestElementId(this ISearchContext webDriver, string testElementId) {
+            if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
+
+            By selector = By.CssSelector($"[data-test-element-id=\"{testElementId}\"]");
+            return webDriver.FindElements(selector);
         }
 
         public static IWebElement FindVisibleElement(this IWebDriver webDriver, By selector) {
@@ -57,6 +81,24 @@ namespace Return.Web.Tests.Integration.Common {
                 webDriver.TryLogContext();
 
                 throw;
+            }
+        }
+
+        private static int ScreenshotCounter = 0;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
+        public static void TryCreateScreenshot(this IWebDriver webDriver, string extraName = null) {
+            if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
+
+            string screenshotName = TestContext.CurrentContext.Test.MethodName + "-" + (++ScreenshotCounter) + (extraName != null ? "-" + extraName : "") + ".png";
+            string screenshotPath = Path.Join(Paths.TestArtifactDir, screenshotName);
+
+            try {
+                TestContext.WriteLine($"Creating screenshot: {screenshotPath}");
+                webDriver.TakeScreenshot().SaveAsFile(screenshotPath, ScreenshotImageFormat.Png);
+            }
+            catch (Exception ex) {
+                TestContext.WriteLine($"--> Unable to create screenshot: {ex}");
             }
         }
 

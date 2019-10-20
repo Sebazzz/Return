@@ -1,8 +1,7 @@
-@using System.Threading
 @implements IDisposable
 
 <div class="c100 @("p"+ ConstrainedPercent)">
-    <span>@(Text)</span>
+    <span data-test-element-id="timer">@(Text)</span>
     <div class="slice">
         <div class="bar"></div>
         <div class="fill"></div>

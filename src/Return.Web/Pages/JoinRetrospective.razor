@@ -86,7 +86,7 @@ else
                             <div class="field has-addons">
                                 <div class="control">
                                     <div class="select">
-                                        <InputSelect @bind-Value="@Model.Color">
+                                        <InputSelect @bind-Value="@Model.Color" id="retro-color-choices">
                                             <option value="">Select an option</option>
                                             @foreach (AvailableParticipantColorModel color in this.AvailablePredefinedColors){
                                                 <option style="color: #@color.HexString" value="#@color.HexString">@color.Name</option>
@@ -107,7 +107,7 @@ else
                 <div class="field">
                     <div class="control">
                         <label class="checkbox">
-                            <InputCheckbox @bind-Value="@Model.JoiningAsFacilitator" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
+                            <InputCheckbox @bind-Value="@Model.JoiningAsFacilitator" id="retro-is-facilitator" disabled="@(this.ShowParticipantAlreadyJoinedWarning ? "disabled" : null)"/>
                             I'm the facilitator of this retrospective
                         </label>
                     </div>
@@ -128,9 +128,9 @@ else
                 else if (this.RetrospectiveInfo.NeedsParticipantPassphrase)
                 {
                     <div class="field">
-                        <label class="label" for="retro-facilitator-passphrase">Passphrase</label>
+                        <label class="label" for="retro-passphrase">Passphrase</label>
                         <div class="control">
-                            <InputText id="retro-facilitator-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
+                            <InputText id="retro-passphrase" class="input" type="text" @bind-Value="@Model.Passphrase" placeholder="" />
                         </div>
 
                         <ValidationMessage For="() => Model.Passphrase"></ValidationMessage>

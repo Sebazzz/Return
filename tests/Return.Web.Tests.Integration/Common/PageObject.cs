@@ -10,14 +10,16 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium;
 
     public abstract class PageObject : IPageObject {
-        protected IWebDriver WebDriver { get; private set; }
+        public IWebDriver WebDriver { get; private set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "Not necessary for testing framework")]
         void IPageObject.SetWebDriver(IWebDriver webDriver) => this.WebDriver = webDriver;
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
+                this.WebDriver?.Close();
                 this.WebDriver?.Dispose();
+                this.WebDriver = null;
             }
         }
 
@@ -29,5 +31,7 @@ namespace Return.Web.Tests.Integration.Common {
 
     public interface IPageObject : IDisposable {
         void SetWebDriver(IWebDriver webDriver);
+
+        IWebDriver WebDriver { get; }
     }
 }

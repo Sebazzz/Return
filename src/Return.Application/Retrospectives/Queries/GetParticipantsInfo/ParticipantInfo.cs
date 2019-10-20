@@ -16,7 +16,7 @@ namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
 #nullable disable
     [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public class ParticipantInfo : IMapFrom<Participant>, IEquatable<ParticipantInfo> {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public ColorModel Color { get; set; }
         public bool IsFacilitator { get; set; }
@@ -39,6 +39,6 @@ namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
             return this.Equals((ParticipantInfo)obj);
         }
 
-        public override int GetHashCode() => (this.Id != null ? this.Id.GetHashCode(StringComparison.OrdinalIgnoreCase) : 0);
+        public override int GetHashCode() => this.Id.GetHashCode();
     }
 }

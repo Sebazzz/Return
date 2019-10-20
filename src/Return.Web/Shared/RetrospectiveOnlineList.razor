@@ -12,7 +12,7 @@
     return;
 }
 
-<article class="message is-dark">
+<article class="message is-dark" id="retrospective-online-list">
     <div class="message-header">
         <p>Who already joined?</p>
     </div>
@@ -55,7 +55,7 @@
     }
 
     protected readonly RenderFragment<ParticipantInfo> RenderParticipant = participantInfo =>
-        @<span style="color: #@participantInfo.Color.HexString">
+        @<span style="color: #@participantInfo.Color.HexString" data-participant-id="@participantInfo.Id">
             @if (participantInfo.IsFacilitator) { <span class="fas fa-crown"></span> }
             @participantInfo.Name
          </span>;

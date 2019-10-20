@@ -25,7 +25,7 @@
         
         <div class="control">
             <div class="control has-icons-left">
-                <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.TimeInMinutes" style="width: 8em" />
+                <InputNumber min="1" max="30" class="input" data-test-element-id="time-in-minutes-input" @bind-Value="@this.Model.TimeInMinutes" style="width: 8em" />
                 <span class="icon is-small is-left">
                     <i class="fas fa-stopwatch"></i>
                 </span>
@@ -36,7 +36,7 @@
 
     <div class="field">
         <div class="control">
-            <button type="submit" class="button is-primary is-large">@ButtonText</button>
+            <button type="submit" class="button is-primary is-large" data-test-element-id="workflow-continue-button">@ButtonText</button>
         </div>
     </div>
 </EditForm>

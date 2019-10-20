@@ -7,6 +7,8 @@
 
 namespace Return.Web.Tests.Integration.Common {
     using System;
+    using System.Drawing;
+    using System.IO;
     using System.Linq;
     using Application.Common.Abstractions;
     using Microsoft.Data.Sqlite;
@@ -15,6 +17,7 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
     using OpenQA.Selenium.Support.Events;
+    using OpenQA.Selenium.Support.Extensions;
 
     public class ReturnAppFactory : CustomWebApplicationFactory<Startup> {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "API consistency / design")]
@@ -26,7 +29,6 @@ namespace Return.Web.Tests.Integration.Common {
                 AcceptInsecureCertificates = true,
             };
 
-
             if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
                 TestContext.WriteLine("Going to run Chrome headless");
                 webDriverOptions.AddArguments("--headless");
@@ -34,12 +36,22 @@ namespace Return.Web.Tests.Integration.Common {
 
             var webDriver = new ChromeDriver(webDriverOptions);
 
+            var window = webDriver.Manage().Window;
+            try {
+                window.Size = new Size(1920, 1080);
+            }
+            catch (Exception ex) {
+                TestContext.WriteLine($"Setting driver window size not supported: {ex}");
+            }
+
             ITimeouts timeouts = webDriver.Manage().Timeouts();
             timeouts.ImplicitWait = TimeSpan.FromSeconds(10);
             timeouts.PageLoad = TimeSpan.FromSeconds(10);
 
-            void WrapLoggerAction<TArgs>(TArgs args, Action act) {
+            void WrapLoggerAction<TArgs>(TArgs args, Action act, string screenshotName = null) {
                 try {
+                    if (screenshotName != null) webDriver.TryCreateScreenshot($"action-{screenshotName}");
+
                     act();
                 }
                 catch (Exception ex) {
@@ -48,18 +60,19 @@ namespace Return.Web.Tests.Integration.Common {
             }
 
             var wrapper = new EventFiringWebDriver(webDriver);
-            wrapper.ElementClicked += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: click - {args.Element.TagName}"));
-            wrapper.ElementClicking += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: clicking - {args.Element.TagName}"));
+            wrapper.ElementClicked += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: click - {args.Element.TagName}"), "element-clicked");
+            wrapper.ElementClicking += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: clicking - {args.Element.TagName}"), "element-clicking");
 
             wrapper.ExceptionThrown += (_, args) => {
                 TestContext.WriteLine($"WebDriver: exception - {args.ThrownException}");
+                webDriver.TryCreateScreenshot("exception-" + args.ThrownException.GetType().Name);
                 webDriver.TryLogContext();
             };
 
             wrapper.FindingElement += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element - {args.FindMethod}"));
             wrapper.FindElementCompleted += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element completed - {args.FindMethod}"));
-            wrapper.Navigating += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigating - {args.Url}"));
-            wrapper.Navigated += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigated - {args.Url}"));
+            wrapper.Navigating += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigating - {args.Url}"), "navigate");
+            wrapper.Navigated += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigated - {args.Url}"), "navigate");
             wrapper.ElementValueChanging += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changing - {args.Element.TagName} [{args.Element.GetProperty("outerHTML")}]"));
             wrapper.ElementValueChanged += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changed - {args.Element.TagName} [{args.Element.GetProperty("outerHTML")}]"));
 
