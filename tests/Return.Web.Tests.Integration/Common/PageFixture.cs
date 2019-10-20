@@ -11,6 +11,7 @@ namespace Return.Web.Tests.Integration.Common {
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
 
+    [RetryTest(3)]
     public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable where TPageObject : IPageObject, new() {
 
         protected TPageObject Page { get; private set; }
@@ -33,6 +34,7 @@ namespace Return.Web.Tests.Integration.Common {
         }
     }
 
+    [RetryTest(3)]
     public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDisposable where TPageObject : IPageObject, new() {
         protected TPageObject Client1 { get; private set; }
         protected TPageObject Client2 { get; private set; }
