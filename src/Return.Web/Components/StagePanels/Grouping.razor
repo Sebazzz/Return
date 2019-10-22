@@ -16,7 +16,7 @@
                 <label class="label">Number of votes per lane</label>
                 <div class="control">
                     <div class="control has-icons-left">
-                        <InputNumber min="1" max="30" class="input" @bind-Value="@this.Model.VotesPerGroup" style="width: 8em" />
+                        <InputNumber min="1" max="30" class="input" data-test-element-id="vote-count-input" @bind-Value="@this.Model.VotesPerGroup" style="width: 8em" />
                         <span class="icon is-small is-left">
                             <i class="fas fa-poll"></i>
                         </span>

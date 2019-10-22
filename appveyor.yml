@@ -21,3 +21,9 @@ after_build:
 test_script:
     - cmd: build.cmd --target=Test
 deploy: off
+artifacts:
+    - path: build\testresults\*.trx
+      name: test logs
+    - path: build\testresults\artifacts
+      name: test artifacts
+      type: zip

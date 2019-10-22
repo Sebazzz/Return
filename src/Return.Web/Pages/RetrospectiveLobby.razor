@@ -16,7 +16,7 @@
     <CascadingValue Value=@this.CurrentParticipant IsFixed="true">
         <CascadingValue Value=@this.RetrospectiveStatus>
             <CascadingValue Value=@this.Votes>
-                <div class="columns">
+                <div class="columns" data-test-element-id="main-board">
                     <div class="column is-three-quarters">
                         @if (this.ShowShowcase == false)
                         {

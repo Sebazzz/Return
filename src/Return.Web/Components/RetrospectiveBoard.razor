@@ -2,8 +2,8 @@
 <div class="columns">
     @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
     {
-        <div class="column">
-            <NoteLane @key="lane.Id" Lane="@lane" />
+        <div class="column" data-test-element-id="note-lane" data-id="@lane.Id" @key="lane.Id">
+            <NoteLane Lane="@lane" />
         </div>
     }
 </div>

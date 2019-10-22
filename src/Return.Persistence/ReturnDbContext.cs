@@ -7,6 +7,9 @@
 
 namespace Return.Persistence {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
@@ -14,6 +17,8 @@ namespace Return.Persistence {
     using Domain.Entities;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using Microsoft.EntityFrameworkCore.Metadata;
+    using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
     public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateFacilitator {
         private readonly DbContextOptions _options;
@@ -58,6 +63,32 @@ namespace Return.Persistence {
 
             // Conventions
             modelBuilder.RemovePluralizingTableNameConvention();
+
+            // Fix datetime offset support for integration tests
+            // See: https://blog.dangl.me/archive/handling-datetimeoffset-in-sqlite-with-entity-framework-core/
+            if (this.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+            {
+                // SQLite does not have proper support for DateTimeOffset via Entity Framework Core, see the limitations
+                // here: https://docs.microsoft.com/en-us/ef/core/providers/sqlite/limitations#query-limitations
+                // To work around this, when the Sqlite database provider is used, all model properties of type DateTimeOffset
+                // use the DateTimeOffsetToBinaryConverter
+                // Based on: https://github.com/aspnet/EntityFrameworkCore/issues/10784#issuecomment-415769754
+                // This only supports millisecond precision, but should be sufficient for most use cases.
+                foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
+                {
+                    IEnumerable<PropertyInfo> properties = entityType.ClrType.GetProperties().Where(p => p.PropertyType == typeof(DateTimeOffset));
+                    foreach (PropertyInfo property in properties)
+                    {
+                        if (entityType.IsOwned() == false)
+                        {
+                            modelBuilder
+                                .Entity(entityType.Name)
+                                .Property(property.Name)
+                                .HasConversion(new DateTimeOffsetToBinaryConverter());
+                        }
+                    }
+                }
+            }
         }
 
         public Task Reload(object entity, CancellationToken cancellationToken) {
