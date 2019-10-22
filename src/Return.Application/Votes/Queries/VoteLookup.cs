@@ -62,13 +62,14 @@ namespace Return.Application.Votes.Queries {
             }
 
             votes.Add(notificationVote);
-            votes.Sort(this._sorter);
 
             // Remove artificial uncast vote
             int uncastVoteIdx = votes.FindIndex(x => x.IsCast == false);
             if (uncastVoteIdx != -1) {
                 votes.RemoveAt(uncastVoteIdx);
             }
+
+            votes.Sort(this._sorter);
         }
         public void Remove(VoteModel notificationVote) {
             int? key = this._keySelector.Invoke(notificationVote);

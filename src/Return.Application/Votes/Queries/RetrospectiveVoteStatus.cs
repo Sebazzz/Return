@@ -40,7 +40,7 @@ namespace Return.Application.Votes.Queries {
             switch (notification.Mutation) {
                 case VoteMutationType.Added:
                     this.Votes.Add(notification.Vote);
-                    int uncastVoteIdx = this.Votes.FindIndex(x => x.IsCast == false);
+                    int uncastVoteIdx = this.Votes.FindIndex(x => x.ParticipantId == notification.Vote.ParticipantId && x.IsCast == false);
                     if (uncastVoteIdx != -1) {
                         this.Votes.RemoveAt(uncastVoteIdx);
                     }
