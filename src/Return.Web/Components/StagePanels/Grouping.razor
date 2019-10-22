@@ -1,6 +1,7 @@
 @using Return.Application.RetrospectiveWorkflows.Commands
 @inherits MediatorComponent
 
+<h3 class="retrospective-status-panel__next-step-title">Next step</h3>
 <RetrospectiveRolePanel>
     <Facilitator>
         <p>
@@ -8,7 +9,7 @@
         </p>
 
         <NextStageInvocationForm TModel="InitiateVotingStageCommand"
-                                 Model="@this.Model" 
+                                 Model="@this.Model"
                                  OnContinue="@this.OnInvokeContinueToNextStage"
                                  ButtonText="Start voting phase"
                                  TimeLabelText="Number of minutes of voting time">
@@ -20,7 +21,7 @@
                         <span class="icon is-small is-left">
                             <i class="fas fa-poll"></i>
                         </span>
-                     </div>
+                    </div>
                     <ValidationMessage For="() => this.Model.VotesPerGroup" />
                 </div>
             </div>
@@ -28,7 +29,7 @@
     </Facilitator>
     <Participant>
         <p>
-            Please wait while the facilitator groups the items in the retrospective.
+            Please wait while the facilitator groups the items in the retrospective. After grouping you will have the opportunity to vote on the items.
         </p>
     </Participant>
 </RetrospectiveRolePanel>
