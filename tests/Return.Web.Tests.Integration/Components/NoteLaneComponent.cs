@@ -20,7 +20,10 @@ namespace Return.Web.Tests.Integration.Components {
         }
 
         public IWebElement AddNoteButton => this._webElement.FindElementByTestElementId("add-note-button");
+        public IWebElement AddNoteGroupButton => this._webElement.FindElementByTestElementId("add-note-group-button");
         public ReadOnlyCollection<IWebElement> NoteElements => this._webElement.FindElementsByTestElementId("note");
+        public ReadOnlyCollection<IWebElement> NoteGroupElements => this._webElement.FindElementsByTestElementId("note-group");
         public IEnumerable<NoteComponent> Notes => this._webElement.FindElementsByTestElementId("note").Select(x => new NoteComponent(x));
+        public IEnumerable<NoteGroupComponent> NoteGroups => this._webElement.FindElementsByTestElementId("note-group").Select(x => new NoteGroupComponent(x));
     }
 }

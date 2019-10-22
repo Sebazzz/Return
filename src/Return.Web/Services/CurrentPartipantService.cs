@@ -44,7 +44,11 @@ namespace Return.Web.Services {
                     }
                 }, TaskScheduler.Current);
 
-        internal void SetHttpContext(HttpContext httpContext) => this._httpContext = httpContext;
+        internal void SetHttpContext(HttpContext httpContext)
+        {
+            this._httpContext = httpContext;
+            this._hasNoHttpContext = false;
+        }
 
         internal void SetNoHttpContext() => this._hasNoHttpContext = true;
 
@@ -64,13 +68,9 @@ namespace Return.Web.Services {
                 identity.AddClaim(new Claim(FacilitatorClaimType, FacilitatorClaimContent, FacilitatorClaimContent.GetType().FullName));
             }
 
-            hostEnvProvider.SetAuthenticationState(
-                Task.FromResult(
-                    new AuthenticationState(
-                        new ClaimsPrincipal(identity)
-                    )
-                )
-            );
+            this._currentClaimsPrincipal = new ClaimsPrincipal(identity);
+
+            hostEnvProvider.SetAuthenticationState(Task.FromResult(new AuthenticationState(this._currentClaimsPrincipal)));
         }
 
         public async ValueTask<CurrentParticipantModel> GetParticipant()

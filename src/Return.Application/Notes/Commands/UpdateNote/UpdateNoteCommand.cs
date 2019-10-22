@@ -13,5 +13,7 @@ namespace Return.Application.Notes.Commands.UpdateNote {
     public sealed class UpdateNoteCommand : IRequest {
         public int Id { get; set; }
         public string Text { get; set; }
+
+        public override string ToString() => $"Update Note [Id: {this.Id}; Text: {this.Text}]";
     }
 }

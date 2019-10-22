@@ -25,19 +25,29 @@ namespace Return.Web.Tests.Integration.Pages {
         public void ResetColorIndex() => this._colorIndex = 1;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Object does not have ownership")]
-        protected void Join(RetrospectiveLobby pageObject, bool facilitator) {
+        protected void Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false) {
             var joinPage = new JoinRetrospectivePage();
             ((IPageObject)joinPage).SetWebDriver(pageObject.WebDriver);
             joinPage.Navigate(this.App, this.RetroId);
 
-            joinPage.NameInput.SendKeys(Name.Create());
+            joinPage.NameInput.SendKeys(name ?? Name.Create());
 
             Thread.Sleep(500);
-            new SelectElement(joinPage.ColorSelect).SelectByIndex(this._colorIndex++);
+            if (!alreadyJoined) {
+                new SelectElement(joinPage.ColorSelect).SelectByIndex(this._colorIndex++);
+            }
+            else {
+                // Force refresh
+                joinPage.Unfocus();
+                Thread.Sleep(500);
+            }
 
             if (facilitator) {
-                joinPage.IsFacilitatorCheckbox.Click();
-                Thread.Sleep(500);
+                if (!alreadyJoined) {
+                    joinPage.IsFacilitatorCheckbox.Click();
+                    Thread.Sleep(500);
+                }
+
                 joinPage.WebDriver.Retry(_ => {
                     joinPage.FacilitatorPassphraseInput.SendKeys("scrummaster");
                     return true;

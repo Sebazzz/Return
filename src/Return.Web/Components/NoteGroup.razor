@@ -4,6 +4,8 @@
 <VoteList NoteGroup="@this.Data"/>
 
 <div class="note-group dropzone @(this.Classes)"
+     data-id="@this.Data.Id"
+     data-test-element-id="note-group"
      @onclick="@ToggleExpand"
      ondragover="event.preventDefault();"
      @ondrop="@HandleDrop"

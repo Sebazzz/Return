@@ -8,16 +8,16 @@
 namespace Return.Web.Tests.Integration.Common {
     using System;
     using System.Drawing;
-    using System.IO;
     using System.Linq;
-    using Application.Common.Abstractions;
+    using Domain.Abstractions;
     using Microsoft.Data.Sqlite;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
     using OpenQA.Selenium.Support.Events;
-    using OpenQA.Selenium.Support.Extensions;
+    using Persistence;
 
     public class ReturnAppFactory : CustomWebApplicationFactory<Startup> {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "API consistency / design")]
@@ -85,6 +85,17 @@ namespace Return.Web.Tests.Integration.Common {
             pageObject.SetWebDriver(this.CreateWebDriver());
             return pageObject;
         }
+
+        public int GetId<TEntity>(Func<DbSet<TEntity>, int> query) where TEntity : class {
+            using IServiceScope scope = this.CreateTestServiceScope();
+
+            var returnDbContext = scope.ServiceProvider.GetRequiredService<ReturnDbContext>();
+            DbSet<TEntity> dbSet = returnDbContext.Set<TEntity>();
+
+            return query.Invoke(dbSet);
+        }
+
+        public int GetLastAddedId<TEntity>() where TEntity : class, IIdPrimaryKey => this.GetId<TEntity>(dbSet => dbSet.OrderByDescending(x => x.Id).Select(x => x.Id).First());
 
         public Uri CreateUri(string path) => new Uri(this.Server.BaseAddress, path);
 

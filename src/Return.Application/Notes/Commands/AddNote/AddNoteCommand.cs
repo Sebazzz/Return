@@ -18,5 +18,7 @@ namespace Return.Application.Notes.Commands.AddNote {
             this.RetroId = retroId;
             this.LaneId = laneId;
         }
+
+        public override string ToString() => $"Add Note [RetroId: {this.RetroId}; LaneId: {this.LaneId}]";
     }
 }

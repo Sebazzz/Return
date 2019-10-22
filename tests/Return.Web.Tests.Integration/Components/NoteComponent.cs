@@ -6,16 +6,17 @@
 // ******************************************************************************
 
 namespace Return.Web.Tests.Integration.Components {
+    using Common;
     using OpenQA.Selenium;
 
     public sealed class NoteComponent {
-        private readonly IWebElement _webElement;
-
         public NoteComponent(IWebElement webElement) {
-            this._webElement = webElement;
+            this.WebElement = webElement;
         }
 
-        public IWebElement Input => this._webElement.FindElement(By.ClassName("textarea"));
-        public IWebElement Content => this._webElement.FindElement(By.ClassName("note__content"));
+        public IWebElement WebElement { get; }
+        public int Id => this.WebElement.GetAttribute<int>("data-id");
+        public IWebElement Input => this.WebElement.FindElement(By.ClassName("textarea"));
+        public IWebElement Content => this.WebElement.FindElement(By.ClassName("note__content"));
     }
 }

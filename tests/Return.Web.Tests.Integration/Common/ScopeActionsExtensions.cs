@@ -37,5 +37,7 @@ namespace Return.Web.Tests.Integration.Common {
             action.Invoke(retrospective);
             await dbContext.SaveChangesAsync(CancellationToken.None);
         }
+
+        public static TestCaseBuilder TestCaseBuilder(this IServiceScope scope, string retrospectiveId) => new TestCaseBuilder(scope, retrospectiveId);
     }
 }

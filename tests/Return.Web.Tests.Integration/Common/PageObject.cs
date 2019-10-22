@@ -7,6 +7,7 @@
 
 namespace Return.Web.Tests.Integration.Common {
     using System;
+    using NUnit.Framework;
     using OpenQA.Selenium;
 
     public abstract class PageObject : IPageObject {
@@ -14,6 +15,11 @@ namespace Return.Web.Tests.Integration.Common {
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "Not necessary for testing framework")]
         void IPageObject.SetWebDriver(IWebDriver webDriver) => this.WebDriver = webDriver;
+
+        public void Unfocus() {
+            TestContext.WriteLine("Unfocus by sending tab");
+            this.WebDriver.FindElement(By.CssSelector("body")).SendKeys("\t");
+        }
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {

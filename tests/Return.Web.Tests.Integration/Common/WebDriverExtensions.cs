@@ -14,6 +14,7 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium;
     using OpenQA.Selenium.Support.Extensions;
     using OpenQA.Selenium.Support.UI;
+    using Return.Common;
 
     public static class WebDriverExtensions {
         public static IWebElement FindElementByTestElementId(this IWebDriver webDriver, string testElementId) {
@@ -127,6 +128,78 @@ namespace Return.Web.Tests.Integration.Common {
             catch (Exception ex) {
                 TestContext.WriteLine($"Unable to log browser log info: {ex}");
             }
+        }
+
+        public static T GetAttribute<T>(this IWebElement webElement, string attributeName) {
+            try {
+                return (T)Convert.ChangeType(webElement.GetAttribute(attributeName), typeof(T), Culture.Invariant);
+            }
+            catch (Exception ex) {
+                throw new InvalidOperationException($"Cannot read attribute '{attributeName}' of element {webElement.TagName} as {typeof(T)}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Drag and drop from element to element
+        /// </summary>
+        /// <remarks>
+        /// Workaround Chromedriver not supporting drag-and-drop: https://bugs.chromium.org/p/chromedriver/issues/detail?id=2695
+        /// </remarks>
+        /// <param name="webDriver"></param>
+        /// <param name="from"></param>
+        /// <param name="dest"></param>
+        public static void ExecuteDragAndDrop(this IWebDriver webDriver, IWebElement from, IWebElement dest) {
+            if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
+            // https://gist.github.com/druska/624501b7209a74040175#file-native_js_drag_and_drop_helper-js
+            const string script = @"
+
+function simulateDragDrop(sourceNode, destinationNode) {
+    var EVENT_TYPES = {
+        DRAG_END: 'dragend',
+        DRAG_START: 'dragstart',
+        DROP: 'drop'
+    }
+
+    function createCustomEvent(type) {
+        var event = new CustomEvent(""CustomEvent"")
+            event.initCustomEvent(type, true, true, null)
+            event.dataTransfer = {
+            data: {
+            },
+            setData: function(type, val) {
+                this.data[type] = val
+            },
+            getData: function(type) {
+                return this.data[type]
+            }
+        }
+        return event
+    }
+
+    function dispatchEvent(node, type, event) {
+        if (node.dispatchEvent) {
+            return node.dispatchEvent(event)
+        }
+        if (node.fireEvent) {
+            return node.fireEvent(""on"" + type, event)
+        }
+    }
+
+    var event = createCustomEvent(EVENT_TYPES.DRAG_START)
+    dispatchEvent(sourceNode, EVENT_TYPES.DRAG_START, event)
+
+    var dropEvent = createCustomEvent(EVENT_TYPES.DROP)
+    dropEvent.dataTransfer = event.dataTransfer
+        dispatchEvent(destinationNode, EVENT_TYPES.DROP, dropEvent)
+
+    var dragEndEvent = createCustomEvent(EVENT_TYPES.DRAG_END)
+    dragEndEvent.dataTransfer = event.dataTransfer
+        dispatchEvent(sourceNode, EVENT_TYPES.DRAG_END, dragEndEvent)
+}
+
+simulateDragDrop(arguments[0], arguments[1]);";
+
+            webDriver.ExecuteJavaScript(script, from, dest);
         }
     }
 }
