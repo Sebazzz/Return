@@ -75,6 +75,9 @@ namespace Return.Web.Components {
         [Parameter]
         public RetrospectiveLane Lane { get; set; }
 
+        [Parameter]
+        public int Order {get;set;}
+
         [CascadingParameter]
         public CurrentParticipantModel CurrentParticipant { get; set; }
 

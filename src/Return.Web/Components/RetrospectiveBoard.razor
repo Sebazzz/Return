@@ -2,8 +2,10 @@
 <div class="columns">
     @foreach (RetrospectiveLane lane in this.RetrospectiveStatus.Lanes)
     {
+        int order = this.RetrospectiveStatus.Lanes.IndexOf(lane) + 1;
+        
         <div class="column" data-test-element-id="note-lane" data-id="@lane.Id" @key="lane.Id">
-            <NoteLane Lane="@lane" />
+            <NoteLane Lane="@lane" Order="@order" />
         </div>
     }
 </div>

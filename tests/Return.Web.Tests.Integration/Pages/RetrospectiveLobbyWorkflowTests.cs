@@ -15,6 +15,7 @@ namespace Return.Web.Tests.Integration.Pages {
     using Common;
     using Components;
     using Domain.Entities;
+    using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
@@ -87,6 +88,138 @@ namespace Return.Web.Tests.Integration.Pages {
             });
 
             // When
+            NoteComponent note = noteLane.Notes.First();
+            string noteText = "some content which does not really matter to me";
+            note.Input.SendKeys(noteText);
+
+            // Then
+            Assert.That(() => this.Client1.GetLane(KnownNoteLane.Continue).Notes.First().Content.Text,
+                Has.Length.EqualTo(noteText.Length).And.Not.EqualTo(noteText).Retry(),
+                "Client 1 does not have the the garbled text from client 2");
+        }
+
+        [Test]
+        public async Task RetrospectiveLobby_WritingStage_CanDeleteNote() {
+            // Given
+            int noteId = 0;
+            using (IServiceScope scope = this.App.CreateTestServiceScope()) {
+                await scope.TestCaseBuilder(this.RetroId).
+                    WithParticipator("Boss", true, "scrummaster").
+                    WithParticipator("Josh", false).
+                    WithRetrospectiveStage(RetrospectiveStage.Writing).
+                    WithNote(KnownNoteLane.Start, "Josh").
+                    WithNote(KnownNoteLane.Continue, "Josh").
+                    WithNote(KnownNoteLane.Continue, "Boss").
+                    OutputId(id => noteId = id).
+                    WithNote(KnownNoteLane.Continue, "Boss").
+                    Build();
+            }
+
+            await Task.WhenAll(
+                Task.Run(() => this.Join(this.Client1, true, "Boss", alreadyJoined: true)),
+                Task.Run(() => this.Join(this.Client2, false, "Josh", true))
+            );
+
+            this.WaitNavigatedToLobby();
+
+            this.MultiAssert(client => {
+                Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(1).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+            });
+
+            // When
+            NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);
+            NoteComponent note = noteLane.Notes.First(x => x.Id == noteId);
+            note.DeleteButton.Click();
+
+            // Then
+            this.MultiAssert(client => {
+                NoteLaneComponent clientNoteLane = this.Client1.GetLane(KnownNoteLane.Continue);
+
+                Assert.That(() => clientNoteLane.NoteElements, Has.Count.EqualTo(2).Retry());
+                Assert.That(() => clientNoteLane.Notes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId).Retry());
+            });
+        }
+
+        [Test]
+        public async Task RetrospectiveLobby_WritingStage_CanDeleteNote_Shortcut() {
+            // Given
+            int noteId = 0;
+            using (IServiceScope scope = this.App.CreateTestServiceScope()) {
+                await scope.TestCaseBuilder(this.RetroId).
+                    WithParticipator("Boss", true, "scrummaster").
+                    WithParticipator("Josh", false).
+                    WithRetrospectiveStage(RetrospectiveStage.Writing).
+                    WithNote(KnownNoteLane.Start, "Josh").
+                    WithNote(KnownNoteLane.Continue, "Josh").
+                    WithNote(KnownNoteLane.Continue, "Boss").
+                    OutputId(id => noteId = id).
+                    WithNote(KnownNoteLane.Continue, "Boss").
+                    Build();
+            }
+
+            await Task.WhenAll(
+                Task.Run(() => this.Join(this.Client1, true, "Boss", alreadyJoined: true)),
+                Task.Run(() => this.Join(this.Client2, false, "Josh", true))
+            );
+
+            this.WaitNavigatedToLobby();
+
+            this.MultiAssert(client => {
+                Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(1).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+            });
+
+            // When
+            NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);
+            NoteComponent note = noteLane.Notes.First(x => x.Id == noteId);
+
+            new Actions(this.Client1.WebDriver)
+                .KeyDown(note.Input, Keys.Control)
+                .SendKeys(Keys.Delete)
+                .KeyUp(Keys.Control)
+                .Perform();
+
+            // Then
+            this.MultiAssert(client => {
+                NoteLaneComponent clientNoteLane = client.GetLane(KnownNoteLane.Continue);
+
+                Assert.That(() => clientNoteLane.NoteElements, Has.Count.EqualTo(2).Retry());
+                Assert.That(() => clientNoteLane.Notes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId).Retry());
+            });
+        }
+
+        [Test]
+        public async Task RetrospectiveLobby_WritingStage_CanAddNote_Shortcut() {
+            // Given
+            await this.SetRetrospective(retro => retro.CurrentStage = RetrospectiveStage.Writing);
+
+            await Task.WhenAll(
+                Task.Run(() => this.Join(this.Client1, true)),
+                Task.Run(() => this.Join(this.Client2, false))
+            );
+
+            this.WaitNavigatedToLobby();
+
+            // When
+            int laneNumber = (int)KnownNoteLane.Continue;
+            new Actions(this.Client2.WebDriver)
+                .KeyDown(Keys.Control)
+                .SendKeys(laneNumber.ToString(Culture.Invariant))
+                .KeyUp(Keys.Control)
+                .Perform();
+
+            // Then
+            this.MultiAssert(client => {
+                Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(1).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(0).Retry());
+                Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+            });
+
+            // When
+            NoteLaneComponent noteLane = this.Client2.GetLane(KnownNoteLane.Continue);
             NoteComponent note = noteLane.Notes.First();
             string noteText = "some content which does not really matter to me";
             note.Input.SendKeys(noteText);

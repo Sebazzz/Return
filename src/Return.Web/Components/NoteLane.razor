@@ -24,7 +24,11 @@
             }
 
             <p class="has-text-centered">
-                <button type="button" class="button is-link is-outlined" @onclick="@AddNote" data-test-element-id="add-note-button">
+                <button type="button" 
+                        class="button is-link is-outlined" 
+                        @onclick="@AddNote" 
+                        data-keypress-handler="CTRL+@this.Order" title="You can also press CTRL+@this.Order"
+                        data-test-element-id="add-note-button">
                     <span class="icon">
                         <span class="fas fa-plus-square"></span>
                     </span>
@@ -43,7 +47,11 @@
             }
 
             <p class="has-text-centered">
-                <button type="button" class="button is-link is-outlined" @onclick="@AddNoteGroup" data-test-element-id="add-note-group-button">
+                <button type="button" 
+                        class="button is-link is-outlined" 
+                        @onclick="@AddNoteGroup"
+                        data-keypress-handler="CTRL+@this.Order" title="You can also press CTRL+@this.Order"
+                        data-test-element-id="add-note-group-button">
                     <span class="icon">
                         <span class="fas fa-plus-square"></span>
                     </span>

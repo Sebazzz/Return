@@ -19,12 +19,16 @@
         }
 
         @if (this.RetrospectiveStatus.IsDeletingNotesAllowed) {
-            <div class="note__delete-icon" @onclick="@this.Delete">
+            <div class="note__delete-icon"
+                 data-keypress-handler="CTRL+Delete" title="You can also press CTRL+Delete when you have the textarea in focus"
+                 data-keypress-handler-id="note-@this.Data.Id"
+                 @onclick="@this.Delete">
                 <i class="fas fa-trash"></i>
             </div>
         }
 
         <textarea class="textarea note__content is-small has-fixed-size"
+                  data-keypress-handler-id="note-@this.Data.Id"
                   rows="1"
                   placeholder="Enter your text here" 
                   @bind-value="@TextData" 

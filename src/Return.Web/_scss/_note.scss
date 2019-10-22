@@ -59,7 +59,7 @@
         z-index: 1;
 
         &:hover {
-            color: $red;
+            transform: scale(1.1);
         }
     }
 }

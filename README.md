@@ -11,6 +11,9 @@ Licensed: GNU GPL v3.0
 ## Features
 
 -   Realtime retrospective app, ideal for remote teams
+-   Shortcut support:
+    -   Ctrl + lane number for adding notes or groups
+    -   Ctrl + delete for deleting focused note
 -   Create password protected retrospectives
 -   As facilitator, manage the retrospective through the writing, grouping and voting phase.
 -   Overview with highest voted items
