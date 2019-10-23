@@ -12,9 +12,9 @@
                                  Model="@this.Model"
                                  OnContinue="@this.OnInvokeContinueToNextStage"
                                  ButtonText="Start voting phase"
-                                 TimeLabelText="Number of minutes of voting time">
+                                 TimeLabelText="Time to vote (minutes)">
             <div class="field">
-                <label class="label">Number of votes per lane</label>
+                <label class="label">Votes per lane</label>
                 <div class="control">
                     <div class="control has-icons-left">
                         <InputNumber min="1" max="30" class="input" data-test-element-id="vote-count-input" @bind-Value="@this.Model.VotesPerGroup" style="width: 8em" />
