@@ -1,42 +1,62 @@
 @page "/retrospective/{retroId}/lobby"
+@layout PlainLayout
 @inherits RetrospectiveLobbyBase
+@using Return.Web.Components.Layout
 
 @if (this.RetrospectiveStatus == null)
 {
-    @if (this.HasLoaded) {
-        <ErrorMessage Text="This retrospective cannot be found!" />
-    }
+    <CommonTopMenu/>
+
+    <section class="section">
+        <div class="container">
+            @if (this.HasLoaded) {
+                <ErrorMessage Text="This retrospective cannot be found!" />
+            } else {
+                <p>Hold on... crunching the data</p>
+            }
+        </div>
+    </section>
+
+    <Footer />
 
     return;
 }
 
-<h1 class="title has-text-centered">Retrospective: @this.RetrospectiveStatus.Title</h1>
 
 <CascadingValue Value=@this.RetroIdObject IsFixed="true">
     <CascadingValue Value=@this.CurrentParticipant IsFixed="true">
         <CascadingValue Value=@this.RetrospectiveStatus>
-            <CascadingValue Value=@this.Votes>
-                <div class="columns" data-test-element-id="main-board">
-                    <div class="column is-three-quarters">
-                        @if (this.ShowShowcase == false)
-                        {
-                            <RetrospectiveBoard />
-                        }
-                        else
-                        {
-                            <Showcase />
-                        }
-                    </div>
+            <RetrospectiveLobbyTopMenu />
 
-                    <div class="column">
-                        <CascadingValue TValue="@IRetrospectiveLobby" Value=@this IsFixed="true">
-                            <RetrospectiveStatusPanel />
-                        </CascadingValue>
+            <section class="section">
+                <div class="container">
+                    <CascadingValue Value=@this.Votes>
+                        <div class="columns" data-test-element-id="main-board">
+                            <div class="column is-three-quarters">
+                                @if (this.ShowShowcase == false)
+                                {
+                                    <RetrospectiveBoard />
+                                }
+                                else
+                                {
+                                    <Showcase />
+                                }
+                            </div>
 
-                        <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
-                    </div>
+                            <div class="column">
+                                <CascadingValue TValue="@IRetrospectiveLobby" Value=@this IsFixed="true">
+                                    <RetrospectiveStatusPanel />
+                                </CascadingValue>
+
+                                <RetrospectiveOnlineList RetroId="@this.RetroId" CurrentParticipant="@this.CurrentParticipant" />
+                            </div>
+                        </div>
+                    </CascadingValue>
                 </div>
-            </CascadingValue>
+            </section>
         </CascadingValue>
     </CascadingValue>
 </CascadingValue>
+ 
+
+<Footer />

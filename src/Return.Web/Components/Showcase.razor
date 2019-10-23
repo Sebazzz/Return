@@ -17,7 +17,7 @@
         <div class="showcase__button-container showcase__button-container--previous">
             <button type="button"
                     class="button @(this.HasPreviousItem ? "is-dark" : "is-light") is-inverted"
-                    data-keypress-handler="CTRL+Left" title="You can also press CTRL+Left arrow key"
+                    data-keypress-handler="CTRL+ArrowLeft" title="You can also press CTRL+Left arrow key"
                     @onclick="@this.ShowPreviousItem">
                 <span class="icon">
                     <span class="fas fa-arrow-left"></span>
@@ -36,7 +36,7 @@
         <div class="showcase__button-container showcase__button-container--next">
             <button type="button"
                     class="button @(this.HasNextItem ? "is-link" : "is-light") is-inverted"
-                    data-keypress-handler="CTRL+Right" title="You can also press CTRL+Right arrow key"
+                    data-keypress-handler="CTRL+ArrowRight" title="You can also press CTRL+Right arrow key"
                     @onclick="@this.ShowNextItem">
                 <span class="icon">
                     <span class="fas fa-arrow-right"></span>

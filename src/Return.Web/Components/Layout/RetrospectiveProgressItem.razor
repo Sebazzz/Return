@@ -1,0 +1,40 @@
+@using Return.Domain.Entities
+
+<div class="retrospective-progress__item @this.CssClass">
+    <span>
+        @this.Text
+    </span>
+</div>
+
+@code {
+    [Parameter]
+    public RetrospectiveStage CurrentStage { get; set; }
+
+    [Parameter]
+    public RetrospectiveStage ApplicableTo { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    private bool IsPrevious => this.ApplicableTo < this.CurrentStage;
+    private bool IsCurrent => this.CurrentStage == this.ApplicableTo;
+
+    private string CssClass
+    {
+        get
+        {
+            if (this.IsCurrent)
+            {
+                return "retrospective-progress__item--is-current";
+            }
+
+            if (this.IsPrevious)
+            {
+                return "retrospective-progress__item--is-previous";
+            }
+
+            return "retrospective-progress__item--future";
+        }
+    }
+
+}

@@ -25,3 +25,12 @@ p {
 .full-width {
     width: 100%;
 }
+
+.navbar-retrospective-start {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.navbar-brand > span.navbar-item {
+    cursor: default;
+}

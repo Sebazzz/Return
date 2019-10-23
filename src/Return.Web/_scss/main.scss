@@ -9,6 +9,7 @@ $body-background-color: $beige-lighter;
 // Import font awesome
 $fa-font-path: '/build/fonts';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '../node_modules/@fortawesome/fontawesome-free/scss/brands.scss';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/regular.scss';
 @import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
 
@@ -39,5 +40,6 @@ $reveal-shadow-spread: 20px;
 @import 'note';
 @import 'note-group';
 @import 'online-list';
+@import 'retrospective-progress';
 @import 'showcase';
 @import 'vote';

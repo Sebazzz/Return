@@ -1,0 +1,100 @@
+$retro-progress-arrow-width: 12px;
+$retro-progress-arrow-height-modifier: 36px / 2;
+$retro-progress-active-color: $grey-dark;
+$retro-progress-previous-color: $grey-light;
+
+.retrospective-title {
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.retrospective-progress-container {
+    align-self: stretch;
+}
+
+.retrospective-progress {
+    height: 100%;
+    cursor: default;
+    user-select: none;
+    margin-right: 1rem;
+
+    transition: opacity ease 500ms;
+    opacity: 1;
+
+    &--inactive {
+        opacity: 0;
+    }
+
+    &__item {
+        display: inline-flex;
+        position: relative;
+        align-content: center;
+        height: 100%;
+        padding: 0.25rem (2 * $retro-progress-arrow-width);
+        padding-left: (3 * $retro-progress-arrow-width);
+        margin-right: -$retro-progress-arrow-width;
+        transition-property: background-color, color;
+        transition-timing-function: ease;
+        transition-duration: 500ms;
+
+        &::after,
+        &::before {
+            position: absolute;
+            top: 0;
+            border: 0 solid transparent;
+            border-top-width: $retro-progress-arrow-height-modifier;
+            border-bottom-width: $retro-progress-arrow-height-modifier;
+            border-left-width: $retro-progress-arrow-width;
+            display: block;
+            content: '';
+            transition-property: border-left-color, border-right-color;
+            transition-timing-function: ease;
+            transition-duration: 500ms;
+        }
+
+        &::before {
+            left: 0;
+        }
+
+        &::after {
+            right: (-1 * $retro-progress-arrow-width);
+        }
+
+        &--is-current {
+            background-color: $retro-progress-active-color;
+            color: $white-ter;
+
+            &::after {
+                border-left-color: $retro-progress-active-color;
+            }
+        }
+
+        &--is-current + &::before {
+            border-left-color: transparent;
+        }
+
+        &--is-previous {
+            background-color: $retro-progress-previous-color;
+
+            &::after {
+                border-left-color: $retro-progress-previous-color;
+            }
+        }
+
+        &--is-previous + &::before {
+            border-left-color: $retro-progress-previous-color;
+        }
+
+        &--future {
+            background-color: inherit;
+            color: inherit;
+
+            &::after {
+            }
+        }
+
+        &:last-child::after {
+            display: none;
+        }
+    }
+}

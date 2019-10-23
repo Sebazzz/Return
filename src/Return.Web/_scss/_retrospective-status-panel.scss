@@ -4,4 +4,9 @@
         font-size: $size-5;
         margin-bottom: 0.5rem !important;
     }
+
+    &__primary-explanation {
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #ccc;
+    }
 }

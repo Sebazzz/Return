@@ -3,24 +3,22 @@
 <article class="message retrospective-status-panel">
     <div class="message-header">
         @* Each stage has its own title *@
-        <p>
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.NotStarted"
-                                    Text="Not started yet" />
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Writing"
-                                    Text="Writing down findings" />
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Discuss"
-                                    Text="Discussion" />
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Grouping"
-                                    Text="Grouping" />
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Voting"
-                                    Text="Voting" />
-            <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Finished"
-                                    Text="Finished" />
-        </p>
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.NotStarted"
+                                Text="Not started yet" />
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Writing"
+                                Text="Writing down findings" />
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Discuss"
+                                Text="Discussion" />
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Grouping"
+                                Text="Grouping" />
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Voting"
+                                Text="Voting" />
+        <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Finished"
+                                Text="Finished" />
     </div>
     <div class="message-body">
         @* Each stage has its own explanation *@
-        <p>
+        <p class="retrospective-status-panel__primary-explanation">
             <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.NotStarted"
                                     Text="We are waiting for the facilitator to start the retrospective." />
             <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Writing"
@@ -30,9 +28,9 @@
             <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Grouping"
                                     Text="The facilitator will now group the related notes together." />
             <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Voting"
-                                    Text="You can now vote on the groups to deem important." />
+                                    Text="You can now vote on the notes and groups to think are important to focus on." />
             <RetrospectiveStageText ApplicableTo="@RetrospectiveStage.Finished"
-                                    Text="The retrospective has finished. You can now view the results here." />
+                                    Text="The retrospective is now finished. You can now view the results here." />
         </p>
 
         @* Each stage has its own panel and controls *@

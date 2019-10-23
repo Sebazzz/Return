@@ -44,7 +44,6 @@ namespace Return.Application.Votes.Queries {
             List<NoteLane> lanes = await this._returnDbContext.NoteLanes.ToListAsync(cancellationToken);
 
             int numberOfVotesPerLane = retrospective.Options.MaximumNumberOfVotes;
-            int numberOfVotes = lanes.Count * numberOfVotesPerLane;
 
             ILookup<int, NoteVote> votes = this._returnDbContext.NoteVotes.AsNoTracking()
                 .Include(x => x.Participant)
@@ -59,19 +58,25 @@ namespace Return.Application.Votes.Queries {
             var result = new RetrospectiveVoteStatus(numberOfVotesPerLane);
 
             foreach (Participant participant in participants) {
-                int votesCast = 0;
-                foreach (NoteVote noteVote in votes[participant.Id]) {
-                    result.Votes.Add(this._mapper.Map<VoteModel>(noteVote));
-                    votesCast++;
-                }
+                foreach (NoteLane noteLane in lanes) {
+                    int votesCast = 0;
+                    foreach (NoteVote noteVote in votes[participant.Id]) {
+                        if ((noteVote.Note?.Lane ?? noteVote.NoteGroup?.Lane)?.Id != noteLane.Id) {
+                            continue;
+                        }
 
-                int votesLeft = numberOfVotes - votesCast;
-                for (int v = 0; v < votesLeft; v++) {
-                    result.Votes.Add(new VoteModel {
-                        ParticipantId = participant.Id,
-                        ParticipantColor = this._mapper.Map<ColorModel>(participant.Color),
-                        ParticipantName = participant.Name
-                    });
+                        result.Votes.Add(this._mapper.Map<VoteModel>(noteVote));
+                        votesCast++;
+                    }
+
+                    int votesLeft = numberOfVotesPerLane - votesCast;
+                    for (int v = 0; v < votesLeft; v++) {
+                        result.Votes.Add(new VoteModel {
+                            ParticipantId = participant.Id,
+                            ParticipantColor = this._mapper.Map<ColorModel>(participant.Color),
+                            ParticipantName = participant.Name
+                        });
+                    }
                 }
             }
 

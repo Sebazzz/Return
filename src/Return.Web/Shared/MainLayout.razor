@@ -1,8 +1,7 @@
 @inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+@using Return.Web.Components.Layout
 
-<aside class="menu">
-    <NavMenu />
-</aside>
+<CommonTopMenu />
 
 <section class="section">
     <div class="container">
@@ -10,10 +9,4 @@
     </div>
 </section>
 
-<footer class="footer">
-    <div class="content has-text-centered">
-        <p>
-            <strong>Return</strong> by <a href="https://damsteen.nl/">Sebastiaan Dammann</a>
-        </p>
-    </div>
-</footer>
+<Footer />

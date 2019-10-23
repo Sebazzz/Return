@@ -1,0 +1,49 @@
+@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
+@using Return.Domain.Entities
+<aside class="menu">
+    <TopMenu BrandIsClickable="false">
+        <div class="navbar-start navbar-retrospective-start">
+            <div class="navbar-item">
+                <h1 class="retrospective-title">@this.RetrospectiveStatus.Title</h1>
+            </div>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item retrospective-progress-container">
+                <div class="retrospective-progress @(this.RetrospectiveStatus.Stage == RetrospectiveStage.NotStarted ? "retrospective-progress--inactive" : String.Empty)">
+                    <RetrospectiveProgressItem 
+                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        ApplicableTo="@RetrospectiveStage.Writing"
+                        Text="Write"/>
+
+                    <RetrospectiveProgressItem 
+                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        ApplicableTo="@RetrospectiveStage.Discuss"
+                        Text="Discuss"/>
+
+                    <RetrospectiveProgressItem 
+                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        ApplicableTo="@RetrospectiveStage.Grouping"
+                        Text="Group"/>
+
+                    <RetrospectiveProgressItem 
+                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        ApplicableTo="@RetrospectiveStage.Voting"
+                        Text="Vote"/>
+
+                    <RetrospectiveProgressItem 
+                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        ApplicableTo="@RetrospectiveStage.Finished"
+                        Text="Finished"/>
+                </div>
+            </div>
+        </div>
+    </TopMenu>
+</aside>
+
+@code
+{
+    #nullable disable
+    [CascadingParameter]
+    public RetrospectiveStatus RetrospectiveStatus { get; set; } 
+}

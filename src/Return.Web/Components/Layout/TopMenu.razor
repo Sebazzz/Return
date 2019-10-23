@@ -1,0 +1,45 @@
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        @if (BrandIsClickable)
+        {
+            <a class="navbar-item" href="/">
+                <Brand />
+            </a>
+        }
+        else
+        {
+            <span class="navbar-item">
+                <Brand />
+            </span>
+        }
+
+        <a role="button" @onclick="@ToggleNavMenu" class="navbar-burger burger @NavMenuCssClass" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class="navbar-menu @NavMenuCssClass">
+        @ChildContent
+    </div>
+</nav>
+
+@code {
+    #nullable disable
+
+    bool _collapseNavMenu = true;
+
+    string NavMenuCssClass => _collapseNavMenu ? null : "is-active";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool BrandIsClickable { get; set; } = true;
+
+    void ToggleNavMenu()
+    {
+        this._collapseNavMenu = !_collapseNavMenu;
+    }
+}
