@@ -71,8 +71,6 @@ document.addEventListener('drop', function(ev) {
         }
 
         // Find an associated handler
-        console.info('Finding handler for %s', eventStr);
-
         var escapedEventStr = eventStr.replace('"', '\\"'),
             selector = '[data-keypress-handler="' + escapedEventStr + '"]',
             keyPressHandlerId = null;
@@ -102,8 +100,6 @@ document.addEventListener('drop', function(ev) {
 
             // Ignore repeating presses but do handle the event to prevent the browser from reacting
             if (!ev.isRepeating) {
-                console.info('Found handler for %s', eventStr);
-
                 handlingElement.click();
             } else {
                 console.info('Found handler for %s - ignoring repeating key press', eventStr);
