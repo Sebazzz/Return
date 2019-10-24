@@ -9,6 +9,10 @@
 .reveal__contents {
     opacity: 0;
     animation: 1s ease 0s 1 normal forwards running reveal-contents-anim;
+
+    .browser-compat & {
+        opacity: 1;
+    }
 }
 
 @keyframes reveal-anim {

@@ -35,3 +35,9 @@ p {
 .navbar-brand > span.navbar-item {
     cursor: default;
 }
+
+.footer {
+    &__gh-link {
+        margin-left: 4em;
+    }
+}

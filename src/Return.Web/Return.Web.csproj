@@ -29,4 +29,8 @@
     <Compile Remove="wwwroot\**\*;node_modules\**\*" />
     <TypeScriptCompile Remove="wwwroot\**\*;node_modules\**\*" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\compat\" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,8 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Hosting
+@using Microsoft.Extensions.Hosting
 @namespace Return.Web.Pages
+@inject IWebHostEnvironment HostEnvironment
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
@@ -16,7 +19,15 @@
 <app>
   @(await Html.RenderComponentAsync<App>(renderMode: RenderMode.ServerPrerendered))
 </app>
-
+  
+<script>
+  window.Promise || (function () {
+    var tag = document.createElement('script');
+    tag.src = 'js/compat/blazor.polyfill@(this.HostEnvironment.IsDevelopment() ? "" : ".min").js';
+    document.body.appendChild(tag);
+    document.body.classList.add('browser-compat');
+  })();
+</script>
 <script src="_framework/blazor.server.js"></script>
 <script src="js/retro.js"></script>
 </body>
