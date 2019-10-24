@@ -1,38 +1,38 @@
-@using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @using Return.Domain.Entities
+
 <aside class="menu">
     <TopMenu BrandIsClickable="false">
         <div class="navbar-start navbar-retrospective-start">
             <div class="navbar-item">
-                <h1 class="retrospective-title">@this.RetrospectiveStatus.Title</h1>
+                <h1 class="retrospective-title">@this._layoutInfo.Title</h1>
             </div>
         </div>
 
         <div class="navbar-end">
             <div class="navbar-item retrospective-progress-container">
-                <div class="retrospective-progress @(this.RetrospectiveStatus.Stage == RetrospectiveStage.NotStarted ? "retrospective-progress--inactive" : String.Empty)">
+                <div class="retrospective-progress @(this.CurrentStage == RetrospectiveStage.NotStarted ? "retrospective-progress--inactive" : String.Empty)">
                     <RetrospectiveProgressItem 
-                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        CurrentStage="@this.CurrentStage"
                         ApplicableTo="@RetrospectiveStage.Writing"
                         Text="Write"/>
 
                     <RetrospectiveProgressItem 
-                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        CurrentStage="@this.CurrentStage"
                         ApplicableTo="@RetrospectiveStage.Discuss"
                         Text="Discuss"/>
 
                     <RetrospectiveProgressItem 
-                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        CurrentStage="@this.CurrentStage"
                         ApplicableTo="@RetrospectiveStage.Grouping"
                         Text="Group"/>
 
                     <RetrospectiveProgressItem 
-                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        CurrentStage="@this.CurrentStage"
                         ApplicableTo="@RetrospectiveStage.Voting"
                         Text="Vote"/>
 
                     <RetrospectiveProgressItem 
-                        CurrentStage="@this.RetrospectiveStatus.Stage"
+                        CurrentStage="@this.CurrentStage"
                         ApplicableTo="@RetrospectiveStage.Finished"
                         Text="Finished"/>
                 </div>
@@ -44,6 +44,14 @@
 @code
 {
     #nullable disable
-    [CascadingParameter]
-    public RetrospectiveStatus RetrospectiveStatus { get; set; } 
+    private RetrospectiveLayoutInfo _layoutInfo = new RetrospectiveLayoutInfo("Loading...");
+
+    private RetrospectiveStage CurrentStage => this._layoutInfo.Stage ?? RetrospectiveStage.NotStarted;
+
+    public void Update(in RetrospectiveLayoutInfo layoutInfo)
+    {
+        this._layoutInfo = layoutInfo;
+
+        this.StateHasChanged();
+    }
 }

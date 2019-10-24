@@ -18,6 +18,7 @@ namespace Return.Web.Pages {
     using Application.Retrospectives.Queries.GetRetrospectiveStatus;
     using Application.Votes.Queries;
     using Components;
+    using Components.Layout;
     using Domain.Entities;
     using Domain.ValueObjects;
     using Microsoft.AspNetCore.Components;
@@ -56,6 +57,9 @@ namespace Return.Web.Pages {
         /// </summary>
         [Parameter]
         public string RetroId { get; set; }
+
+        [CascadingParameter]
+        public IRetrospectiveLayout Layout { get; set; }
 
         public CurrentParticipantModel CurrentParticipant { get; set; }
 
@@ -116,6 +120,7 @@ namespace Return.Web.Pages {
 
             try {
                 this.RetrospectiveStatus = await this.Mediator.Send(new GetRetrospectiveStatusQuery(this.RetroId));
+                this.Layout?.Update(new RetrospectiveLayoutInfo(this.RetrospectiveStatus.Title, this.RetrospectiveStatus.Stage));
 
                 if (this.RetrospectiveStatus.Stage == RetrospectiveStage.Finished) {
                     this.ShowShowcase = true;
@@ -138,6 +143,7 @@ namespace Return.Web.Pages {
 
             return this.InvokeAsync(() => {
                 this.RetrospectiveStatus = retrospectiveStatus;
+                this.Layout?.Update(new RetrospectiveLayoutInfo(retrospectiveStatus.Title, retrospectiveStatus.Stage));
 
                 if (retrospectiveStatus.Stage == RetrospectiveStage.Finished) {
                     this.ShowShowcase = true;

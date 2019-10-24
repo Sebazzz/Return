@@ -1,0 +1,46 @@
+@inherits Microsoft.AspNetCore.Components.LayoutComponentBase
+@using Return.Web.Components.Layout
+@implements Return.Web.Components.Layout.IRetrospectiveLayout
+
+<RetrospectiveLobbyTopMenu @ref="this._topMenu"/>
+
+<section class="section">
+    <div class="container">
+        <CascadingValue Value=@this IsFixed="true" TValue="IRetrospectiveLayout">
+            @Body
+        </CascadingValue>
+    </div>
+</section>
+
+<Footer />
+
+@code {
+
+    private RetrospectiveLayoutInfo _layoutInfo = new RetrospectiveLayoutInfo("Loading...", null);
+    private RetrospectiveLobbyTopMenu? _topMenu;
+    private bool _needToUpdateTopMenu;
+
+    public void Update(in RetrospectiveLayoutInfo layoutInfo)
+    {
+        this._layoutInfo = layoutInfo;
+
+        if (this._topMenu != null)
+        {
+            this._topMenu.Update(layoutInfo);
+        }
+        else
+        {
+            this._needToUpdateTopMenu = true;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (this._needToUpdateTopMenu && this._topMenu != null)
+        {
+            this._topMenu.Update(this._layoutInfo);
+        }
+    }
+}
