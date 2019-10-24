@@ -107,6 +107,9 @@ namespace Return.Application.Votes.Commands {
             };
             await this._securityValidator.EnsureAddOrUpdate(noteGroup.Retrospective, vote);
 
+            // Validate vote action against number of votes
+            await ValidateNumberOfVotes(dbContext, noteGroup.Lane.Id, noteGroup.Retrospective, vote.Participant.Id);
+
             // Save
             dbContext.NoteVotes.Add(vote);
             await dbContext.SaveChangesAsync(cancellationToken);
@@ -153,6 +156,9 @@ namespace Return.Application.Votes.Commands {
             };
             await this._securityValidator.EnsureAddOrUpdate(note.Retrospective, vote);
 
+            // Validate vote action against number of votes
+            await ValidateNumberOfVotes(dbContext, note.Lane.Id, note.Retrospective, vote.Participant.Id);
+
             // Save
             dbContext.NoteVotes.Add(vote);
             await dbContext.SaveChangesAsync(cancellationToken);
@@ -185,5 +191,16 @@ namespace Return.Application.Votes.Commands {
         }
 
         private async ValueTask<Participant> GetParticipant(IReturnDbContext dbContext) => await dbContext.Participants.FindAsync((await this._currentParticipantService.GetParticipant()).Id);
+
+        private static async Task ValidateNumberOfVotes(IReturnDbContext dbContext, KnownNoteLane laneId, Retrospective retrospective, int participantId)
+        {
+            int maxNumberOfVotesPerLane = retrospective.Options.MaximumNumberOfVotes;
+            int votesInLane = await dbContext.NoteVotes.CountAsync(v => v.ParticipantId == participantId && (v.Note == null || v.Note.Lane.Id == laneId) && (v.NoteGroup == null || v.NoteGroup.Lane.Id == laneId) && v.Retrospective.Id == retrospective.Id);
+
+            if (votesInLane >= maxNumberOfVotesPerLane)
+            {
+                throw new InvalidOperationException($"Participant {participantId} already cast {votesInLane} votes (maximum allowed: {maxNumberOfVotesPerLane})");
+            }
+        }
     }
 }
