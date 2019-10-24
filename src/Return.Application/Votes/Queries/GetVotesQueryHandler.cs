@@ -21,31 +21,33 @@ namespace Return.Application.Votes.Queries {
     using Services;
 
     public sealed class GetVotesQueryHandler : IRequestHandler<GetVotesQuery, GetVotesQueryResult> {
-        private readonly IReturnDbContext _returnDbContext;
+        private readonly IReturnDbContextFactory _returnDbContextFactory;
         private readonly IMapper _mapper;
 
-        public GetVotesQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
-            this._returnDbContext = returnDbContext;
+        public GetVotesQueryHandler(IReturnDbContext returnDbContextFactory, IMapper mapper) {
+            this._returnDbContextFactory = returnDbContextFactory;
             this._mapper = mapper;
         }
 
         public async Task<GetVotesQueryResult> Handle(GetVotesQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
+
+            using IReturnDbContext dbContext = this._returnDbContextFactory.CreateForEditContext();
+            Retrospective retrospective = await dbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
 
             if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);
             }
 
-            List<Participant> participants = await this._returnDbContext.Participants.AsNoTracking().
+            List<Participant> participants = await dbContext.Participants.AsNoTracking().
                 Where(x => x.Retrospective.UrlId.StringId == request.RetroId).
                 ToListAsync(cancellationToken);
 
-            List<NoteLane> lanes = await this._returnDbContext.NoteLanes.ToListAsync(cancellationToken);
+            List<NoteLane> lanes = await dbContext.NoteLanes.ToListAsync(cancellationToken);
 
             int numberOfVotesPerLane = retrospective.Options.MaximumNumberOfVotes;
 
-            ILookup<int, NoteVote> votes = this._returnDbContext.NoteVotes.AsNoTracking()
+            ILookup<int, NoteVote> votes = dbContext.NoteVotes.AsNoTracking()
                 .Include(x => x.Participant)
                 .Include(x => x.Note)
                 .Include(x => x.Note.Lane)
