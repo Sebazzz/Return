@@ -7,6 +7,7 @@
 namespace Return.Web.Tests.Integration.Pages {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
@@ -24,10 +25,10 @@ namespace Return.Web.Tests.Integration.Pages {
         [SetUp]
         public void ResetColorIndex() => this._colorIndex = 1;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Object does not have ownership")]
+        [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Retry runs while the webdriver runs")]
         protected void Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false) {
-            var joinPage = new JoinRetrospectivePage();
-            ((IPageObject)joinPage).SetWebDriver(pageObject.WebDriver);
+            using var joinPage = new JoinRetrospectivePage();
+            joinPage.InitializeFrom(pageObject);
             joinPage.Navigate(this.App, this.RetroId);
 
             joinPage.NameInput.SendKeys(name ?? Name.Create());

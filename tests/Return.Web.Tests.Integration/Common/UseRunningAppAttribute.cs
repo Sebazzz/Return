@@ -21,8 +21,7 @@ namespace Return.Web.Tests.Integration.Common {
             }
 
             try {
-                appFixture.App = new ReturnAppFactory();
-                appFixture.App.InitializeBaseData();
+                appFixture.App = UseReturnAppServerAttribute.ServerInstance;
 
                 appFixture.OnInitialized();
             }
@@ -38,7 +37,7 @@ namespace Return.Web.Tests.Integration.Common {
 
             try {
                 if (test.Fixture is IAppFixture appFixture) {
-                    appFixture.App?.Dispose();
+                    appFixture.App = null;
                 }
             }
             catch (Exception ex) {

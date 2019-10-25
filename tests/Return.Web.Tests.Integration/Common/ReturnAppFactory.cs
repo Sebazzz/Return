@@ -19,11 +19,28 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium.Support.Events;
     using Persistence;
 
-    public class ReturnAppFactory : CustomWebApplicationFactory<Startup> {
+    public sealed class ReturnAppFactory : CustomWebApplicationFactory<Startup> {
+        private WebDriverPool _webDriverPool;
+
+        public ReturnAppFactory() {
+            this._webDriverPool = new WebDriverPool(this.CreateWebDriver);
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+
+            this._webDriverPool?.Dispose();
+            this._webDriverPool = null;
+        }
+
+        public WebDriverContainer GetWebDriver() => new WebDriverContainer(this._webDriverPool.Get(), this);
+
+        internal void Return(IWebDriver webDriver) => this._webDriverPool.Return(webDriver);
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "API consistency / design")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
-        public IWebDriver CreateWebDriver() {
+        private IWebDriver CreateWebDriver() {
             var webDriverOptions = new ChromeOptions {
                 PageLoadStrategy = PageLoadStrategy.Normal,
                 AcceptInsecureCertificates = true,
@@ -82,7 +99,7 @@ namespace Return.Web.Tests.Integration.Common {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IPageObject is disposable itself")]
         public TPageObject CreatePageObject<TPageObject>() where TPageObject : IPageObject, new() {
             var pageObject = Activator.CreateInstance<TPageObject>();
-            pageObject.SetWebDriver(this.CreateWebDriver());
+            pageObject.SetWebDriver(this.GetWebDriver());
             return pageObject;
         }
 

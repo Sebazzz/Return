@@ -11,21 +11,36 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium;
 
     public abstract class PageObject : IPageObject {
-        public IWebDriver WebDriver { get; private set; }
+        private bool _ownsWebdriver;
+        private WebDriverContainer _webDriverContainer;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "Not necessary for testing framework")]
-        void IPageObject.SetWebDriver(IWebDriver webDriver) => this.WebDriver = webDriver;
+        public IWebDriver WebDriver => this._webDriverContainer?.WebDriver;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+            "CA1033:Interface methods should be callable by child types",
+            Justification = "Not necessary for testing framework")]
+        void IPageObject.SetWebDriver(WebDriverContainer webDriver) {
+            this._webDriverContainer = webDriver;
+            this._ownsWebdriver = true;
+        }
 
         public void Unfocus() {
             TestContext.WriteLine("Unfocus by sending tab");
             this.WebDriver.FindElement(By.CssSelector("body")).SendKeys("\t");
         }
 
+        public void InitializeFrom(PageObject owner) {
+            this._webDriverContainer = owner._webDriverContainer;
+            this._ownsWebdriver = false;
+        }
+
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                this.WebDriver?.Close();
-                this.WebDriver?.Dispose();
-                this.WebDriver = null;
+                if (this._ownsWebdriver) {
+                    this._webDriverContainer?.Dispose();
+                }
+
+                this._webDriverContainer = null;
             }
         }
 
@@ -36,7 +51,7 @@ namespace Return.Web.Tests.Integration.Common {
     }
 
     public interface IPageObject : IDisposable {
-        void SetWebDriver(IWebDriver webDriver);
+        void SetWebDriver(WebDriverContainer webDriver);
 
         IWebDriver WebDriver { get; }
     }
