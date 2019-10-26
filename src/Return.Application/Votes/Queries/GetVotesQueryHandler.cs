@@ -24,7 +24,7 @@ namespace Return.Application.Votes.Queries {
         private readonly IReturnDbContextFactory _returnDbContextFactory;
         private readonly IMapper _mapper;
 
-        public GetVotesQueryHandler(IReturnDbContext returnDbContextFactory, IMapper mapper) {
+        public GetVotesQueryHandler(IReturnDbContextFactory returnDbContextFactory, IMapper mapper) {
             this._returnDbContextFactory = returnDbContextFactory;
             this._mapper = mapper;
         }
