@@ -21,6 +21,12 @@ gulp.task('copy-fonts', function() {
         .pipe(gulp.dest('./wwwroot/build/fonts/'));
 });
 
+gulp.task('copy-js-deps', function() {
+    return gulp
+        .src('./node_modules/blazor.polyfill/blazor.polyfill.min.js')
+        .pipe(gulp.dest('./wwwroot/build/js/compat'));
+});
+
 gulp.task('sass:watch', function() {
     gulp.watch('./_scss/**/*.scss', gulp.series('sass'));
 });
@@ -29,6 +35,6 @@ gulp.task('clean', function(cb) {
     del(['./wwwroot/build'], cb);
 });
 
-gulp.task('build', gulp.parallel('sass', 'copy-fonts'));
+gulp.task('build', gulp.parallel('sass', 'copy-fonts', 'copy-js-deps'));
 
 gulp.task('default', gulp.series('clean', 'build'));

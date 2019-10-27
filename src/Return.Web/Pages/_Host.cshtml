@@ -23,7 +23,7 @@
 <script>
   window.Promise || (function () {
     var tag = document.createElement('script');
-    tag.src = 'js/compat/blazor.polyfill@(this.HostEnvironment.IsDevelopment() ? "" : ".min").js';
+    tag.src = 'build/js/compat/blazor.polyfill.min.js';
     document.body.appendChild(tag);
     document.body.classList.add('browser-compat');
   })();
