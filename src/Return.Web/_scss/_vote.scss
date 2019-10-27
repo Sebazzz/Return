@@ -49,8 +49,10 @@
     margin-bottom: 1.5rem;
     font-size: 0.75rem;
 
-    &__title {
+    &__title,
+    &__title:not(:last-child) {
         font-size: $size-5;
+        margin-bottom: 0.2rem;
     }
 
     &__list {
@@ -61,5 +63,10 @@
 
     &__list-item {
         white-space: nowrap;
+    }
+
+    &__personal-vote-status {
+        font-size: $size-7;
+        margin-top: 0;
     }
 }

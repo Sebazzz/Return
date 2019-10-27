@@ -1,6 +1,8 @@
 @inherits MediatorComponent
+@using Return.Application.Common.Models
 @using Return.Application.Retrospectives.Queries.GetRetrospectiveStatus
 @using Return.Application.RetrospectiveWorkflows.Commands
+@using Return.Application.Votes.Queries
 <RetrospectiveRolePanel>
     <Facilitator>
         <VoteStatusPanel />
@@ -35,21 +37,20 @@
 </RetrospectiveRolePanel>
 
 @code {
-    #nullable disable
+#nullable disable
 
     [CascadingParameter]
     public RetrospectiveStatus RetrospectiveStatus { get; set; }
 
-    private Task Continue()
-    {
-        if (this.RetrospectiveStatus == null)
-        {
+    private Task Continue() {
+        if (this.RetrospectiveStatus == null) {
             return Task.CompletedTask;  // Shouldn't happen, but ignore
         }
 
-        return this.Mediator.Send(new InitiateFinishStageCommand
-        {
+        return this.Mediator.Send(new InitiateFinishStageCommand {
             RetroId = this.RetrospectiveStatus.RetroId
         });
     }
+
+    
 }

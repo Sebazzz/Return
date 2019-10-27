@@ -4,6 +4,10 @@
 <div class="vote-status-panel">
     <h3 class="title vote-status-panel__title">Vote status</h3>
 
+    <p class="vote-status-panel__personal-vote-status">
+        You have @VotesLeft votes left.
+    </p>
+
     <ul class="vote-status-panel__list">
         @foreach (int participantId in this.Votes.VotesByParticipant.Keys)
         {
@@ -30,4 +34,16 @@
 
     [CascadingParameter]
     public RetrospectiveVoteStatus Votes { get; set; }
+
+    [CascadingParameter]
+    public CurrentParticipantModel CurrentParticipant { get; set; }
+
+    private int VotesLeft
+    {
+        get
+        {
+            List<VoteModel> votesForParticipant = this.Votes.VotesByParticipant.Get(this.CurrentParticipant.Id);
+            return votesForParticipant.Count(x => x.IsCast == false);
+        }
+    }
 }
