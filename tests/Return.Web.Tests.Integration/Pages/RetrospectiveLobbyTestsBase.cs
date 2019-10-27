@@ -24,7 +24,7 @@ namespace Return.Web.Tests.Integration.Pages {
         public void ResetColorIndex() => this._colorIndex = 1;
 
         [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Retry runs while the webdriver runs")]
-        protected void Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false) {
+        protected void Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false, string colorName = null, Action submitCallback = null) {
             using var joinPage = new JoinRetrospectivePage();
             joinPage.InitializeFrom(pageObject);
             joinPage.Navigate(this.App, this.RetroId);
@@ -33,7 +33,12 @@ namespace Return.Web.Tests.Integration.Pages {
 
             Thread.Sleep(500);
             if (!alreadyJoined) {
-                new SelectElement(joinPage.ColorSelect).SelectByIndex(this._colorIndex++);
+                if (colorName != null) {
+                    new SelectElement(joinPage.ColorSelect).SelectByText(colorName, true);
+                }
+                else {
+                    new SelectElement(joinPage.ColorSelect).SelectByIndex(this._colorIndex++);
+                }
             }
             else {
                 // Force refresh
@@ -53,6 +58,7 @@ namespace Return.Web.Tests.Integration.Pages {
                 });
             }
 
+            submitCallback?.Invoke();
             Thread.Sleep(500);
             joinPage.Submit();
             Thread.Sleep(500);

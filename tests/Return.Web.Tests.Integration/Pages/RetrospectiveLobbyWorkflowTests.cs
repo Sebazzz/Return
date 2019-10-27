@@ -102,8 +102,8 @@ namespace Return.Web.Tests.Integration.Pages {
             int noteId = 0;
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
                 await scope.TestCaseBuilder(this.RetroId).
-                    WithParticipator("Boss", true, "scrummaster").
-                    WithParticipator("Josh", false).
+                    WithParticipant("Boss", true, "scrummaster").
+                    WithParticipant("Josh", false).
                     WithRetrospectiveStage(RetrospectiveStage.Writing).
                     WithNote(KnownNoteLane.Start, "Josh").
                     WithNote(KnownNoteLane.Continue, "Josh").
@@ -146,8 +146,8 @@ namespace Return.Web.Tests.Integration.Pages {
             int noteId = 0;
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
                 await scope.TestCaseBuilder(this.RetroId).
-                    WithParticipator("Boss", true, "scrummaster").
-                    WithParticipator("Josh", false).
+                    WithParticipant("Boss", true, "scrummaster").
+                    WithParticipant("Josh", false).
                     WithRetrospectiveStage(RetrospectiveStage.Writing).
                     WithNote(KnownNoteLane.Start, "Josh").
                     WithNote(KnownNoteLane.Continue, "Josh").
@@ -234,12 +234,12 @@ namespace Return.Web.Tests.Integration.Pages {
             int note1Id = 0, note2Id = 0, noteGroupId = 0, bossId = 0;
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
                 await scope.TestCaseBuilder(this.RetroId).
-                    WithParticipator("Boss", true, "scrummaster").
+                    WithParticipant("Boss", true, "scrummaster").
                     OutputId(id => bossId = id).
-                    WithParticipator("Josh", false).
-                    WithParticipator("Foo", false).
-                    WithParticipator("Bar", false).
-                    WithParticipator("Baz", false).
+                    WithParticipant("Josh", false).
+                    WithParticipant("Foo", false).
+                    WithParticipant("Bar", false).
+                    WithParticipant("Baz", false).
                     WithRetrospectiveStage(RetrospectiveStage.Writing).
                     WithNote(KnownNoteLane.Start, "Josh").
                     OutputId(id => note1Id = id).
@@ -295,11 +295,11 @@ namespace Return.Web.Tests.Integration.Pages {
             // Given
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
                 await scope.TestCaseBuilder(this.RetroId).
-                    WithParticipator("Boss", true, "scrummaster").
-                    WithParticipator("Josh", false).
-                    WithParticipator("Foo", false).
-                    WithParticipator("Bar", false).
-                    WithParticipator("Baz", false).
+                    WithParticipant("Boss", true, "scrummaster").
+                    WithParticipant("Josh", false).
+                    WithParticipant("Foo", false).
+                    WithParticipant("Bar", false).
+                    WithParticipant("Baz", false).
                     WithRetrospectiveStage(RetrospectiveStage.Writing).
                     WithNote(KnownNoteLane.Start, "Josh").
                     WithNote(KnownNoteLane.Continue, "Boss").

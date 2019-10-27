@@ -16,6 +16,7 @@ namespace Return.Web.Tests.Integration.Pages {
         public IWebElement TimeInMinutesInput => this.WebDriver.FindElementByTestElementId("time-in-minutes-input");
         public IWebElement VoteCountInput => this.WebDriver.FindElementByTestElementId("vote-count-input");
         public IWebElement WorkflowContinueButton => this.WebDriver.FindElementByTestElementId("workflow-continue-button");
+        public IWebElement ToggleViewButton => this.WebDriver.FindElementByTestElementId("toggle-view-button");
         public IWebElement TimerText => this.WebDriver.FindElementByTestElementId("timer");
         public ReadOnlyCollection<IWebElement> NoteLaneElements => this.WebDriver.FindElementsByTestElementId("note-lane");
         public NoteLaneComponent GetLane(KnownNoteLane id) => new NoteLaneComponent(this.WebDriver.FindElementByTestElementId("note-lane", (int)id));

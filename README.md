@@ -18,9 +18,22 @@ Licensed: GNU GPL v3.0
 -   As facilitator, manage the retrospective through the writing, grouping and voting phase.
 -   Overview with highest voted items
 
+### Browser Support
+
+Developed and tested on:
+
+-   Internet Explorer 11
+-   Microsoft Edge
+-   Google Chrome
+-   Mozilla Firefox
+
 ## Download
 
 Download the release for your OS from the [releases tab](https://github.com/Sebazzz/Return/releases) or download the cutting edge builds from [AppVeyor](https://ci.appveyor.com/project/Sebazzz/Return).
+
+## Building Financial App from sources
+
+If you prefer to build the application yourself, please follow the [compilation instructions](docs/Building-from-sources.md) in the documentation.
 
 ## Screenshots
 

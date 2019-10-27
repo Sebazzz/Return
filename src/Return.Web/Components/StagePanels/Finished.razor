@@ -23,12 +23,14 @@
     {
         <button type="button"
                 class="button is-link is-outlined full-width"
+                data-test-element-id="toggle-view-button"
                 @onclick="@(() => this.RetrospectiveLobby.ShowBoardDisplay())">
             <span class="icon"><span class="fas fa-columns"></span></span><span>Show full board</span>
         </button>
     } else {
         <button type="button"
                 class="button is-link is-outlined full-width"
+                data-test-element-id="toggle-view-button"
                 @onclick="@(() => this.RetrospectiveLobby.ShowShowcaseDisplay())">
             <span class="icon"><span class="fas fa-list-ol"></span></span><span>Show top items</span>
         </button>

@@ -8,17 +8,24 @@
 namespace Return.Web.Tests.Integration.Common {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Application.Common.Abstractions;
     using Application.Common.Models;
     using Application.NoteGroups.Commands;
     using Application.Notes.Commands.AddNote;
     using Application.Notes.Commands.MoveNote;
     using Application.Notes.Commands.UpdateNote;
+    using Application.Notifications.VoteChanged;
+    using Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
     using Application.Retrospectives.Commands.JoinRetrospective;
     using Application.Retrospectives.Queries.GetParticipantsInfo;
+    using Application.Votes.Commands;
     using Domain.Entities;
     using MediatR;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using Return.Common;
@@ -40,14 +47,42 @@ namespace Return.Web.Tests.Integration.Common {
             this._entityIds = new FriendlyIdEntityDictionary();
         }
 
-        public TestCaseBuilder WithParticipator(string name, bool isFacilitator, string passphrase = null) {
+        public TestCaseBuilder HasExistingParticipant(string participantName) {
+            this._actions.Enqueue(async () => {
+                var dbContext = this._scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
+                Participant participant = await dbContext.Participants.FirstAsync(x => x.Name == participantName && x.Retrospective.UrlId.StringId == this._retrospectiveId);
+
+                this._participators.Add(participant.Name, new ParticipantInfo {
+                    Id = participant.Id,
+                    Name = participant.Name,
+                    Color = new ColorModel(), // Doesn't matter
+                    IsFacilitator = participant.IsFacilitator
+                });
+            });
+            return this;
+        }
+
+        public TestCaseBuilder WithParticipant(string name, bool isFacilitator, string passphrase = null) {
             string RandomByte() {
                 return TestContext.CurrentContext.Random.NextByte().ToString("X2", Culture.Invariant);
             }
 
+            AvailableParticipantColorModel availableParticipantColor = null;
+            this._actions.Enqueue(async () => {
+                this._scope.SetNoAuthenticationInfo();
+                var yellowColor = new ColorModel {
+                    R = Color.Yellow.R,
+                    G = Color.Yellow.G,
+                    B = Color.Yellow.B,
+                };
+
+                IList<AvailableParticipantColorModel> response = await this._scope.Send(new GetAvailablePredefinedParticipantColorsQuery(this._retrospectiveId));
+                availableParticipantColor = response.FirstOrDefault(x => !x.HasSameColors(yellowColor)); // Yellow is a bad color for testing
+            });
+
             return this.EnqueueMediatorAction(() => new JoinRetrospectiveCommand {
                 Name = name,
-                Color = RandomByte() + RandomByte() + RandomByte(),
+                Color = availableParticipantColor?.HexString ?? (RandomByte() + RandomByte() + RandomByte()),
                 JoiningAsFacilitator = isFacilitator,
                 Passphrase = passphrase,
                 RetroId = this._retrospectiveId
@@ -84,6 +119,14 @@ namespace Return.Web.Tests.Integration.Common {
             return this;
         }
 
+        public TestCaseBuilder WithVoteOnNoteGroup(string participantName, int noteGroupId) =>
+            this.EnqueueMediatorAction(participantName, () => CastVoteCommand.ForNoteGroup(noteGroupId, VoteMutationType.Added),
+                _ => { });
+
+        public TestCaseBuilder WithVoteOnNote(string participantName, int noteId) =>
+            this.EnqueueMediatorAction(participantName, () => CastVoteCommand.ForNote(noteId, VoteMutationType.Added),
+                _ => { });
+
         public TestCaseBuilder OutputId(Action<int> callback) {
             this._actions.Enqueue(() => {
                 if (this._lastAddedItem == default) {
@@ -92,6 +135,15 @@ namespace Return.Web.Tests.Integration.Common {
 
                 callback.Invoke(this._lastAddedItem.Id);
 
+                return Task.CompletedTask;
+            });
+
+            return this;
+        }
+
+        public TestCaseBuilder Callback(Action<TestCaseBuilder> callback) {
+            this._actions.Enqueue(() => {
+                callback(this);
                 return Task.CompletedTask;
             });
 
@@ -117,20 +169,20 @@ namespace Return.Web.Tests.Integration.Common {
             return this;
         }
 
-        public TestCaseBuilder WithNoteGroup(string participatorName, KnownNoteLane laneId, string text = null) {
+        public TestCaseBuilder WithNoteGroup(string participantName, KnownNoteLane laneId, string text = null) {
             if (text == null) {
                 text = TestContext.CurrentContext.Random.GetString();
             }
 
             RetrospectiveNoteGroup addedNoteGroup = null;
-            this.EnqueueMediatorAction(participatorName, () => new AddNoteGroupCommand(this._retrospectiveId, (int)laneId),
+            this.EnqueueMediatorAction(participantName, () => new AddNoteGroupCommand(this._retrospectiveId, (int)laneId),
                 n => {
                     this._lastAddedItem = (typeof(RetrospectiveNoteGroup), n.Id);
                     addedNoteGroup = n;
                 });
 
             if (!String.IsNullOrEmpty(text)) {
-                this.EnqueueMediatorAction(participatorName,
+                this.EnqueueMediatorAction(participantName,
                     () => new UpdateNoteGroupCommand(this._retrospectiveId, addedNoteGroup.Id, text)
                     , _ => Task.CompletedTask);
             }
@@ -138,14 +190,18 @@ namespace Return.Web.Tests.Integration.Common {
             return this;
         }
 
-        public TestCaseBuilder AddNoteToNoteGroup(string participatorName, string noteId, string noteGroupId) =>
-            this.EnqueueMediatorAction(participatorName, () => {
+        public TestCaseBuilder AddNoteToNoteGroup(string participantName, string noteId, string noteGroupId) =>
+            this.EnqueueMediatorAction(participantName, () => {
                 int dbNoteId = this._entityIds.Get(noteId, typeof(RetrospectiveNote));
                 int? dbNoteGroupId = noteGroupId != null
                     ? this._entityIds.Get(noteGroupId, typeof(RetrospectiveNoteGroup))
                     : (int?)null;
                 return new MoveNoteCommand(dbNoteId, dbNoteGroupId);
             },
+                _ => { });
+
+        public TestCaseBuilder AddNoteToNoteGroup(string participantName, int dbNoteId, int? dbNoteGroupId) =>
+            this.EnqueueMediatorAction(participantName, () => new MoveNoteCommand(dbNoteId, dbNoteGroupId),
                 _ => { });
 
         public TestCaseBuilder WithRetrospectiveStage(RetrospectiveStage stage) => this.EnqueueRetrospectiveAction(r => r.CurrentStage = stage);
@@ -160,8 +216,16 @@ namespace Return.Web.Tests.Integration.Common {
         }
 
         public async Task Build() {
+            int actionNumber = 1;
             while (this._actions.TryDequeue(out Func<Task> action)) {
-                await action();
+                try {
+                    await action();
+                }
+                catch (Exception ex) {
+                    throw new InvalidOperationException($"Error execution action #{actionNumber}: {action}", ex);
+                }
+
+                actionNumber++;
             }
         }
 
