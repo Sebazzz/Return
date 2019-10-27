@@ -141,12 +141,17 @@ namespace Return.Web.Pages {
                 return Task.CompletedTask;
             }
 
-            return this.InvokeAsync(() => {
+            return this.InvokeAsync(async () => {
                 this.RetrospectiveStatus = retrospectiveStatus;
                 this.Layout?.Update(new RetrospectiveLayoutInfo(retrospectiveStatus.Title, retrospectiveStatus.Stage));
 
-                if (retrospectiveStatus.Stage == RetrospectiveStage.Finished) {
-                    this.ShowShowcase = true;
+                switch (retrospectiveStatus.Stage) {
+                    case RetrospectiveStage.Voting:
+                        this.Votes = (await this.Mediator.Send(new GetVotesQuery(this.RetroId))).VoteStatus;
+                        break;
+                    case RetrospectiveStage.Finished:
+                        this.ShowShowcase = true;
+                        break;
                 }
 
                 this.StateHasChanged();

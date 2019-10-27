@@ -12,13 +12,13 @@
     return;
 }
 
-<div class="@this.CssClass">
+<div class="@this.CssClass" data-test-element-id="vote-list" data-id="@this.ItemId">
     @if (this.RetrospectiveStatus.IsVotingAllowed)
     {
         if (this.Votes.CanCastVote(this.CurrentParticipant.Id, this.Lane.Id) && !this.IsSaving) {
             <span class="vote-list__vote-button" @onclick="@DoVote">
-                      <i class="fas fa-thumbs-up"></i>
-                  </span>
+                <i class="fas fa-thumbs-up"></i>
+            </span>
         } else {
             <span class="vote-list__vote-button vote-list__vote-button--disabled">
                 <i class="far fa-thumbs-up"></i>

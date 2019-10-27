@@ -1,6 +1,6 @@
 @using Return.Application.Common.Models
 
-<span class="vote-indicator">
+<span class="vote-indicator" data-test-element-id="@TestElementId">
     <span class="@CssClass fa-star"></span>
 </span>
 
@@ -14,4 +14,5 @@
     public bool IsCast { get; set; }
 
     private string CssClass => this.IsCast ? "fas" : "far";
+    private string TestElementId => this.IsCast ? "cast-vote" : "uncast-vote";
 }

@@ -12,7 +12,7 @@
             bool isDone = participantVotes.All(v => v.IsCast);
             string faClass = isDone ? "fas" : "far";
 
-            <li>
+            <li data-test-element-id="participant-vote-status" class="vote-status-panel__list-item" data-id="@participantId">
                 <span style="color: #@participantVote.ParticipantColor.HexString" 
                       class="@faClass fa-user-circle"
                       title="@participantVote.ParticipantName"></span>

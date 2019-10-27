@@ -19,5 +19,6 @@ namespace Return.Web.Tests.Integration.Pages {
         public IWebElement TimerText => this.WebDriver.FindElementByTestElementId("timer");
         public ReadOnlyCollection<IWebElement> NoteLaneElements => this.WebDriver.FindElementsByTestElementId("note-lane");
         public NoteLaneComponent GetLane(KnownNoteLane id) => new NoteLaneComponent(this.WebDriver.FindElementByTestElementId("note-lane", (int)id));
+        public VoteStatusPanelComponent VoteStatus => new VoteStatusPanelComponent(this.WebDriver.FindVisibleElement(By.ClassName("vote-status-panel")));
     }
 }

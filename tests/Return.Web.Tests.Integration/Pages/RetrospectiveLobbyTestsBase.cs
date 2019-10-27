@@ -10,8 +10,6 @@ namespace Return.Web.Tests.Integration.Pages {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
-    using Application.Common.Abstractions;
-    using Application.Services;
     using Common;
     using Domain.Entities;
     using Microsoft.Extensions.DependencyInjection;

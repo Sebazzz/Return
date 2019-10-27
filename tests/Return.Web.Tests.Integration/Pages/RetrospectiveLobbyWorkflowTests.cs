@@ -8,14 +8,12 @@
 namespace Return.Web.Tests.Integration.Pages {
     using System;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Models;
     using Application.Notes.Commands.MoveNote;
     using Common;
     using Components;
     using Domain.Entities;
-    using Microsoft.EntityFrameworkCore.Metadata.Internal;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
