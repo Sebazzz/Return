@@ -15,12 +15,15 @@ namespace Return.Persistence {
     using Application.Common.Abstractions;
     using Conventions;
     using Domain.Entities;
+    using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
     using Microsoft.EntityFrameworkCore.Metadata;
     using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
     public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateFacilitator {
+        private const string SqliteProvider = "Microsoft.EntityFrameworkCore.Sqlite";
+
         private readonly DbContextOptions _options;
         private readonly IDatabaseOptions? _databaseOptions;
 
@@ -42,7 +45,7 @@ namespace Return.Persistence {
                         optionsBuilder.UseSqlServer(this._databaseOptions.CreateConnectionString(), sql => sql.EnableRetryOnFailure());
                         break;
                     case DatabaseProvider.Sqlite:
-                        optionsBuilder.UseSqlite(this._databaseOptions.CreateConnectionString());
+                        SqliteConfigurator.ConfigureDbContext(optionsBuilder, this._databaseOptions);
                         break;
                     default:
                         throw new InvalidOperationException($"Invalid database provider: {this._databaseOptions.DatabaseProvider}");
@@ -75,7 +78,7 @@ namespace Return.Persistence {
 
             // Fix datetime offset support for integration tests
             // See: https://blog.dangl.me/archive/handling-datetimeoffset-in-sqlite-with-entity-framework-core/
-            if (this.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite") {
+            if (this.Database.ProviderName == SqliteProvider) {
                 // SQLite does not have proper support for DateTimeOffset via Entity Framework Core, see the limitations
                 // here: https://docs.microsoft.com/en-us/ef/core/providers/sqlite/limitations#query-limitations
                 // To work around this, when the Sqlite database provider is used, all model properties of type DateTimeOffset
@@ -102,5 +105,14 @@ namespace Return.Persistence {
         }
 
         public IReturnDbContext CreateForEditContext() => this._databaseOptions != null ? new ReturnDbContext(this._databaseOptions) : new ReturnDbContext(this._options);
+
+        public void Initialize() {
+            if (this.Database.ProviderName == SqliteProvider) {
+                this.Database.EnsureCreated();
+            }
+            else {
+                this.Database.Migrate();
+            }
+        }
     }
 }

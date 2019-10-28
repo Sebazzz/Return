@@ -44,7 +44,7 @@ namespace Return.Web.Configuration {
             var connStringBuilder = new SqliteConnectionStringBuilder();
 
             // Set values current connection string
-            if (connStringBuilder.DataSource != null) connStringBuilder.DataSource = this.Database;
+            if (this.Database != null) connStringBuilder.DataSource = this.Database;
             connStringBuilder.ForeignKeys = true;
             connStringBuilder.Mode = SqliteOpenMode.ReadWriteCreate;
             connStringBuilder.Cache = SqliteCacheMode.Private;
@@ -54,8 +54,8 @@ namespace Return.Web.Configuration {
                 var srcConnStringBuilder = new SqliteConnectionStringBuilder(connectionString: this.ConnectionString);
                 foreach (string? key in srcConnStringBuilder.Keys ??
                                         throw new InvalidOperationException(message: "Invalid connection string")) {
-                    if (key != null) {
-                        connStringBuilder[keyword: key] = srcConnStringBuilder[keyword: key];
+                    if (key != null && !String.IsNullOrEmpty(srcConnStringBuilder[key]?.ToString())) {
+                        connStringBuilder[key] = srcConnStringBuilder[key];
                     }
                 }
             }
