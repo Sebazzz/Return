@@ -10,7 +10,6 @@ namespace Return.Web {
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Net;
-    using System.Threading;
     using System.Threading.Tasks;
     using Application.App.Commands.SeedBaseData;
     using Application.Common.Abstractions;

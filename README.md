@@ -31,7 +31,9 @@ Developed and tested on:
 
 Download the release for your OS from the [releases tab](https://github.com/Sebazzz/Return/releases) or download the cutting edge builds from [AppVeyor](https://ci.appveyor.com/project/Sebazzz/Return).
 
-## Building Financial App from sources
+[Follow the installation instructions](docs/Installation.md) in the documentation to install it.
+
+## Building Return from sources
 
 If you prefer to build the application yourself, please follow the [compilation instructions](docs/Building-from-sources.md) in the documentation.
 
