@@ -37,7 +37,16 @@ namespace Return.Persistence {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             // Use connection string if available
             if (this._databaseOptions != null) {
-                optionsBuilder.UseSqlServer(this._databaseOptions.CreateConnectionString(), sql => sql.EnableRetryOnFailure());
+                switch (this._databaseOptions.DatabaseProvider) {
+                    case DatabaseProvider.SqlServer:
+                        optionsBuilder.UseSqlServer(this._databaseOptions.CreateConnectionString(), sql => sql.EnableRetryOnFailure());
+                        break;
+                    case DatabaseProvider.Sqlite:
+                        optionsBuilder.UseSqlite(this._databaseOptions.CreateConnectionString());
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Invalid database provider: {this._databaseOptions.DatabaseProvider}");
+                }
             }
 
             // Error logging (DEBUG only)
@@ -66,21 +75,17 @@ namespace Return.Persistence {
 
             // Fix datetime offset support for integration tests
             // See: https://blog.dangl.me/archive/handling-datetimeoffset-in-sqlite-with-entity-framework-core/
-            if (this.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
-            {
+            if (this.Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite") {
                 // SQLite does not have proper support for DateTimeOffset via Entity Framework Core, see the limitations
                 // here: https://docs.microsoft.com/en-us/ef/core/providers/sqlite/limitations#query-limitations
                 // To work around this, when the Sqlite database provider is used, all model properties of type DateTimeOffset
                 // use the DateTimeOffsetToBinaryConverter
                 // Based on: https://github.com/aspnet/EntityFrameworkCore/issues/10784#issuecomment-415769754
                 // This only supports millisecond precision, but should be sufficient for most use cases.
-                foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
-                {
+                foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes()) {
                     IEnumerable<PropertyInfo> properties = entityType.ClrType.GetProperties().Where(p => p.PropertyType == typeof(DateTimeOffset));
-                    foreach (PropertyInfo property in properties)
-                    {
-                        if (entityType.IsOwned() == false)
-                        {
+                    foreach (PropertyInfo property in properties) {
+                        if (entityType.IsOwned() == false) {
                             modelBuilder
                                 .Entity(entityType.Name)
                                 .Property(property.Name)

@@ -335,6 +335,8 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 
 	criteria = criteria ?? new Func<bool>(() => true);
 	
+	var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
+	
 	Task($"Test-CS-{name}")
 		.IsDependentOn("Restore-NuGet-Packages")
 		.IsDependentOn("Set-HeadlessEnvironment")
@@ -342,28 +344,25 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 		.IsDependeeOf("Test-CS")
 		.WithCriteria(criteria)
 		.Does(() => {
-			var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
-
 			Information($"Running tests for {projectName} - logging to {logFilePath} - artifacts dumped to {testArtifactsDir}");
 
-			try {
-				System.Environment.SetEnvironmentVariable("TEST_ARTIFACT_DIR", MakeAbsolute(testArtifactsDir).ToString());
-				DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
-					ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
-					                                      .Append("--logger:\"console;verbosity=normal;noprogress=true\"")
-				});
-			} finally {
-				if (AppVeyor.IsRunningOnAppVeyor && FileExists(logFilePath)) {
-					var jobId = EnvironmentVariable("APPVEYOR_JOB_ID");
-					var resultsType = "mstest"; // trx is vstest format
-					
-					var wc = new System.Net.WebClient();
-					var url = $"https://ci.appveyor.com/api/testresults/{resultsType}/{jobId}";
-					var fullTestResultsPath = logFilePath.FullPath;
-					
-					Information("Uploading test results from {0} to {1}", fullTestResultsPath, url);
-					wc.UploadFile(url, fullTestResultsPath);
-				}
+			System.Environment.SetEnvironmentVariable("TEST_ARTIFACT_DIR", MakeAbsolute(testArtifactsDir).ToString());
+			DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
+				ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
+													  .Append("--logger:\"console;verbosity=normal;noprogress=true\"")
+			});
+		})
+		.Finally(() => {
+			if (AppVeyor.IsRunningOnAppVeyor && FileExists(logFilePath)) {
+				var jobId = EnvironmentVariable("APPVEYOR_JOB_ID");
+				var resultsType = "mstest"; // trx is vstest format
+				
+				var wc = new System.Net.WebClient();
+				var url = $"https://ci.appveyor.com/api/testresults/{resultsType}/{jobId}";
+				var fullTestResultsPath = logFilePath.FullPath;
+				
+				Information("Uploading test results from {0} to {1}", fullTestResultsPath, url);
+				wc.UploadFile(url, fullTestResultsPath);
 			}
 		});
 }
