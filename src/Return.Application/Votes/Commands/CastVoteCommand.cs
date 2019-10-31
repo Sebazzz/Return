@@ -24,6 +24,8 @@ namespace Return.Application.Votes.Commands {
 
         public static CastVoteCommand ForNote(int id, VoteMutationType mutation) => new CastVoteCommand(VoteEntityType.Note, id, mutation);
         public static CastVoteCommand ForNoteGroup(int id, VoteMutationType mutation) => new CastVoteCommand(VoteEntityType.NoteGroup, id, mutation);
+
+        public override string ToString() => $"[{nameof(CastVoteCommand)}] {this.Mutation} on {this.EntityType} #{this.Id}";
     }
 
     internal enum VoteEntityType {

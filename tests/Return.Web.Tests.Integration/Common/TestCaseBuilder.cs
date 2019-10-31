@@ -49,6 +49,8 @@ namespace Return.Web.Tests.Integration.Common {
 
         public TestCaseBuilder HasExistingParticipant(string participantName) {
             this._actions.Enqueue(async () => {
+                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] attempting to record presence of existing participant [{participantName}]");
+
                 var dbContext = this._scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
                 Participant participant = await dbContext.Participants.FirstAsync(x => x.Name == participantName && x.Retrospective.UrlId.StringId == this._retrospectiveId);
 
@@ -58,6 +60,8 @@ namespace Return.Web.Tests.Integration.Common {
                     Color = new ColorModel(), // Doesn't matter
                     IsFacilitator = participant.IsFacilitator
                 });
+
+                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] recorded presence of existing participant [{participantName}] with ID #{participant.Id}");
             });
             return this;
         }
@@ -86,15 +90,14 @@ namespace Return.Web.Tests.Integration.Common {
                 JoiningAsFacilitator = isFacilitator,
                 Passphrase = passphrase,
                 RetroId = this._retrospectiveId
-            },
-                p => {
-                    if (this._participators.ContainsKey(p.Name)) {
-                        Assert.Inconclusive($"Trying to register existing participantName: {p.Name}");
-                    }
+            }, p => {
+                if (this._participators.ContainsKey(p.Name)) {
+                    Assert.Inconclusive($"Trying to register existing participant: {p.Name}");
+                }
 
-                    this._lastAddedItem = (typeof(ParticipantInfo), p.Id);
-                    this._participators.Add(p.Name, p);
-                });
+                this.RecordAddedId<ParticipantInfo>(p.Id);
+                this._participators.Add(p.Name, p);
+            });
         }
 
         public TestCaseBuilder WithNote(KnownNoteLane laneId, string participantName, string text = null) {
@@ -105,7 +108,7 @@ namespace Return.Web.Tests.Integration.Common {
             RetrospectiveNote addedNote = null;
             this.EnqueueMediatorAction(participantName, () => new AddNoteCommand(this._retrospectiveId, (int)laneId),
                 n => {
-                    this._lastAddedItem = (typeof(RetrospectiveNote), n.Id);
+                    this.RecordAddedId<RetrospectiveNote>(n.Id);
                     addedNote = n;
                 });
 
@@ -133,6 +136,7 @@ namespace Return.Web.Tests.Integration.Common {
                     throw new InvalidOperationException("A call to OutputId should follow a call to an entity creating action");
                 }
 
+                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Outputting last added item {this._lastAddedItem.Type} with ID #{this._lastAddedItem.Id} to callback ({callback})");
                 callback.Invoke(this._lastAddedItem.Id);
 
                 return Task.CompletedTask;
@@ -176,9 +180,9 @@ namespace Return.Web.Tests.Integration.Common {
 
             RetrospectiveNoteGroup addedNoteGroup = null;
             this.EnqueueMediatorAction(participantName, () => new AddNoteGroupCommand(this._retrospectiveId, (int)laneId),
-                n => {
-                    this._lastAddedItem = (typeof(RetrospectiveNoteGroup), n.Id);
-                    addedNoteGroup = n;
+                ng => {
+                    this.RecordAddedId<RetrospectiveNoteGroup>(ng.Id);
+                    addedNoteGroup = ng;
                 });
 
             if (!String.IsNullOrEmpty(text)) {
@@ -229,6 +233,11 @@ namespace Return.Web.Tests.Integration.Common {
             }
         }
 
+        private void RecordAddedId<T>(int id) {
+            TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Recording last added item: [{typeof(T)}] with ID #{id}");
+            this._lastAddedItem = (typeof(T), id);
+        }
+
         private TestCaseBuilder EnqueueRetrospectiveAction(Action<Retrospective> action) {
             this._actions.Enqueue(() => this._scope.SetRetrospective(this._retrospectiveId, action));
 
@@ -239,15 +248,20 @@ namespace Return.Web.Tests.Integration.Common {
 
         private TestCaseBuilder EnqueueMediatorAction<TResponse>(string participantName, Func<IRequest<TResponse>> requestFunc, Func<TResponse, Task> responseProcessor) {
             this._actions.Enqueue(async () => {
+                IRequest<TResponse> request = requestFunc();
+
                 if (participantName == null) {
+                    TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with no participant");
+
                     this._scope.SetNoAuthenticationInfo();
                 }
                 else {
+                    TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with participant {participantName}");
+
                     ParticipantInfo participantInfo = this.GetParticipatorInfo(participantName);
                     this._scope.SetAuthenticationInfo(new CurrentParticipantModel(participantInfo.Id, participantInfo.Name, participantInfo.IsFacilitator));
                 }
 
-                IRequest<TResponse> request = requestFunc();
                 try {
                     TResponse response = await this._scope.Send(request, CancellationToken.None);
                     await responseProcessor.Invoke(response);

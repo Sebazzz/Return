@@ -6,6 +6,7 @@
 // ******************************************************************************
 
 namespace Return.Application.NoteGroups.Commands {
+    using Domain.Entities;
     using MediatR;
 
     public sealed class UpdateNoteGroupCommand : IRequest {
@@ -20,5 +21,6 @@ namespace Return.Application.NoteGroups.Commands {
             this.Id = id;
             this.Name = name;
         }
+        public override string ToString() => $"[{nameof(AddNoteGroupCommand)}] {this.RetroId} on lane #{(KnownNoteLane)this.Id} - content: {this.Name}";
     }
 }

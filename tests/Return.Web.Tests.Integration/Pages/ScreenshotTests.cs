@@ -15,9 +15,11 @@ namespace Return.Web.Tests.Integration.Pages {
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
+    using Application.Services;
     using Common;
     using Components;
     using Domain.Entities;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
     using NUnit.Framework;
     using OpenQA.Selenium;
@@ -86,6 +88,8 @@ namespace Return.Web.Tests.Integration.Pages {
         [Test]
         [Order((int)RetrospectiveStage.Writing)]
         public async Task Screenshot_Writing() {
+            this.EnsureRetrospectiveInStage(RetrospectiveStage.NotStarted);
+
             // Given
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
                 await scope.SetRetrospective(this.RetroId, r => r.HashedPassphrase = null);
@@ -179,6 +183,8 @@ namespace Return.Web.Tests.Integration.Pages {
         [Test]
         [Order((int)RetrospectiveStage.Grouping)]
         public async Task Screenshot_Grouping() {
+            this.EnsureRetrospectiveInStage(RetrospectiveStage.Discuss);
+
             // Given
             this.Client1.WorkflowContinueButton.Click();
 
@@ -226,6 +232,8 @@ namespace Return.Web.Tests.Integration.Pages {
         [Test]
         [Order((int)RetrospectiveStage.Voting)]
         public async Task Screenshot_Voting() {
+            this.EnsureRetrospectiveInStage(RetrospectiveStage.Grouping);
+
             // Given
             this.Client1.WorkflowContinueButton.Click();
 
@@ -287,8 +295,12 @@ namespace Return.Web.Tests.Integration.Pages {
         [Test]
         [Order((int)RetrospectiveStage.Finished)]
         public void Screenshot_Finish() {
+            this.EnsureRetrospectiveInStage(RetrospectiveStage.Voting);
+
             // Given
             this.Client1.WorkflowContinueButton.Click();
+
+            this.EnsureRetrospectiveInStage(RetrospectiveStage.Finished);
 
             // Then
             CreateDocScreenshot(this.Client1.WebDriver, "finish-1");
@@ -335,6 +347,14 @@ namespace Return.Web.Tests.Integration.Pages {
                 Select(x => x.Id).
                 First();
             return noteId;
+        }
+
+        private void EnsureRetrospectiveInStage(RetrospectiveStage retrospectiveStage) {
+            using IServiceScope scope = this.App.CreateTestServiceScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
+            Assume.That(() => dbContext.Retrospectives.AsNoTracking().FindByRetroId(this.RetroId, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult(),
+                Has.Property(nameof(Retrospective.CurrentStage)).EqualTo(retrospectiveStage).Retry(),
+                $"Retrospective {this.RetroId} is not in stage {retrospectiveStage} required for this test. Are the tests running in the correct order?");
         }
     }
 }

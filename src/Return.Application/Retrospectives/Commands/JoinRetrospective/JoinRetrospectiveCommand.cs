@@ -19,5 +19,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
         public bool JoiningAsFacilitator { get; set; }
         public string RetroId { get; set; }
+
+        public override string ToString() => $"[{nameof(JoinRetrospectiveCommand)}] Join retro {this.RetroId} as {this.Name} (facilitator: {this.JoiningAsFacilitator})";
     }
 }

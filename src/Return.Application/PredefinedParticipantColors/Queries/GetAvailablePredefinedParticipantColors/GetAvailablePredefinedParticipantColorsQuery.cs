@@ -15,6 +15,8 @@ namespace Return.Application.PredefinedParticipantColors.Queries.GetAvailablePre
         public GetAvailablePredefinedParticipantColorsQuery(string retrospectiveId) {
             this.RetrospectiveId = retrospectiveId;
         }
+
+        public override string ToString() => $"[{nameof(GetAvailablePredefinedParticipantColorsQuery)}] {this.RetrospectiveId}";
     }
 
 }
