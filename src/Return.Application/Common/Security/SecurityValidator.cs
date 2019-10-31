@@ -66,7 +66,7 @@ namespace Return.Application.Common.Security {
             if (entity is IOwnedByParticipant ownedEntity) {
                 if (participant.Id != ownedEntity.ParticipantId && ownedEntity.ParticipantId != 0) {
                     string message =
-                        $"Operation '{operation}': Not allowed - entity is owned by participant {ownedEntity.ParticipantId} by operation is performed by {participant.Id} ({participant.Name})";
+                        $"Operation '{operation}': Not allowed - entity is owned by participant {ownedEntity.ParticipantId}. Operation is performed by {participant.Id} ({participant.Name})";
                     this._logger.LogError(message);
 
                     throw new OperationSecurityException(message);

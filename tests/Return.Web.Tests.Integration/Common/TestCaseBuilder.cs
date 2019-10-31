@@ -10,6 +10,7 @@ namespace Return.Web.Tests.Integration.Common {
     using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Abstractions;
@@ -136,7 +137,7 @@ namespace Return.Web.Tests.Integration.Common {
                     throw new InvalidOperationException("A call to OutputId should follow a call to an entity creating action");
                 }
 
-                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Outputting last added item {this._lastAddedItem.Type} with ID #{this._lastAddedItem.Id} to callback ({callback})");
+                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Outputting last added item {this._lastAddedItem.Type} with ID #{this._lastAddedItem.Id} to callback ({callback.GetMethodInfo().Name})");
                 callback.Invoke(this._lastAddedItem.Id);
 
                 return Task.CompletedTask;

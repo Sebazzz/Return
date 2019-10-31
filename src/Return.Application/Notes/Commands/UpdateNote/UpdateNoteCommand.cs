@@ -14,6 +14,6 @@ namespace Return.Application.Notes.Commands.UpdateNote {
         public int Id { get; set; }
         public string Text { get; set; }
 
-        public override string ToString() => $"Update Note [Id: {this.Id}; Text: {this.Text}]";
+        public override string ToString() => $"[{nameof(UpdateNoteCommand)}] Id: {this.Id} - Text: {this.Text}";
     }
 }
