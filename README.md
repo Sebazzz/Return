@@ -15,7 +15,7 @@ Licensed: GNU GPL v3.0
     -   Ctrl + lane number for adding notes or groups
     -   Ctrl + delete for deleting focused note
 -   Create password protected retrospectives
--   As facilitator, manage the retrospective through the writing, grouping and voting phase.
+-   As facilitator, lead the retrospective through the writing, grouping and voting phase.
 -   Overview with highest voted items
 
 ### Browser Support
