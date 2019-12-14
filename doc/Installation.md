@@ -1,4 +1,4 @@
-# Financial App installation guide
+# Return installation guide
 
 This guide will help you in installation of the application. The application is a ASP.NET Core web application and will in the basis only require a SQL Server database server to get up and running.
 
@@ -13,7 +13,7 @@ Download a release from the [releases](https://github.com/Sebazzz/Return/release
 To run the application you'Il need:
 
 -   A virtual machine or Azure website to deploy it to.
-    -   If using Windows, install on Windows Server 2012 or higher.
+    -   If using Windows, install on Windows Server 2016 or higher.
     -   If using Linux, install on Ubuntu 16.x or higher.
 -   Microsoft SQL Server for the database. The free SQL Server Express also works.
 -   E-mail (SMTP) server if you want account recovery e-mails etc. to work
