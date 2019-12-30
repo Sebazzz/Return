@@ -13,7 +13,7 @@
     <PackageReference Include="Accelist.FluentValidation.Blazor" Version="1.3.0" />
 
     <PackageReference Include="NReco.Logging.File" Version="1.0.4" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.0" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.1" />
 
     <!--Scrutor provides decorator abilities for IServiceCollection -->
     <PackageReference Include="Scrutor" Version="3.1.0" />
