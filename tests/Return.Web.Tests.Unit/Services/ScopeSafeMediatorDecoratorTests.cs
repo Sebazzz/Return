@@ -54,6 +54,8 @@ namespace Return.Web.Tests.Unit.Services {
                 return (TResponse)Activator.CreateInstance(typeof(TResponse));
             }
 
+            public Task<object> Send(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
+
             public Task Publish(object notification, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
 
             public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification => throw new System.NotImplementedException();
