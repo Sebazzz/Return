@@ -4,13 +4,13 @@ If you like to build Return from sources, you can follow the instructions below.
 
 ## Prequisites
 
--   [.NET Core 3.0 SDK](https://www.microsoft.com/net/download/core).
+-   [.NET Core 3.1 SDK](https://www.microsoft.com/net/download/core).
 -   [Node.js LTS](https://nodejs.org/en/download/) or higher (Node.js 10.x is supported too).
 -   [Yarn](https://yarnpkg.com/en/docs/install) or higher
 
 ### Additional prequisites on Windows
 
--   Powershell 5.x
+-   Windows Powershell or Powershell 7
 
 ### Additional prequisites on Linux (Ubuntu)
 
