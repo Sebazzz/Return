@@ -7,6 +7,7 @@
 
 namespace Return.Web.Tests.Integration.Pages {
     using System.Collections.ObjectModel;
+    using System.Threading;
     using Common;
     using Components;
     using Domain.Entities;
@@ -21,5 +22,12 @@ namespace Return.Web.Tests.Integration.Pages {
         public ReadOnlyCollection<IWebElement> NoteLaneElements => this.WebDriver.FindElementsByTestElementId("note-lane");
         public NoteLaneComponent GetLane(KnownNoteLane id) => new NoteLaneComponent(this.WebDriver.FindElementByTestElementId("note-lane", (int)id));
         public VoteStatusPanelComponent VoteStatus => new VoteStatusPanelComponent(this.WebDriver.FindVisibleElement(By.ClassName("vote-status-panel")));
+
+        public void InvokeContinueWorkflow() {
+            this.WorkflowContinueButton.Click();
+
+            // Insert sleep for AppVeyor and slower CI
+            Thread.Sleep(1000);
+        }
     }
 }

@@ -102,7 +102,7 @@ namespace Return.Web.Tests.Integration.Pages {
 
             this.Client1.TimeInMinutesInput.Clear();
             this.Client1.TimeInMinutesInput.SendKeys("5");
-            this.Client1.WorkflowContinueButton.Click();
+            this.Client1.InvokeContinueWorkflow();
 
             // When
             var writtenNoteIds = new HashSet<int>();
@@ -177,7 +177,7 @@ namespace Return.Web.Tests.Integration.Pages {
             CreateDocScreenshot(this.Client2.WebDriver, "writing");
 
             // Then
-            this.Client1.WorkflowContinueButton.Click();
+            this.Client1.InvokeContinueWorkflow();
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace Return.Web.Tests.Integration.Pages {
             this.EnsureRetrospectiveInStage(RetrospectiveStage.Discuss);
 
             // Given
-            this.Client1.WorkflowContinueButton.Click();
+            this.Client1.InvokeContinueWorkflow();
 
             // When
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
@@ -235,7 +235,7 @@ namespace Return.Web.Tests.Integration.Pages {
             this.EnsureRetrospectiveInStage(RetrospectiveStage.Grouping);
 
             // Given
-            this.Client1.WorkflowContinueButton.Click();
+            this.Client1.InvokeContinueWorkflow();
 
             // When
             using (IServiceScope scope = this.App.CreateTestServiceScope()) {
@@ -298,7 +298,7 @@ namespace Return.Web.Tests.Integration.Pages {
             this.EnsureRetrospectiveInStage(RetrospectiveStage.Voting);
 
             // Given
-            this.Client1.WorkflowContinueButton.Click();
+            this.Client1.InvokeContinueWorkflow();
 
             this.EnsureRetrospectiveInStage(RetrospectiveStage.Finished);
 
