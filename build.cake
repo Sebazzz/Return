@@ -105,7 +105,7 @@ Task("Check-Node-Version")
 
 Task("Check-Yarn-Version")
 	.Does(() => {
-	CheckToolVersion("yarn package manager", "yarn", "--version", new Version(1,16,0) /*Minimum supported on appveyor*/);
+	CheckToolVersion("yarn package manager", "yarn", "--version", new Version(1,22,0));
 });
 
 Task("Restore-NuGet-Packages")
