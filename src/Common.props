@@ -29,5 +29,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" />
+
+        <!-- Fixes CS8034: Unable to load Analyzer assembly [...] Microsoft.AspNetCore.Components.Analyzers.dll : Assembly with same name is already loaded -->
+        <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="3.1.2" />
     </ItemGroup>
 </Project>
