@@ -9,19 +9,19 @@ $box-radius: 4px;
 
 // Import font awesome
 $fa-font-path: '/build/fonts';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/brands.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/regular.scss';
-@import '../node_modules/@fortawesome/fontawesome-free/scss/solid.scss';
+@import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '@fortawesome/fontawesome-free/scss/brands.scss';
+@import '@fortawesome/fontawesome-free/scss/regular.scss';
+@import '@fortawesome/fontawesome-free/scss/solid.scss';
 
 // Import bulma
-@import '../node_modules/bulma/sass/utilities/_all';
-@import '../node_modules/bulma/sass/base/_all';
-@import '../node_modules/bulma/sass/elements/_all';
-@import '../node_modules/bulma/sass/form/_all';
-@import '../node_modules/bulma/sass/components/_all';
-@import '../node_modules/bulma/sass/grid/_all';
-@import '../node_modules/bulma/sass/layout/_all';
+@import 'bulma/sass/utilities/_all.sass';
+@import 'bulma/sass/base/_all.sass';
+@import 'bulma/sass/elements/_all.sass';
+@import 'bulma/sass/form/_all.sass';
+@import 'bulma/sass/components/_all.sass';
+@import 'bulma/sass/grid/_all.sass';
+@import 'bulma/sass/layout/_all.sass';
 
 // Vars
 $reveal-shadow-color: yellow;

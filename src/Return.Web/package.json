@@ -17,10 +17,10 @@
         "pretty-quick": "^2.0.1"
     },
     "scripts": {
-        "build": "gulp build",
+        "build": "yarn pnpify gulp build",
         "pre-commit": "../../pre-commit",
         "test": "echo 0",
-        "watch": "gulp sass:watch"
+        "watch": "yarn pnpify gulp sass:watch"
     },
     "husky": {
         "hooks": {
@@ -28,10 +28,19 @@
         }
     },
     "dependencies": {
+        "@yarnpkg/pnpify": "^2.0.0-rc.18",
         "blazor.polyfill": "^3.0.7",
         "gulp": "^4.0.2",
         "gulp-autoprefixer": "^7.0.1",
         "gulp-cli": "^2.2.0",
         "gulp-sass": "^4.0.2"
+    },
+    "dependenciesMeta": {
+        "@fortawesome/fontawesome-free": {
+            "unplugged": true
+        },
+        "bulma": {
+            "unplugged": true
+        }
     }
 }

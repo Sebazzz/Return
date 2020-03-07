@@ -7,10 +7,20 @@ const autoprefixer = require('gulp-autoprefixer');
 
 sass.compiler = require('node-sass');
 
+const sassOptions = {
+	importer: (url, _, done) => {
+		try {
+			done({ file: require.resolve(url) });
+		} catch(e) {
+			done(null);
+		}
+	}
+};
+
 gulp.task('sass', function() {
     return gulp
         .src('./_scss/main.scss')
-        .pipe(sass().on('error', sass.logError))
+        .pipe(sass(sassOptions).on('error', sass.logError))
         .pipe(autoprefixer({ cascade: false }))
         .pipe(gulp.dest('./wwwroot/build/css/'));
 });
@@ -23,7 +33,7 @@ gulp.task('copy-fonts', function() {
 
 gulp.task('copy-js-deps', function() {
     return gulp
-        .src('./node_modules/blazor.polyfill/blazor.polyfill.min.js')
+        .src(require.resolve('blazor.polyfill/blazor.polyfill.min.js'))
         .pipe(gulp.dest('./wwwroot/build/js/compat'));
 });
 
