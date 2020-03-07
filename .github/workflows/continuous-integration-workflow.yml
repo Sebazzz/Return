@@ -24,11 +24,6 @@ jobs:
               with:
                   node-version: '10.x'
 
-            - name: Install .NET 2.x SDK for Cake (temporary)
-              uses: actions/setup-dotnet@v1
-              with:
-                  dotnet-version: '2.2.103'
-
             - name: Install .NET 3.x SDK for build
               uses: actions/setup-dotnet@v1
               with:

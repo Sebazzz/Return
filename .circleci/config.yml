@@ -33,14 +33,6 @@ jobs:
                       apt-get install --no-install-recommends -y gcc g++ make build-essential nodejs
 
             - run:
-                  name: Install .NET 2.x SDK for Cake (temporary)
-                  command: |
-                      curl -L https://dot.net/v1/dotnet-install.sh -o dotnet-install.sh
-                      chmod +x dotnet-install.sh
-                      echo "export TERM=xterm-256color" >> $BASH_ENV
-                      ./dotnet-install.sh --version 2.2.105 --verbose --install-dir /usr/share/dotnet
-
-            - run:
                   name: Install Yarn
                   command: |
                       curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
