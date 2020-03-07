@@ -35,7 +35,7 @@ Download the release for your OS from the [releases tab](https://github.com/Seba
 
 ## Building Return from sources
 
-If you prefer to build the application yourself, please follow the [compilation instructions](docs/Building-from-sources.md) in the documentation.
+If you prefer to build the application yourself, please follow the [compilation instructions](doc/Building-from-sources.md) in the documentation.
 
 ## Screenshots
 
