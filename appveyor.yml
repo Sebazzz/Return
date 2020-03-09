@@ -13,6 +13,8 @@ install:
     - choco install firefox
     - choco install googlechrome
 cache: '%LOCALAPPDATA%\Yarn'
+environment:
+    RETURN_TEST_WAIT_TIME: 30
 build_script:
     - cmd: build.cmd --target=Publish --verbosity=verbose
 after_build:

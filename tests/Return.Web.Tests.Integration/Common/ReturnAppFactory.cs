@@ -61,9 +61,15 @@ namespace Return.Web.Tests.Integration.Common {
                 TestContext.WriteLine($"Setting driver window size not supported: {ex}");
             }
 
+            // Overridable timeout for tests for known CI failures
+            if (!Int32.TryParse(Environment.GetEnvironmentVariable("RETURN_TEST_WAIT_TIME"), out int waitTime)) {
+                waitTime = 10;
+            }
+
+            TestContext.WriteLine($"Configuration of WebDriver using wait time: {waitTime}s");
             ITimeouts timeouts = webDriver.Manage().Timeouts();
-            timeouts.ImplicitWait = TimeSpan.FromSeconds(60);
-            timeouts.PageLoad = TimeSpan.FromSeconds(60);
+            timeouts.ImplicitWait = TimeSpan.FromSeconds(waitTime);
+            timeouts.PageLoad = TimeSpan.FromSeconds(waitTime);
 
             void WrapLoggerAction<TArgs>(TArgs args, Action act, string screenshotName = null) {
                 try {
