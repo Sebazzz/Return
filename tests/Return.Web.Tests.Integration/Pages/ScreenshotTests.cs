@@ -52,6 +52,13 @@ namespace Return.Web.Tests.Integration.Pages {
         private int _startClientRetroPresenceNoteId;
         private int _continueDailyBuildNoteId;
 
+        [SetUp]
+        public void SkipOnAppVeyor() {
+            if (String.Equals(Environment.GetEnvironmentVariable("APPVEYOR"), Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) {
+                throw new IgnoreException("AppVeyor is too slow to run this test fixture - this test is skipped on AppVeyor");
+            }
+        }
+
         [Test]
         [Order((int)RetrospectiveStage.NotStarted)]
         public void Screenshot_CreateRetrospective() {

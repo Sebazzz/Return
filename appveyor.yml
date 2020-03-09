@@ -30,6 +30,6 @@ deploy: off
 artifacts:
     - path: build\testresults\*.trx
       name: test logs
-    - path: build\testresults\artifacts\**
+    - path: build\testresults\**
       name: test artifacts
       type: zip
