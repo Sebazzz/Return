@@ -18,8 +18,8 @@ build_script:
 after_build:
     - ps: Get-ChildItem ./build/publish/* -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
     - ps: Get-ChildItem ./build/ -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
-before_test:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+#before_test:
+#    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 test_script:
     - cmd: build.cmd --target=Test
 after_test:
