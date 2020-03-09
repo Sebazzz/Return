@@ -25,7 +25,8 @@ after_build:
 test_script:
     - cmd: build.cmd --target=Test
 after_test:
-    - ps: Compress-Archive -Path .\build\testresults -File .\build\testresults-all.zip -PassThru | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
+    - ps: Compress-Archive -Path .\build\testresults -DestinationPath .\build\testresults-all.zip
+    - ps: Push-AppveyorArtifact .\build\testresults-all.zip -FileName "testresults-all.zip"
 deploy: off
 artifacts:
     - path: build\testresults\*.trx
