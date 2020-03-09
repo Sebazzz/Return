@@ -13,8 +13,8 @@ install:
     - choco install firefox
     - choco install googlechrome
 cache: '%LOCALAPPDATA%\Yarn'
-#build_script:
-#    - cmd: build.cmd --target=Publish --verbosity=verbose
+build_script:
+    - cmd: build.cmd --target=Publish --verbosity=verbose
 after_build:
     - ps: Get-ChildItem ./build/publish/* -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
     - ps: Get-ChildItem ./build/ -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }

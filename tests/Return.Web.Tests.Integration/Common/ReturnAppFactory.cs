@@ -62,8 +62,8 @@ namespace Return.Web.Tests.Integration.Common {
             }
 
             ITimeouts timeouts = webDriver.Manage().Timeouts();
-            timeouts.ImplicitWait = TimeSpan.FromSeconds(10);
-            timeouts.PageLoad = TimeSpan.FromSeconds(10);
+            timeouts.ImplicitWait = TimeSpan.FromSeconds(60);
+            timeouts.PageLoad = TimeSpan.FromSeconds(60);
 
             void WrapLoggerAction<TArgs>(TArgs args, Action act, string screenshotName = null) {
                 try {
