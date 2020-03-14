@@ -20,8 +20,8 @@ var testArtifactsDir = buildDir + Directory("./testresults/artifacts");
 var publishDir = Directory("./build/publish");
 var assemblyInfoFile = Directory($"./src/{baseName}/Properties") + File("AssemblyInfo.cs");
 var nodeEnv = configuration == "Release" ? "production" : "development";
-var persistenceProjectPath = Directory("./src/Return.Persistence");
-var mainProjectPath = Directory("./src/Return.Web");
+var persistenceProjectPath = Directory($"./src/{baseName}.Persistence");
+var mainProjectPath = Directory($"./src/{baseName}.Web");
 
 int p = (int) Environment.OSVersion.Platform;
 bool isUnix = (p == 4) || (p == 6) || (p == 128);
@@ -124,7 +124,7 @@ Task("Generate-MigrationScript")
 			System.Environment.CurrentDirectory = MakeAbsolute(persistenceProjectPath).ToString();
 			
 			DotNetCoreTool(
-				"Return.Persistence.csproj", 
+				$"{baseName}.Persistence.csproj", 
 				"ef", 
 				new ProcessArgumentBuilder()
 					.Append("migrations")
@@ -175,7 +175,7 @@ Task("Build")
 Task("Run")
     .IsDependentOn("Build")
     .Does(() => {
-        DotNetCoreRun($"Return.Web.csproj", null, new DotNetCoreRunSettings { WorkingDirectory = "./src/Return.Web" });
+        DotNetCoreRun($"{baseName}.Web.csproj", null, new DotNetCoreRunSettings { WorkingDirectory = $"./src/{baseName}.Web" });
 });
 
 void PublishSelfContained(string platform, string folder) {
@@ -188,7 +188,7 @@ void PublishSelfContained(string platform, string folder) {
 				 Runtime = platform
 			 };
 	
-    DotNetCorePublish($"./src/Return.Web/Return.Web.csproj", settings);
+    DotNetCorePublish($"./src/{baseName}.Web/{baseName}.Web.csproj", settings);
 }
 
 Task("Run-FrontendBuild")
@@ -366,10 +366,10 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 		});
 }
 
-TestTask("Unit-Application", "Return.Application.Tests.Unit");
-TestTask("Unit-Domain", "Return.Domain.Tests.Unit");
-TestTask("Unit-Web", "Return.Web.Tests.Unit");
-TestTask("Integration-Web", "Return.Web.Tests.Integration", () => HasEnvironmentVariable("CIRCLECI") == false /* Headless tests are unstable on CircleCI*/);
+TestTask("Unit-Application", $"{baseName}.Application.Tests.Unit");
+TestTask("Unit-Domain", $"{baseName}.Domain.Tests.Unit");
+TestTask("Unit-Web", $"{baseName}.Web.Tests.Unit");
+TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration", () => HasEnvironmentVariable("CIRCLECI") == false /* Headless tests are unstable on CircleCI*/);
 
 Task("Test-CS")
     .Description("Test backend-end compiled code");
