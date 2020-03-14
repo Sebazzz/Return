@@ -179,6 +179,17 @@ csharp_preserve_single_line_statements = false:suggestion
 csharp_preserve_single_line_blocks = true:silent
 
 ## Ref: https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2017
+
+
+# By default, name items with PascalCase
+dotnet_naming_rule.members_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.members_should_be_pascal_case.symbols = all_members
+dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
+
+dotnet_naming_symbols.all_members.applicable_kinds = namespace, class, struct, interface, enum, property, method, event, delegate, type_parameter, local_function
+
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
 # Public members must be capitalized (public_members_must_be_capitalized)
 dotnet_naming_rule.public_members_must_be_capitalized.symbols   = public_symbols
 dotnet_naming_symbols.public_symbols.applicable_kinds           = property,method,field,event,delegate
@@ -189,7 +200,6 @@ dotnet_naming_rule.public_members_must_be_capitalized.style    = first_word_uppe
 dotnet_naming_style.first_word_upper_case_style.capitalization = first_word_upper
 
 dotnet_naming_rule.public_members_must_be_capitalized.severity = suggestion
-
 
 # Non-private static fields are PascalCase
 dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.severity = suggestion
@@ -233,6 +243,15 @@ dotnet_naming_symbols.local_functions.applicable_kinds = local_function
 
 dotnet_naming_style.local_function_style.capitalization = pascal_case
 
+# Locals are camelCase
+dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.locals_should_be_camel_case.symbols = local
+dotnet_naming_rule.locals_should_be_camel_case.style = locals_style
+
+dotnet_naming_symbols.locals_style.applicable_kinds = local
+
+dotnet_naming_style.locals_style.capitalization = camel_case
+
 
 # Static fields are PascalCased and are not prefixed
 dotnet_naming_rule.static_fields_should_be_camel_case.severity = suggestion
@@ -243,15 +262,6 @@ dotnet_naming_symbols.static_fields.applicable_kinds = field
 dotnet_naming_symbols.static_fields.required_modifiers = static
 
 dotnet_naming_style.static_field_style.capitalization = pascal_case
-
-# By default, name items with PascalCase
-dotnet_naming_rule.members_should_be_pascal_case.severity = suggestion
-dotnet_naming_rule.members_should_be_pascal_case.symbols = all_members
-dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
-
-dotnet_naming_symbols.all_members.applicable_kinds = *
-
-dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
 # Ref: https://www.jetbrains.com/help/resharper/2018.1/EditorConfig_Index.html
 add_imports_to_deepest_scope = true
