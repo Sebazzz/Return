@@ -295,6 +295,7 @@ void WindowsPublishTask(string taskId, string versionId, string description) {
 }
 
 WindowsPublishTask("10-x64", "win10-x64", "Windows 10 / Windows Server 2016 64-bit");
+WindowsPublishTask("8-x64", "win81-x64", "Windows 8.1 / Windows Server 2012 R2 64-bit");
 
 var ubuntuAllPublishTask = Task("Publish-Ubuntu");
 
