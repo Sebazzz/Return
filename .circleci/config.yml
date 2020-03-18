@@ -3,7 +3,7 @@ jobs:
     build:
         parallelism: 4
         docker:
-            - image: mcr.microsoft.com/dotnet/core/sdk:3.1
+            - image: mcr.microsoft.com/dotnet/core/sdk:3.1.200
         steps:
             - checkout
 
@@ -47,7 +47,9 @@ jobs:
 
             - run:
                   name: Build - restore nuget packages
-                  command: ./build.sh --target=restore-nuget-packages --verbosity=verbose
+                  command: |
+                      export TERM=dumb
+                      ./build.sh --target=restore-nuget-packages --verbosity=verbose
 
             - run:
                   name: Build - restore node packages
