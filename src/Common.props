@@ -33,4 +33,11 @@
         <!-- Fixes CS8034: Unable to load Analyzer assembly [...] Microsoft.AspNetCore.Components.Analyzers.dll : Assembly with same name is already loaded -->
         <PackageReference Include="Microsoft.AspNetCore.Components.Analyzers" Version="3.1.2" />
     </ItemGroup>
+
+    <!-- Git versioning -->
+    <ItemGroup>
+        <PackageReference Include="GitVersionTask" Version="5.2.4">
+            <PrivateAssets>All</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>
