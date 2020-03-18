@@ -1,5 +1,6 @@
 #addin nuget:?package=Cake.Compression&version=0.2.4
 #addin nuget:?package=SharpZipLib&version=1.2.0
+#tool "nuget:?package=GitVersion.CommandLine&version=5.2.4"
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -37,7 +38,6 @@ Task("Clean")
     .Does(() => {
     CleanDirectory(buildDir);
 	CleanDirectory(publishDir);
-	CleanDirectories("./src/**/bin");
 	CleanDirectories("./src/**/obj");
 });
 
@@ -272,6 +272,12 @@ Task("Publish-Common")
     .IsDependentOn("Generate-MigrationScript")
 	.IsDependentOn("Run-FrontendBuild");
 
+string GetVersionString() {
+	var version = GitVersion();
+	
+	return version.NuGetVersion;
+}
+
 var windowsAllPublishTask = Task("Publish-Windows");
 
 void WindowsPublishTask(string taskId, string versionId, string description) {
@@ -283,7 +289,7 @@ void WindowsPublishTask(string taskId, string versionId, string description) {
 		.IsDependentOn("Publish-Common")
 		.Does(() => PublishSelfContained(versionId, $"{versionId}/app"));
 
-	var output = publishDir + File($"return-web-{versionId}.zip");
+	var output = publishDir + File($"return-web-{versionId}-{GetVersionString()}.zip");
 	Task(taskName)
 		.IsDependentOn(internalTaskName)
 		.Description($"Publish for {description}, output to {output}")
@@ -308,7 +314,7 @@ void UbuntuPublishTask(string taskId, string versionId, string description) {
 		.IsDependentOn("Publish-Common")
 		.Does(() => PublishSelfContained(versionId, $"{versionId}/app"));
 
-	var output = publishDir + File($"return-web-{versionId}.tar.gz");
+	var output = publishDir + File($"return-web-{versionId}-{GetVersionString()}.tar.gz");
 	Task(taskName)
 		.IsDependentOn(internalTaskName)
 		.Description($"Publish for {description}, output to {output}")
