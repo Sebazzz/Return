@@ -1,6 +1,5 @@
 #addin nuget:?package=Cake.Compression&version=0.2.4
 #addin nuget:?package=SharpZipLib&version=1.2.0
-#tool "nuget:?package=GitVersion.Tool&version=5.2.4"
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
