@@ -39,17 +39,30 @@ jobs:
                       echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $BASH_ENV
 
             - run:
+                  name: Fix TERM var for CIRCLECI builds
+                  command: |
+                      echo 'export TERM=dumb' >> $BASH_ENV
+
+            - run:
+                  name: Workaround GitTools/GitVersion/issues/1852
+                  command: |
+                      dotnet tool install -g GitVersion.Tool --version 5.2.4
+                      echo 'export LD_LIBRARY_PATH=/root/.dotnet/tools/.store/gitversion.tool/5.2.4/gitversion.tool/5.2.4/tools/netcoreapp3.1/any/runtimes/debian.9-x64/native/' >> $BASH_ENV
+                      echo 'export PATH="/root/.dotnet/tools:$PATH"' >> $BASH_ENV
+                      echo 'export PATH="/root/.dotnet/tools:$PATH"' >> $BASH_ENV
+
+            - run:
                   name: Output important software versions
                   command: |
                       node --version
                       yarn --version
                       dotnet --version
+                      echo $LD_LIBRARY_PATH
 
             - run:
                   name: Build - restore nuget packages
                   command: |
-                      export TERM=dumb
-                      ./build.sh --target=restore-nuget-packages --verbosity=verbose
+                      ./build.sh --target=restore-nuget-packages --verbosity=diagnostic
 
             - run:
                   name: Build - restore node packages

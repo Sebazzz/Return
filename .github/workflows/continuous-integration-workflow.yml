@@ -51,6 +51,7 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v1
               continue-on-error: true
+              if: always()
               with:
                   name: logs
                   path: build/testresults

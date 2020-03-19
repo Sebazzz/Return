@@ -1,7 +1,7 @@
 #module nuget:?package=Cake.DotNetTool.Module&version=0.4.0
 #addin nuget:?package=Cake.Compression&version=0.2.4
 #addin nuget:?package=SharpZipLib&version=1.2.0
-#tool dotnet:?package=GitVersion.Tool&version=5.1.2
+#tool dotnet:?package=GitVersion.Tool&version=5.2.4
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -112,7 +112,8 @@ Task("Check-Yarn-Version")
 Task("Restore-NuGet-Packages")
     .Does(() => {
     DotNetCoreRestore(new DotNetCoreRestoreSettings {
-		IgnoreFailedSources = true
+		IgnoreFailedSources = true,
+		DisableParallel = AppVeyor.IsRunningOnAppVeyor // GitVersion/issues/1381
 	});
 });
 
@@ -170,7 +171,11 @@ Task("Build")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Restore-Node-Packages")
     .Does(() => {
-        DotNetCoreBuild($"./{baseName}.sln");
+        DotNetCoreBuild($"./{baseName}.sln", new DotNetCoreBuildSettings {
+			MSBuildSettings = new DotNetCoreMSBuildSettings {
+			   MaxCpuCount = AppVeyor.IsRunningOnAppVeyor ? (int?) 1 : null
+		    } // GitVersion/issues/1381
+		});
 });
 
 Task("Run")
@@ -183,11 +188,14 @@ void PublishSelfContained(string platform, string folder) {
 	Information("Publishing self-contained for platform {0}", platform);
 
 	var settings = new DotNetCorePublishSettings
-			 {
-				 Configuration = configuration,
-				 OutputDirectory = publishDir + Directory(folder ?? platform),
-				 Runtime = platform
-			 };
+	 {
+		 Configuration = configuration,
+		 OutputDirectory = publishDir + Directory(folder ?? platform),
+		 Runtime = platform,
+		 MSBuildSettings = new DotNetCoreMSBuildSettings {
+			MaxCpuCount = AppVeyor.IsRunningOnAppVeyor ? (int?) 1 : null
+		 }
+	 };
 	
     DotNetCorePublish($"./src/{baseName}.Web/{baseName}.Web.csproj", settings);
 }

@@ -24,7 +24,7 @@ after_build:
 #    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 test_script:
     - cmd: build.cmd --target=Test
-after_test:
+on_finish:
     - ps: Compress-Archive -Path .\build\testresults -DestinationPath .\build\testresults-all.zip
     - ps: Push-AppveyorArtifact .\build\testresults-all.zip -FileName "testresults-all.zip"
 deploy: off
