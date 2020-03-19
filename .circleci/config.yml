@@ -10,7 +10,7 @@ jobs:
             - restore_cache:
                   name: Restore Yarn Package Cache
                   keys:
-                      - yarn-packages-{{ checksum "src/App/yarn.lock" }}
+                      - yarn-packages-{{ checksum "src/Return.Web/yarn.lock" }}
 
             - run:
                   name: Install Chrome
@@ -77,6 +77,6 @@ jobs:
 
             - save_cache:
                   name: Save Yarn Package Cache
-                  key: yarn-packages-{{ checksum "src/App/yarn.lock" }}
+                  key: yarn-packages-{{ checksum "src/Return.Web/yarn.lock" }}
                   paths:
                       - ~/.cache/yarn
