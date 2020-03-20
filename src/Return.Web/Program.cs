@@ -82,7 +82,7 @@ namespace Return.Web {
 
                         if (!String.IsNullOrEmpty(fileName)) {
                             try {
-                                logging.AddFile(fileSection);
+                                logging.AddFile(config.GetSection("Logging"));
                             }
                             catch (Exception ex) {
                                 Console.WriteLine($"Failed to add file log to path [{fileName}]: {ex}");
