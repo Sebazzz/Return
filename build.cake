@@ -1,7 +1,6 @@
-#module nuget:?package=Cake.DotNetTool.Module&version=0.4.0
 #addin nuget:?package=Cake.Compression&version=0.2.4
 #addin nuget:?package=SharpZipLib&version=1.2.0
-#tool dotnet:?package=GitVersion.Tool&version=5.2.4
+#addin nuget:?package=Cake.GitVersioning&version=3.1.71
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -40,6 +39,11 @@ Task("Clean")
     CleanDirectory(buildDir);
 	CleanDirectory(publishDir);
 	CleanDirectories("./src/**/obj");
+});
+
+Task("Clean-TestResults")
+    .Does(() => {
+    CleanDirectory(testResultsDir);
 });
 
 Task("Rebuild")
@@ -112,8 +116,7 @@ Task("Check-Yarn-Version")
 Task("Restore-NuGet-Packages")
     .Does(() => {
     DotNetCoreRestore(new DotNetCoreRestoreSettings {
-		IgnoreFailedSources = true,
-		DisableParallel = AppVeyor.IsRunningOnAppVeyor // GitVersion/issues/1381
+		IgnoreFailedSources = true
 	});
 });
 
@@ -171,11 +174,7 @@ Task("Build")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Restore-Node-Packages")
     .Does(() => {
-        DotNetCoreBuild($"./{baseName}.sln", new DotNetCoreBuildSettings {
-			MSBuildSettings = new DotNetCoreMSBuildSettings {
-			   MaxCpuCount = AppVeyor.IsRunningOnAppVeyor ? (int?) 1 : null
-		    } // GitVersion/issues/1381
-		});
+        DotNetCoreBuild($"./{baseName}.sln");
 });
 
 Task("Run")
@@ -282,9 +281,9 @@ Task("Publish-Common")
 	.IsDependentOn("Run-FrontendBuild");
 
 string GetVersionString() {
-	var version = GitVersion();
+	var version = GitVersioningGetVersion();
 	
-	return version.NuGetVersion;
+	return version.SemVer1;
 }
 
 var windowsAllPublishTask = Task("Publish-Windows");
@@ -356,6 +355,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 		.IsDependentOn("Restore-NuGet-Packages")
 		.IsDependentOn("Set-HeadlessEnvironment")
 		.IsDependentOn("Run-FrontendBuild")
+		.IsDependentOn("Clean-TestResults")
 		.IsDependeeOf("Test-CS")
 		.WithCriteria(criteria)
 		.Does(() => {

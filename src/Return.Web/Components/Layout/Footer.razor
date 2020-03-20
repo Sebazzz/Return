@@ -1,7 +1,15 @@
+@using System.Reflection
+@{
+    Assembly currentAssembly = typeof(Startup).Assembly;
+
+    string version = currentAssembly.GetName().Version?.ToString(3) ?? ThisAssembly.AssemblyVersion;
+    string uniqueVersionId = ThisAssembly.AssemblyInformationalVersion;
+}
+
 <footer class="footer">
     <div class="content has-text-centered">
         <p>
-            <span title="@GitVersionInformation.InformationalVersion"><strong>Return</strong> v@(GitVersionInformation.MajorMinorPatch)</span> by <a href="https://damsteen.nl/">Sebastiaan Dammann</a>
+            <span title="@uniqueVersionId"><strong>Return</strong> v@(version)</span> by <a href="https://damsteen.nl/">Sebastiaan Dammann</a>
             <a href="https://github.com/Sebazzz/Return" target="_blank" class="footer__gh-link">
                 <span class="icon"><span class="fab fa-github"></span></span>
                 <span>Github</span>
