@@ -17,6 +17,6 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
 #nullable enable
         public string? Passphrase { get; set; }
 
-
+        public string? LobbyCreationPassphrase { get; set; }
     }
 }

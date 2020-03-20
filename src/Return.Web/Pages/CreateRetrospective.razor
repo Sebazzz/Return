@@ -1,8 +1,11 @@
 @page "/create-retro"
 @inherits MediatorComponent
 @using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Options
+@using Return.Application.Common.Settings
 @using Return.Application.Retrospectives.Commands.CreateRetrospective
 @inject ILogger<CreateRetrospective> Logger
+@inject IOptions<SecuritySettings> SecuritySettingsAccessor
 
 @if (ShowCompletionMessage)
 {
@@ -106,6 +109,18 @@ else
                 </div>
             </div>
         </div>
+        
+        @if (SecuritySettingsAccessor.Value.LobbyCreationNeedsPassphrase)
+        {
+            <div class="field">
+                <label class="label" for="retro-lobby-creation-passphrase">Lobby creation passphrase</label>
+                <div class="control">
+                    <InputText id="retro-lobby-creation-passphrase" class="input" type="password" @bind-Value="@Model.LobbyCreationPassphrase" />
+                </div>
+
+                <ValidationMessage For="() => Model.LobbyCreationPassphrase"></ValidationMessage>
+            </div>
+        }
 
         <div class="field is-grouped">
             <div class="control">

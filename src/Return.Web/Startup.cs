@@ -8,6 +8,7 @@ namespace Return.Web {
     using System;
     using Application;
     using Application.Common.Abstractions;
+    using Application.Common.Settings;
     using Application.Services;
     using Configuration;
     using Domain;
@@ -53,6 +54,8 @@ namespace Return.Web {
 
             services.Configure<HttpsServerOptions>(this.Configuration.GetSection("server").GetSection("https"));
             services.Configure<ServerOptions>(this.Configuration.GetSection("server"));
+
+            services.Configure<SecuritySettings>(this.Configuration.GetSection("Security"));
 
             // Framework
             services.AddRazorPages();

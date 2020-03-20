@@ -86,6 +86,8 @@ For instance with section `Server.Https` and setting `CertificatePath` becomes:
        }
     }
 
+You can add a `appsettings.Production.json` file to keep your own settings.
+
 ### General configuration - `Server`
 
 `BaseUrl`: Base URL used for mailing. If not set, auto-detection is attempted.
@@ -109,6 +111,10 @@ To configure logging to a file:
 `FileSizeLimitBytes`: Maximum size of log file in bytes. 0 for unlimited.
 
 `MaxRollingFiles`: Maximum file rollover. 0 for unlimited.
+
+### Security settings
+
+`LobbyCreationPassphrase`: Passphrase to create a lobby. Prevents anyone without this passphrase from creating retrospectives.
 
 ### Database set-up - `Database`
 
