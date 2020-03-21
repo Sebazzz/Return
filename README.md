@@ -31,7 +31,7 @@ Developed and tested on:
 
 Download the release for your OS from the [releases tab](https://github.com/Sebazzz/Return/releases) or download the cutting edge builds from [AppVeyor](https://ci.appveyor.com/project/Sebazzz/Return).
 
-[Follow the installation instructions](docs/Installation.md) in the documentation to install it.
+[Follow the installation instructions](doc/Installation.md) in the documentation to install it.
 
 ## Building Return from sources
 

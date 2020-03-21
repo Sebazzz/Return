@@ -1,8 +1,10 @@
 # Return installation guide
 
-This guide will help you in installation of the application. The application is a ASP.NET Core web application and will in the basis only require a SQL Server database server to get up and running.
+This guide will help you in installation of the application. The application is a ASP.NET Core web application and will in essence only require a SQL Server database server to get up and running.
 
 **Note:** This installation guide covers very basic installation, just enough to get the application up and running. It does _not_ cover installation of the application as a systemd or Windows Service, nor setting it up behind any reverse proxy. Please refer to [hosting as a Windows service](https://docs.microsoft.com/nl-nl/aspnet/core/hosting/windows-service), [hosting in Windows IIS](https://docs.microsoft.com/nl-nl/aspnet/core/publishing/iis?tabs=aspnetcore2x) or [hosting on Linux](https://docs.microsoft.com/nl-nl/aspnet/core/publishing/linuxproduction?tabs=aspnetcore2x) pages on the official Microsoft docs for more information.
+
+**Note:** Return features also experimental SQLite support.
 
 ## Getting a release
 
