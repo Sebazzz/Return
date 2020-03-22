@@ -23,7 +23,7 @@ namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
             this.RuleFor(x => x.LobbyCreationPassphrase)
                 .Equal(securitySettingsAccessor.Value.LobbyCreationPassphrase)
                 .When(_ => securitySettingsAccessor.Value.LobbyCreationNeedsPassphrase)
-                .WithMessage("Invalid passphrase entered needed for creating a lobby");
+                .WithMessage("Invalid pre-shared passphrase entered needed for creating a retrospective");
         }
     }
 }

@@ -82,13 +82,20 @@ namespace Return.Web.Tests.Integration.Pages {
         public IWebElement FacilitatorPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-facilitator-passphrase"));
         public IWebElement ParticipantPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-passphrase"));
         public IWebElement SubmitButton => this.WebDriver.FindVisibleElement(By.Id("create-retro-button"));
+        public IWebElement ModalSubmitButton => this.WebDriver.FindVisibleElement(By.Id("modal-create-retro-button"));
 
         public IWebElement UrlLocationInput => this.WebDriver.FindVisibleElement(By.Id("retro-location"));
         public IWebElement ParticipatorInstructions => this.WebDriver.FindElementByTestElementId("participator instructions");
         public IWebElement FacilitatorInstructions => this.WebDriver.FindElementByTestElementId("facilitator instructions");
 
+        public IWebElement LobbyCreationPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-lobby-creation-passphrase"));
+        public IWebElement LobbyCreationPassphraseModal => this.WebDriver.FindElementByTestElementId("lobby-creation-passphrase-modal");
+
+        public bool LobbyCreationPassphraseModalIsDisplayed => this.WebDriver.FindElement(By.CssSelector("[data-test-element-id=\"lobby-creation-passphrase-modal\"]")).Displayed;
+
         public void Navigate(ReturnAppFactory app) => this.WebDriver.NavigateToBlazorPage(app.CreateUri("create-retro"));
         public void Submit() => this.SubmitButton.Click();
+        public void ModalSubmit() => this.ModalSubmitButton.Click();
 
         public string GetUrlShown() => this.WebDriver.Retry(_ => this.UrlLocationInput.GetAttribute("value"));
         public ReadOnlyCollection<IWebElement> GetValidationMessages() => this.WebDriver.FindElements(By.ClassName("validation-message"));

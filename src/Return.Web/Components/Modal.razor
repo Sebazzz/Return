@@ -1,0 +1,17 @@
+<div class="modal @(this.IsShown ? "is-active" : String.Empty)">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        @ChildContent
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+
+@code {
+#nullable disable
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsShown { get; set; }
+}

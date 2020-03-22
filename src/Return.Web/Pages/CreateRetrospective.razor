@@ -112,19 +112,32 @@ else
         
         @if (SecuritySettingsAccessor.Value.LobbyCreationNeedsPassphrase)
         {
-            <div class="field">
-                <label class="label" for="retro-lobby-creation-passphrase">Lobby creation passphrase</label>
-                <div class="control">
-                    <InputText id="retro-lobby-creation-passphrase" class="input" type="password" @bind-Value="@Model.LobbyCreationPassphrase" />
-                </div>
+            <Modal IsShown="@this.ShowPasswordModal">
+                <div class="box" data-test-element-id="lobby-creation-passphrase-modal">
+                    <div class="field">
+                        <label class="label" for="retro-lobby-creation-passphrase">Pre-shared retrospective creation passphrase</label>
+                        <div class="control">
+                            <InputText id="retro-lobby-creation-passphrase" class="input" type="password" @bind-Value="@Model.LobbyCreationPassphrase" />
+                        </div>
 
-                <ValidationMessage For="() => Model.LobbyCreationPassphrase"></ValidationMessage>
-            </div>
+                        <ValidationMessage For="() => Model.LobbyCreationPassphrase"></ValidationMessage>
+                    </div>
+
+                    <button class="button is-link" id="modal-create-retro-button">Submit</button>
+                </div>
+            </Modal>
         }
 
-        <div class="field is-grouped">
+         <div class="field is-grouped">
             <div class="control">
-                <button class="button is-link" id="create-retro-button">Submit</button>
+                @if (SecuritySettingsAccessor.Value.LobbyCreationNeedsPassphrase)
+                {
+                    <button class="button is-link" id="create-retro-button" type="button" @onclick="@HandleProtectedFormSubmit">Submit</button>
+                }
+                else
+                {
+                    <button class="button is-link" id="create-retro-button">Submit</button>
+                }
             </div>
         </div>
     </EditForm>
@@ -134,15 +147,24 @@ else
 
 #nullable disable
 
-    Task HandleInvalidSubmit()
+    Task HandleInvalidSubmit(EditContext editContext)
     {
         this.ShowErrorMessage = false;
+
+        bool hasLobbyCreationPassphraseError = editContext.GetValidationMessages(() => this.Model.LobbyCreationPassphrase).Any();
+        this.ShowPasswordModal = hasLobbyCreationPassphraseError;
 
         return Task.CompletedTask;
     }
 
+    void HandleProtectedFormSubmit()
+    {
+        this.ShowPasswordModal = true;
+    }
+
     async Task HandleValidSubmit()
     {
+        this.ShowPasswordModal = false;
         this.ShowErrorMessage = false;
 
         try
@@ -164,6 +186,7 @@ else
 
     public bool ShowCompletionMessage;
     public bool ShowErrorMessage;
+    public bool ShowPasswordModal;
 
     [Parameter]
     public CreateRetrospectiveCommand Model { get; set; } = new CreateRetrospectiveCommand();
