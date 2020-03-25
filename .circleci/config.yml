@@ -3,7 +3,7 @@ jobs:
     build:
         parallelism: 4
         docker:
-            - image: mcr.microsoft.com/dotnet/core/sdk:3.1.200
+            - image: mcr.microsoft.com/dotnet/core/sdk:3.1.201
         steps:
             - checkout
 

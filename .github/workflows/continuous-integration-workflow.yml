@@ -25,7 +25,7 @@ jobs:
             - name: Install .NET 3.x SDK for build
               uses: actions/setup-dotnet@v1
               with:
-                  dotnet-version: '3.1.102'
+                  dotnet-version: '3.1.103'
 
             - name: Output important software versions (node)
               run: node --version
