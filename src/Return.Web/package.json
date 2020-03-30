@@ -28,7 +28,7 @@
         }
     },
     "dependencies": {
-        "blazor.polyfill": "^3.0.7",
+        "blazor.polyfill": "^3.0.8",
         "gulp": "^4.0.2",
         "gulp-autoprefixer": "^7.0.1",
         "gulp-cli": "^2.2.0",
