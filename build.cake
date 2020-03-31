@@ -394,7 +394,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 					CoverletOutputDirectory = codeCoverageOutputDirectory,
 					CoverletOutputName = codeCoverageResultsFileName
 				}.WithFilter("[Return.*.Tests.*]*")
-				 .WithFilter("[Return.Persistence]Return.Persistence.Migrations*")				 ;
+				 .WithFilter("[Return.Persistence]Return.Persistence.Migrations");
 
 				DotNetCoreTest(testPath, testSettings, coverletSettings);
 			}
