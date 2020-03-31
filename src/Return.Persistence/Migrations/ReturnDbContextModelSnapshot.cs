@@ -8,6 +8,9 @@ using Return.Persistence;
 
 namespace Return.Persistence.Migrations
 {
+    using System.Diagnostics.CodeAnalysis;
+
+    [ExcludeFromCodeCoverage]
     [DbContext(typeof(ReturnDbContext))]
     partial class ReturnDbContextModelSnapshot : ModelSnapshot
     {
