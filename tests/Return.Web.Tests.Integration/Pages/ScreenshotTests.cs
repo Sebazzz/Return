@@ -54,9 +54,9 @@ namespace Return.Web.Tests.Integration.Pages {
         private int _continueDailyBuildNoteId;
 
         [TearDown]
-        public void SkipOnAppVeyor() {
+        public void TestFailureTolerance() {
             if (TestContext.CurrentContext.Result.Outcome != ResultState.Success &&
-                String.Equals(Environment.GetEnvironmentVariable("APPVEYOR"), Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) {
+                String.Equals(Environment.GetEnvironmentVariable("SCREENSHOT_TEST_FAILURE_TOLERANCE"), Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) {
                 throw new IgnoreException("AppVeyor is too slow to run this test fixture - this test is skipped on AppVeyor");
             }
         }
@@ -111,9 +111,14 @@ namespace Return.Web.Tests.Integration.Pages {
 
             this.Client1.TimeInMinutesInput.Clear();
             this.Client1.TimeInMinutesInput.SendKeys("5");
+            Thread.Sleep(10000);
             this.Client1.InvokeContinueWorkflow();
 
             // When
+            TestContext.WriteLine("Attempting to find Note Lane button after state transition");
+            Thread.Sleep(10000);
+            this.Client2.WebDriver.Retry(_ => this.Client2.GetLane(KnownNoteLane.Continue).AddNoteButton.Displayed);
+
             var writtenNoteIds = new HashSet<int>();
             void WriteNote(RetrospectiveLobby client, KnownNoteLane laneId, string text) {
                 NoteLaneComponent lane = client.GetLane(laneId);

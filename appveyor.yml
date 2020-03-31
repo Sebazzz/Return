@@ -15,6 +15,7 @@ install:
 cache: '%LOCALAPPDATA%\Yarn'
 environment:
     RETURN_TEST_WAIT_TIME: 30
+    SCREENSHOT_TEST_FAILURE_TOLERANCE: True
 build_script:
     - cmd: build.cmd --target=build --verbosity=verbose
 after_build:

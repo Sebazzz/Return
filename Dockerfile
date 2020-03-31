@@ -47,6 +47,8 @@ FROM build-env AS test
 
 # ... run tests
 COPY . .
+ENV RETURN_TEST_WAIT_TIME 30
+ENV SCREENSHOT_TEST_FAILURE_TOLERANCE True
 RUN ./build.sh --target=test
 
 ### PUBLISHING
