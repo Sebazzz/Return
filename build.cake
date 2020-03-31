@@ -1,6 +1,9 @@
 #addin nuget:?package=Cake.Compression&version=0.2.4
 #addin nuget:?package=SharpZipLib&version=1.2.0
 #addin nuget:?package=Cake.GitVersioning&version=3.1.71
+#addin nuget:?package=Cake.Codecov&version=0.8.0
+#addin nuget:?package=Cake.Coverlet&version=2.4.2
+#tool nuget:?package=Codecov&version=1.10.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -9,6 +12,9 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var verbosity = Argument<Verbosity>("verbosity", Verbosity.Minimal);
+var skipCompression = Argument<bool>("skip-compression", false);
+var skipGitVersionDetection = Argument<bool>("skip-git-version-detection", false);
+var useCodeCoverage = Argument<bool>("use-code-coverage", false);
 
 //////////////////////////////////////////////////////////////////////
 // PREPARATION
@@ -18,7 +24,7 @@ var baseName = "Return";
 var buildDir = Directory("./build");
 var testResultsDir = buildDir + Directory("./testresults");
 var testArtifactsDir = buildDir + Directory("./testresults/artifacts");
-var publishDir = Directory("./build/publish");
+var publishDir = Directory(Argument("publish-dir", "./build/publish"));
 var assemblyInfoFile = Directory($"./src/{baseName}/Properties") + File("AssemblyInfo.cs");
 var nodeEnv = configuration == "Release" ? "production" : "development";
 var persistenceProjectPath = Directory($"./src/{baseName}.Persistence");
@@ -281,6 +287,8 @@ Task("Publish-Common")
 	.IsDependentOn("Run-FrontendBuild");
 
 string GetVersionString() {
+	if (skipGitVersionDetection) return "0.0.0-null";
+
 	var version = GitVersioningGetVersion();
 	
 	return version.SemVer1;
@@ -302,7 +310,7 @@ void WindowsPublishTask(string taskId, string versionId, string description) {
 		.IsDependentOn(internalTaskName)
 		.Description($"Publish for {description}, output to {output}")
 		.Does(() => {
-		   ZipCompress(publishDir + Directory($"{versionId}/"), output);
+		   if (!skipCompression) ZipCompress(publishDir + Directory($"{versionId}/"), output);
 		});
 	
 	windowsAllPublishTask.IsDependentOn(taskName);
@@ -329,7 +337,7 @@ void UbuntuPublishTask(string taskId, string versionId, string description) {
 		.Does(() => {
 		   CopyFile(File("./distscripts/ubuntu/launch"), publishDir + File($"{versionId}/launch"));
 		   CopyFile(File("./distscripts/ubuntu/launch.conf"), publishDir + File($"{versionId}/launch.conf.example"));
-		   GZipCompress(publishDir + Directory($"{versionId}/"), output);
+		   if (!skipCompression) GZipCompress(publishDir + Directory($"{versionId}/"), output);
 		});
 	
 	ubuntuAllPublishTask.IsDependentOn(taskName);
@@ -343,6 +351,7 @@ Task("Publish")
     .IsDependentOn("Publish-Windows")
     .IsDependentOn("Publish-Ubuntu");
 	
+List<string> codeCoveragePaths = null;
 void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	CreateDirectory(testResultsDir);
 	CreateDirectory(testArtifactsDir);
@@ -350,6 +359,9 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	criteria = criteria ?? new Func<bool>(() => true);
 	
 	var logFilePath = MakeAbsolute(testResultsDir + File($"test-{name}-log.trx"));
+	var codeCoverageOutputDirectory = testArtifactsDir + Directory($"code-coverage-{projectName}");
+	var codeCoverageResultsFileName = $"code-coverage-{projectName}.xml";
+	var codeCoverageResultsFile = codeCoverageOutputDirectory + File(codeCoverageResultsFileName);
 	
 	Task($"Test-CS-{name}")
 		.IsDependentOn("Restore-NuGet-Packages")
@@ -361,11 +373,33 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 		.Does(() => {
 			Information($"Running tests for {projectName} - logging to {logFilePath} - artifacts dumped to {testArtifactsDir}");
 
+			CreateDirectory(testArtifactsDir);
+			CreateDirectory(codeCoverageOutputDirectory);
+			
 			System.Environment.SetEnvironmentVariable("TEST_ARTIFACT_DIR", MakeAbsolute(testArtifactsDir).ToString());
-			DotNetCoreTest($"./tests/{projectName}/{projectName}.csproj", new DotNetCoreTestSettings {
+	
+			var testPath = $"./tests/{projectName}/{projectName}.csproj";
+			var testSettings = new DotNetCoreTestSettings {
+				Configuration = configuration,
 				ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
-													  .Append("--logger:\"console;verbosity=normal;noprogress=true\"")
-			});
+													  .Append("--logger:\"console;verbosity=normal;noprogress=true\"") 
+			};
+
+			if (!useCodeCoverage) {
+				DotNetCoreTest(testPath, testSettings);
+			} else {
+				var coverletSettings = new CoverletSettings {
+					CollectCoverage = true,
+					CoverletOutputFormat = CoverletOutputFormat.opencover,
+					CoverletOutputDirectory = codeCoverageOutputDirectory,
+					CoverletOutputName = codeCoverageResultsFileName
+				}.WithFilter("+[PokerTime]*")
+				 .WithFilter("-[PokerTime.*.Tests.*]*")
+				 .WithFilter("-[PokerTime.Persistence]PokerTime.Persistence.Migrations*")
+				 ;
+
+				DotNetCoreTest(testPath, testSettings, coverletSettings);
+			}
 		})
 		.Finally(() => {
 			if (AppVeyor.IsRunningOnAppVeyor && FileExists(logFilePath)) {
@@ -379,13 +413,37 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 				Information("Uploading test results from {0} to {1}", fullTestResultsPath, url);
 				wc.UploadFile(url, fullTestResultsPath);
 			}
+
+			if (useCodeCoverage) {
+				if (!FileExists(codeCoverageResultsFile)) {
+					Warning($"Code coverage file result not found in path: {codeCoverageOutputDirectory} - expected to file {codeCoverageResultsFile}");
+				} else {
+					Verbose($"Registering for code coverage upload: {codeCoverageResultsFile}");
+					codeCoveragePaths.Add(codeCoverageResultsFile);
+				}
+			}
 		});
+
+	if (codeCoveragePaths == null) {
+		Debug("Setup code coverage upload task. Skipping...");
+
+		codeCoveragePaths = new List<string>();
+		Teardown(context =>	{
+			// Upload all reports consolidated - this prevents half coverage reports from being uploaded
+			if (codeCoveragePaths.Count > 0) {
+				Information($"Uploading {codeCoveragePaths.Count} code coverage results...");
+				Codecov(codeCoveragePaths.ToArray());
+			} else if (useCodeCoverage) {
+				Warning("No code coverage has been collected.");
+			}
+		});
+	}
 }
 
 TestTask("Unit-Application", $"{baseName}.Application.Tests.Unit");
 TestTask("Unit-Domain", $"{baseName}.Domain.Tests.Unit");
 TestTask("Unit-Web", $"{baseName}.Web.Tests.Unit");
-TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration", () => HasEnvironmentVariable("CIRCLECI") == false /* Headless tests are unstable on CircleCI*/);
+TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration");
 
 Task("Test-CS")
     .Description("Test backend-end compiled code");

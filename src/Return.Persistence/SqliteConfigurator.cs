@@ -1,7 +1,9 @@
 ﻿namespace Return.Persistence {
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
 
+    [ExcludeFromCodeCoverage]
     internal static class SqliteConfigurator {
         private static SqliteConnection? InMemoryConnection;
 
@@ -22,7 +24,7 @@
                 optionsBuilder.UseSqlite(connString);
             }
             else {
-                // Create a connection ourselve because we run into timeouts when seeding
+                // Create a connection ourselves because we run into timeouts when seeding
                 // https://github.com/aspnet/EntityFrameworkCore/issues/18607
 
                 var conn = new SqliteConnection(connString) {

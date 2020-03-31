@@ -7,12 +7,14 @@
 
 namespace Return.Persistence {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using Common;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Design;
     using Microsoft.Extensions.Configuration;
 
+    [ExcludeFromCodeCoverage]
     public abstract class DesignTimeDbContextFactoryBase<TContext> :
         IDesignTimeDbContextFactory<TContext> where TContext : DbContext {
         private const string AspNetCoreEnvironment = "ASPNETCORE_ENVIRONMENT";

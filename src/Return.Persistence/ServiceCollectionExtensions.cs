@@ -19,6 +19,8 @@ namespace Return.Persistence {
             services.ChainInterfaceImplementation<IEntityStateFacilitator, ReturnDbContext>();
             services.ChainInterfaceImplementation<IReturnDbContextFactory, ReturnDbContext>();
 
+            services.AddHealthChecks().AddDbContextCheck<ReturnDbContext>();
+
             return services;
         }
     }

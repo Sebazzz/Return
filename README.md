@@ -4,9 +4,13 @@ Retrospective tool built in ASP.NET Core and Blazor
 
 Licensed: GNU GPL v3.0
 
-[![Build status](https://ci.appveyor.com/api/projects/status/7bjrmgtek7j080d7?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return)
-[![CircleCI](https://circleci.com/gh/Sebazzz/Return.svg?style=svg)](https://circleci.com/gh/Sebazzz/Return)
-[![Github CI](https://github.com/sebazzz/Return/workflows/Continuous%20integration/badge.svg)](https://github.com/Sebazzz/Return/actions?workflow=Continuous+integration)
+|                    | master                                                                                                                                                                                                            | develop                                                                                                                                                                                                             |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AppVeyor CI**    | [![Build status](https://ci.appveyor.com/api/projects/status/7bjrmgtek7j080d7/branch/master?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return/branch/master)                                              | [![Build status](https://ci.appveyor.com/api/projects/status/7bjrmgtek7j080d7/branch/develop?svg=true)](https://ci.appveyor.com/project/Sebazzz/Return/branch/develop)                                              |
+| **CircleCI**       | [![CircleCI](https://circleci.com/gh/Sebazzz/Return/tree/master.svg?style=shield)](https://circleci.com/gh/Sebazzz/Return/tree/master)                                                                            | [![CircleCI](https://circleci.com/gh/Sebazzz/Return/tree/develop.svg?style=shield)](https://circleci.com/gh/Sebazzz/Return/tree/develop)                                                                            |
+| **Github actions** | [![Github CI](https://github.com/sebazzz/Return/workflows/Continuous%20integration/badge.svg?branch=master)](https://github.com/Sebazzz/Return/actions?workflow=Continuous+integration&branch=master)             | [![Github CI](https://github.com/sebazzz/Return/workflows/Continuous%20integration/badge.svg?branch=develop)](https://github.com/Sebazzz/Return/actions?workflow=Continuous+integration&branch=develop)             |
+| **Codeconv**       | [![codecov](https://codecov.io/gh/Sebazzz/Return/branch/master/graph/badge.svg)](https://codecov.io/gh/Sebazzz/Return)                                                                                            | [![codecov](https://codecov.io/gh/Sebazzz/Return/branch/develop/graph/badge.svg)](https://codecov.io/gh/Sebazzz/Return)                                                                                             |
+| **Daily build**    | [![Github CI](https://github.com/sebazzz/Return/workflows/Build%20installation%20packages/badge.svg?branch=master)](https://github.com/Sebazzz/Return/actions?workflow=Build+installation+packages&branch=master) | [![Github CI](https://github.com/sebazzz/Return/workflows/Build%20installation%20packages/badge.svg?branch=develop)](https://github.com/Sebazzz/Return/actions?workflow=Build+installation+packages&branch=develop) |
 
 ## Features
 
@@ -28,6 +32,19 @@ Developed and tested on:
 -   Mozilla Firefox
 
 ## Download
+
+### Docker
+
+Return is available as a docker image. Simply pull it from the Docker hub, and run it:
+
+    docker pull sebazzz/return:latest
+    docker run -p 80:80 sebazzz/return
+
+For further configuration you may want to mount a directory with [the configuration](doc/Installation.md#Configuration):
+
+    docker run -p 80:80 -v /path/to/my/configuration/directory:/etc/return-retro sebazzz/return
+
+### Manual installation
 
 Download the release for your OS from the [releases tab](https://github.com/Sebazzz/Return/releases) or download the cutting edge builds from [AppVeyor](https://ci.appveyor.com/project/Sebazzz/Return).
 

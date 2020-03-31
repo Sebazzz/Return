@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Return.Web {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Application;
     using Application.Common.Abstractions;
     using Application.Common.Settings;
@@ -22,6 +23,7 @@ namespace Return.Web {
     using Persistence;
     using Services;
 
+    [ExcludeFromCodeCoverage]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "ASP.NET Core conventions")]
     public class Startup {
         public Startup(IConfiguration configuration) {
@@ -77,7 +79,7 @@ namespace Return.Web {
             }
 
             // Set-up application pipeline
-            app.UseMiddleware<SiteUrlDetectionMiddleware>();
+            app.UseRequestEnvironmentDetection();
             app.UseCurrentParticipantService();
 
             if (env.IsDevelopment()) {
@@ -93,6 +95,8 @@ namespace Return.Web {
             app.UseRouting();
 
             app.UseEndpoints(endpoints => {
+                endpoints.MapHealthChecks("/health");
+
                 endpoints.MapBlazorHub();
 
                 endpoints.MapFallbackToPage("/_Host");
