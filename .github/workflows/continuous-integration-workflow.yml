@@ -46,6 +46,7 @@ jobs:
               env:
                   MOZ_HEADLESS: 1
                   CIRCLECI: 1
+                  RETURN_TEST_WAIT_TIME: 30
               run: ${{ matrix.script_name }} --target=test --use-code-coverage=false --verbosity=verbose
 
             - name: Upload artifacts

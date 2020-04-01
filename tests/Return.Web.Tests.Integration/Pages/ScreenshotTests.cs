@@ -111,6 +111,7 @@ namespace Return.Web.Tests.Integration.Pages {
 
             this.Client1.TimeInMinutesInput.Clear();
             this.Client1.TimeInMinutesInput.SendKeys("5");
+            this.Client1.TimeInMinutesInput.SendKeys(Keys.Tab);
             Thread.Sleep(10000);
             this.Client1.InvokeContinueWorkflow();
 
