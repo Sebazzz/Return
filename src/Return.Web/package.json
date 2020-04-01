@@ -8,7 +8,7 @@
     "private": true,
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.12.1",
-        "autoprefixer": "^9.7.4",
+        "autoprefixer": "^9.7.5",
         "bulma": "^0.8.0",
         "husky": "^4.2.3",
         "node-sass": "^4.13.1",
@@ -28,7 +28,7 @@
         }
     },
     "dependencies": {
-        "blazor.polyfill": "^3.0.7",
+        "blazor.polyfill": "^3.0.8",
         "gulp": "^4.0.2",
         "gulp-autoprefixer": "^7.0.1",
         "gulp-cli": "^2.2.0",
