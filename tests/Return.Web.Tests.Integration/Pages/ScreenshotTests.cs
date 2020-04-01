@@ -36,6 +36,7 @@ namespace Return.Web.Tests.Integration.Pages {
     /// Client2: Hong (participant)
     /// </remarks>
     [TestFixture]
+    [FlakyTestFailureTolerance]
     public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         private readonly HashSet<int> _startAutomationGroupNoteIds = new HashSet<int>();
         private readonly HashSet<int> _stopBacklogUnstableNoteIds = new HashSet<int>();
@@ -52,14 +53,6 @@ namespace Return.Web.Tests.Integration.Pages {
         private int _continueFrameworkNoteId;
         private int _startClientRetroPresenceNoteId;
         private int _continueDailyBuildNoteId;
-
-        [TearDown]
-        public void TestFailureTolerance() {
-            if (TestContext.CurrentContext.Result.Outcome != ResultState.Success &&
-                String.Equals(Environment.GetEnvironmentVariable("SCREENSHOT_TEST_FAILURE_TOLERANCE"), Boolean.TrueString, StringComparison.OrdinalIgnoreCase)) {
-                throw new IgnoreException("AppVeyor is too slow to run this test fixture - this test is skipped on AppVeyor");
-            }
-        }
 
         [Test]
         [Order((int)RetrospectiveStage.NotStarted)]
