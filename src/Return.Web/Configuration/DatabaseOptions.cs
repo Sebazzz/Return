@@ -12,6 +12,7 @@ namespace Return.Web.Configuration {
     using Microsoft.Data.Sqlite;
     using Persistence;
 
+    [ExcludeFromCodeCoverage] // Not much use including this in code coverage
     public class DatabaseOptions : IDatabaseOptions {
         private string? _cachedConnectionString;
 

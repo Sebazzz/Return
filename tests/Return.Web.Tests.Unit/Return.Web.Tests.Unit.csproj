@@ -8,4 +8,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Return.Web\Return.Web.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
 </Project>
