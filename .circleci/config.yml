@@ -3,80 +3,14 @@ jobs:
     build:
         parallelism: 4
         docker:
-            - image: mcr.microsoft.com/dotnet/core/sdk:3.1.201
+            - image: circleci/buildpack-deps:buster
         steps:
             - checkout
 
-            - restore_cache:
-                  name: Restore Yarn Package Cache
-                  keys:
-                      - yarn-packages-{{ checksum "src/Return.Web/yarn.lock" }}
+            - setup_remote_docker
 
             - run:
-                  name: Install Chrome
+                  name: Run docker-compose tests
                   command: |
-                      apt-get -qqy update
-                      apt-get -qqy install lsb-release libappindicator3-1
-                      curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-                      apt -y install ./google-chrome.deb
-                      sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
-                      rm google-chrome.deb
-
-            - run:
-                  name: Install node.js prereqs
-                  command: apt-get -qq update && apt-get -qqy --no-install-recommends install wget gnupg git unzip
-
-            - run:
-                  name: Download and install node.js
-                  command: |
-                      curl -sL https://deb.nodesource.com/setup_10.x | bash -
-                      apt-get install --no-install-recommends -y gcc g++ make build-essential nodejs
-
-            - run:
-                  name: Install Yarn
-                  command: |
-                      curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.16.0
-                      echo 'export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"' >> $BASH_ENV
-
-            - run:
-                  name: Fix TERM var for CIRCLECI builds
-                  command: |
-                      echo 'export TERM=dumb' >> $BASH_ENV
-
-            - run:
-                  name: Workaround GitTools/GitVersion/issues/1852
-                  command: |
-                      dotnet tool install -g GitVersion.Tool --version 5.2.4
-                      echo 'export LD_LIBRARY_PATH=/root/.dotnet/tools/.store/gitversion.tool/5.2.4/gitversion.tool/5.2.4/tools/netcoreapp3.1/any/runtimes/debian.9-x64/native/' >> $BASH_ENV
-                      echo 'export PATH="/root/.dotnet/tools:$PATH"' >> $BASH_ENV
-                      echo 'export PATH="/root/.dotnet/tools:$PATH"' >> $BASH_ENV
-
-            - run:
-                  name: Output important software versions
-                  command: |
-                      node --version
-                      yarn --version
-                      dotnet --version
-                      echo $LD_LIBRARY_PATH
-
-            - run:
-                  name: Build - restore nuget packages
-                  command: |
-                      ./build.sh --target=restore-nuget-packages --verbosity=diagnostic
-
-            - run:
-                  name: Build - restore node packages
-                  command: ./build.sh --target=restore-node-packages --verbosity=verbose
-
-            - run:
-                  name: Build - test
-                  command: |
-                      export MOZ_HEADLESS=1
-                      export CIRCLECI=1
-                      ./build.sh --target=test --verbosity=verbose < /dev/null
-
-            - save_cache:
-                  name: Save Yarn Package Cache
-                  key: yarn-packages-{{ checksum "src/Return.Web/yarn.lock" }}
-                  paths:
-                      - ~/.cache/yarn
+                      docker-compose --file docker-compose.test.yml build
+                      docker-compose --file docker-compose.test.yml run sut

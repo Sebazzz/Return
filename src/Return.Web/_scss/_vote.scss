@@ -1,5 +1,11 @@
 .vote-indicator {
     display: inline-block;
+
+    filter: grayscale(70%);
+
+    .vote-list__vote-remove-button & {
+        filter: grayscale(40%);
+    }
 }
 
 .vote-list {

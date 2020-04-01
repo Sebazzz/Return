@@ -8,6 +8,7 @@
 namespace Return.Persistence {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using System.Threading;
@@ -21,6 +22,7 @@ namespace Return.Persistence {
     using Microsoft.EntityFrameworkCore.Metadata;
     using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+    [ExcludeFromCodeCoverage] // No use testing the database context
     public sealed class ReturnDbContext : DbContext, IReturnDbContext, IEntityStateFacilitator {
         private const string SqliteProvider = "Microsoft.EntityFrameworkCore.Sqlite";
 

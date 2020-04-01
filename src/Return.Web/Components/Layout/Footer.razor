@@ -2,7 +2,7 @@
 @{
     Assembly currentAssembly = typeof(Startup).Assembly;
 
-    string version = currentAssembly.GetName().Version?.ToString(3) ?? ThisAssembly.AssemblyVersion;
+    string version = currentAssembly.GetName().Version?.ToString(3) ?? ThisAssembly.AssemblyFileVersion;
     string uniqueVersionId = ThisAssembly.AssemblyInformationalVersion;
 }
 

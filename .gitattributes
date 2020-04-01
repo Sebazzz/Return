@@ -1,2 +1,5 @@
-build.sh text eol=lf
+*.sh text eol=lf
+.dockerignore text eol=lf
+Dockerfile text eol=lf
 build.cake text eol=lf
+distscripts/* eol=lf

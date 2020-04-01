@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+    sut:
+        build:
+            context: .
+            target: test
+        command: echo 1 # This is fake, the real build is in the docker file

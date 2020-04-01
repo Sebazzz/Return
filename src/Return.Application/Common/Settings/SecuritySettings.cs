@@ -14,7 +14,11 @@ namespace Return.Application.Common.Settings {
         /// </summary>
         public string? LobbyCreationPassphrase { get; set; }
 
-
         public bool LobbyCreationNeedsPassphrase => !String.IsNullOrEmpty(this.LobbyCreationPassphrase);
+
+        /// <summary>
+        /// Enable detection of X-HTTP-Forwarded-For HTTP headers
+        /// </summary>
+        public bool EnableProxyMode { get; set; }
     }
 }

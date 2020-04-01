@@ -70,7 +70,7 @@ namespace Return.Web.Tests.Integration.Common {
                     typeof(NoSuchFrameException),
                     typeof(NoSuchWindowException),
                     typeof(StaleElementReferenceException));
-                wait.Timeout = TimeSpan.FromSeconds(15);
+                wait.Timeout = TimeSpan.FromSeconds(60);
                 wait.PollingInterval = TimeSpan.FromSeconds(1.5);
                 return wait.Until(wd => {
                     TestContext.WriteLine($"Attempting to run Retry<{typeof(T)}> operation ({callback.Method.DeclaringType}.{callback.Method.Name})");

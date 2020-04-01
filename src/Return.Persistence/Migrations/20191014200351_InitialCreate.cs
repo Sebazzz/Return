@@ -1,28 +1,25 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Return.Persistence.Migrations
-{
-    public partial class InitialCreate : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+namespace Return.Persistence.Migrations {
+    using System.Diagnostics.CodeAnalysis;
+
+    [ExcludeFromCodeCoverage]
+    public partial class InitialCreate : Migration {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
                 name: "NoteLane",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false),
                     Name = table.Column<string>(maxLength: 256, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_NoteLane", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "PredefinedParticipantColor",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(maxLength: 128, nullable: false),
@@ -30,15 +27,13 @@ namespace Return.Persistence.Migrations
                     Color_G = table.Column<byte>(nullable: true),
                     Color_B = table.Column<byte>(nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_PredefinedParticipantColor", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Retrospective",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UrlId_StringId = table.Column<string>(unicode: false, maxLength: 32, nullable: true),
@@ -51,23 +46,20 @@ namespace Return.Persistence.Migrations
                     WorkflowData_CurrentWorkflowInitiationTimestamp = table.Column<DateTimeOffset>(nullable: true),
                     WorkflowData_CurrentWorkflowTimeLimitInMinutes = table.Column<int>(nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Retrospective", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "NoteGroup",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RetrospectiveId = table.Column<int>(nullable: false),
                     LaneId = table.Column<int>(nullable: false),
                     Title = table.Column<string>(maxLength: 256, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_NoteGroup", x => x.Id);
                     table.ForeignKey(
                         name: "FK_NoteGroup_NoteLane_LaneId",
@@ -85,8 +77,7 @@ namespace Return.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Participant",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Color_R = table.Column<byte>(nullable: true),
@@ -96,8 +87,7 @@ namespace Return.Persistence.Migrations
                     Name = table.Column<string>(maxLength: 256, nullable: false),
                     IsFacilitator = table.Column<bool>(nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Participant", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Participant_Retrospective_RetrospectiveId",
@@ -109,8 +99,7 @@ namespace Return.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Note",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RetrospectiveId = table.Column<int>(nullable: false),
@@ -120,8 +109,7 @@ namespace Return.Persistence.Migrations
                     CreationTimestamp = table.Column<DateTimeOffset>(nullable: false),
                     GroupId = table.Column<int>(nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Note", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Note_NoteGroup_GroupId",
@@ -151,8 +139,7 @@ namespace Return.Persistence.Migrations
 
             migrationBuilder.CreateTable(
                 name: "NoteVote",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     NoteId = table.Column<int>(nullable: true),
@@ -160,8 +147,7 @@ namespace Return.Persistence.Migrations
                     RetrospectiveId = table.Column<int>(nullable: false),
                     ParticipantId = table.Column<int>(nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_NoteVote", x => x.Id);
                     table.ForeignKey(
                         name: "FK_NoteVote_NoteGroup_NoteGroupId",
@@ -252,8 +238,7 @@ namespace Return.Persistence.Migrations
                 filter: "[UrlId_StringId] IS NOT NULL");
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "NoteVote");
 

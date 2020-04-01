@@ -15,15 +15,15 @@ install:
 cache: '%LOCALAPPDATA%\Yarn'
 environment:
     RETURN_TEST_WAIT_TIME: 30
+    SCREENSHOT_TEST_FAILURE_TOLERANCE: True
 build_script:
-    - cmd: build.cmd --target=Publish --verbosity=verbose
+    - cmd: build.cmd --target=build --verbosity=verbose
 after_build:
-    - ps: Get-ChildItem ./build/publish/* -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
     - ps: Get-ChildItem ./build/ -File | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 #before_test:
 #    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 test_script:
-    - cmd: build.cmd --target=Test
+    - cmd: build.cmd --target=test --configuration=debug --use-code-coverage=true
 on_finish:
     - ps: Compress-Archive -Path .\build\testresults -DestinationPath .\build\testresults-all.zip
     - ps: Push-AppveyorArtifact .\build\testresults-all.zip -FileName "testresults-all.zip"

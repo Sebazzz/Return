@@ -7,10 +7,12 @@
 
 namespace Return.Web.Configuration {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Data.SqlClient;
     using Microsoft.Data.Sqlite;
     using Persistence;
 
+    [ExcludeFromCodeCoverage] // Not much use including this in code coverage
     public class DatabaseOptions : IDatabaseOptions {
         private string? _cachedConnectionString;
 

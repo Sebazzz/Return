@@ -1,9 +1,9 @@
-name: Continuous integration
+name: Build installation packages
 on: push
 
 jobs:
     build:
-        name: Build and test ${{ matrix.os }}
+        name: Build installation packages on ${{ matrix.os }}
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
@@ -27,32 +27,18 @@ jobs:
               with:
                   dotnet-version: '3.1.103'
 
-            - name: Output important software versions (node)
-              run: node --version
-
-            - name: Output important software versions (yarn)
-              run: yarn --version
-
-            - name: Output important software versions (dotnet)
-              run: dotnet --version
+            - name: Restore .NET Core tools
+              run: dotnet tool restore
 
             - name: Build - restore nuget packages
               run: ${{ matrix.script_name }} --target=restore-nuget-packages --verbosity=verbose
 
-            - name: Build - restore node packages
-              run: ${{ matrix.script_name }} --target=restore-node-packages --verbosity=verbose
+            - name: Publish
+              run: ${{ matrix.script_name }} --target=Publish --verbosity=verbose
 
-            - name: Build - test
-              env:
-                  MOZ_HEADLESS: 1
-                  CIRCLECI: 1
-                  RETURN_TEST_WAIT_TIME: 30
-              run: ${{ matrix.script_name }} --target=test --use-code-coverage=false --verbosity=verbose
-
-            - name: Upload artifacts
+            - name: Upload built packages
               uses: actions/upload-artifact@v1
               continue-on-error: true
-              if: always()
               with:
-                  name: logs
-                  path: build/testresults
+                  name: installation packages
+                  path: build/publish/ # We upload *everything*, but I'd rather upload just the zip files

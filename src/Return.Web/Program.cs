@@ -25,6 +25,7 @@ namespace Return.Web {
     using Persistence;
     using Services;
 
+    [ExcludeFromCodeCoverage]
     public static class Program {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
         public static async Task Main(string[] args) {
@@ -63,6 +64,7 @@ namespace Return.Web {
                     }
 
                     cfg.AddOperatingSpecificConfigurationFolders();
+                    cfg.AddEnvironmentVariables();
                 })
                 .ConfigureLogging((wc, logging) => {
                     IWebHostEnvironment env = wc.HostingEnvironment;

@@ -5,11 +5,6 @@
 @inject ILogger<NextStageInvocationForm<TModel>> Logger
 
 @* Fix up when blazor supports type param constraints: https://github.com/aspnet/AspNetCore/issues/8433 *@
-@if (this.Model == null)
-{
-    return;
-}
-
 @if (ShowErrorMessage)
 {
     <ErrorMessage Text="Something went wrong executing your command. Please try again." />
