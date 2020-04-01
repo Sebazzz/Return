@@ -435,10 +435,10 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.0.0.tgz#23c0df14f6a88077f5f986c0d167ec03c3d5537c"
   integrity sha512-Phlt0plgpIIBOGTT/ehfFnbNlfsDEiqmzE2KRXoX1bLIlir4X/MR+zSyBEkL05ffWgnRSf/DXv+WrUAVr93/ow==
 
-blazor.polyfill@^3.0.7:
-  version "3.0.7"
-  resolved "https://registry.yarnpkg.com/blazor.polyfill/-/blazor.polyfill-3.0.7.tgz#81014688442e6fc031135c8fc5674fbf808016f9"
-  integrity sha512-ymnuySZy6UcGYwY4VWXWvCD9cIw8lK8zK13zGE2KNH76ghyr72vwFuhBvD08ypMG4+YVDlRmRv3bpUeXzMpQyQ==
+blazor.polyfill@^3.0.8:
+  version "3.0.8"
+  resolved "https://registry.yarnpkg.com/blazor.polyfill/-/blazor.polyfill-3.0.8.tgz#92d84d435b5d50ff9fb61eae3864ba15d86582cd"
+  integrity sha512-nUVlA1L6GSLKJXp8dSEt7yBYjNyzygoOn4AIrQUJbhvZP6nPojbbNkVjGF7hEmMNvS2nDP1gavLEOk6RU3MYfQ==
 
 block-stream@*:
   version "0.0.9"
