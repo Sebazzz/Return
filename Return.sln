@@ -47,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{D6A25E
 		.gitignore = .gitignore
 		.prettierrc = .prettierrc
 		README.md = README.md
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Return.Web.Tests.Integration", "tests\Return.Web.Tests.Integration\Return.Web.Tests.Integration.csproj", "{D120FE6A-74F8-474E-9654-FC4E1CCD2B9E}"
