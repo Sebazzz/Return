@@ -76,7 +76,7 @@ namespace Return.Web.Components {
         public RetrospectiveLane Lane { get; set; }
 
         [Parameter]
-        public int Order {get;set;}
+        public int Order { get; set; }
 
         [CascadingParameter]
         public CurrentParticipantModel CurrentParticipant { get; set; }
@@ -298,6 +298,11 @@ namespace Return.Web.Components {
             });
 
             return Task.CompletedTask;
+        }
+
+        protected override void OnAfterRender(bool firstRender) {
+            // Reset last added note - this prevents refocus if someone else adds a new note in a different lane even
+            this.LastAddedNote = null;
         }
 
         protected void OnNoteDeletedCallback(RetrospectiveNote note) {
