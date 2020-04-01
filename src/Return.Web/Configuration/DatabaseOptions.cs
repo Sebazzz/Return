@@ -7,6 +7,7 @@
 
 namespace Return.Web.Configuration {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Microsoft.Data.SqlClient;
     using Microsoft.Data.Sqlite;
     using Persistence;
