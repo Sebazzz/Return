@@ -16,7 +16,7 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
 
     <!--Scrutor provides decorator abilities for IServiceCollection -->
-    <PackageReference Include="Scrutor" Version="3.2.0" />
+    <PackageReference Include="Scrutor" Version="3.2.1" />
   </ItemGroup>
 
   <ItemGroup>
