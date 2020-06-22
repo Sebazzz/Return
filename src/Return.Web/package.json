@@ -8,7 +8,7 @@
     "private": true,
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.12.1",
-        "autoprefixer": "^9.7.6",
+        "autoprefixer": "^9.8.2",
         "bulma": "^0.8.0",
         "husky": "^4.2.5",
         "node-sass": "^4.13.1",
