@@ -7,7 +7,7 @@
     "license": "GPLv3",
     "private": true,
     "devDependencies": {
-        "@fortawesome/fontawesome-free": "^5.12.1",
+        "@fortawesome/fontawesome-free": "^5.14.0",
         "autoprefixer": "^9.7.6",
         "bulma": "^0.8.0",
         "husky": "^4.2.5",
