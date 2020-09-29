@@ -9,7 +9,7 @@
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.12.1",
         "autoprefixer": "^9.7.6",
-        "bulma": "^0.8.0",
+        "bulma": "^0.9.1",
         "husky": "^4.2.5",
         "node-sass": "^4.13.1",
         "postcss-cli": "^7.1.0",
