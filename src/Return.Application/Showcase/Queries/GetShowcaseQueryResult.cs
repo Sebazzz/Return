@@ -50,7 +50,7 @@ namespace Return.Application.Showcase.Queries {
         }
 
         private sealed class ShowcaseItemRelationalComparer : IComparer<ShowcaseItem> {
-            public int Compare(ShowcaseItem x, ShowcaseItem y) {
+            public int Compare(ShowcaseItem? x, ShowcaseItem? y) {
                 if (x == null) throw new ArgumentNullException(nameof(x));
                 if (y == null) throw new ArgumentNullException(nameof(y));
 
