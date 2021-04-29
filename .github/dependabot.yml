@@ -1,0 +1,42 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/src/Return.Web"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  target-branch: develop
+  ignore:
+  - dependency-name: Nerdbank.GitVersioning
+    versions:
+    - 3.3.37
+    - 3.4.190
+  - dependency-name: Microsoft.EntityFrameworkCore.Design
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Microsoft.EntityFrameworkCore.Sqlite
+    versions:
+    - 5.0.2
+    - 5.0.3
+    - 5.0.4
+  - dependency-name: Blazored.FluentValidation
+    versions:
+    - 1.3.2
+    - 1.4.1
+- package-ecosystem: npm
+  directory: "/src/Return.Web"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  target-branch: develop
+  ignore:
+  - dependency-name: "@fortawesome/fontawesome-free"
+    versions:
+    - 5.15.2
+  - dependency-name: lodash
+    versions:
+    - 4.17.20
