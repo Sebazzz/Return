@@ -13,7 +13,7 @@
         "husky": "^4.2.5",
         "node-sass": "^4.13.1",
         "postcss-cli": "^7.1.0",
-        "prettier": "^1.19.1",
+        "prettier": "^2.3.0",
         "pretty-quick": "^2.0.1"
     },
     "scripts": {
