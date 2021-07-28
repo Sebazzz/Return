@@ -38,7 +38,7 @@
 
     <!-- Git versioning -->
     <ItemGroup>
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37">
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.228">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>
