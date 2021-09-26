@@ -14,7 +14,7 @@
         "node-sass": "^4.13.1",
         "postcss-cli": "^7.1.0",
         "prettier": "^1.19.1",
-        "pretty-quick": "^2.0.1"
+        "pretty-quick": "^2.0.2"
     },
     "scripts": {
         "build": "gulp build",
