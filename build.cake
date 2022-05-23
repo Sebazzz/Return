@@ -128,27 +128,17 @@ Task("Restore-NuGet-Packages")
 
 Task("Generate-MigrationScript")
 	.Does(() => {
-		string workingDirectory = System.Environment.CurrentDirectory;
-		
-		// Work around the fact that Cake is not applying the working directory to the dotnet core executable
-		try {
-			System.Environment.CurrentDirectory = MakeAbsolute(persistenceProjectPath).ToString();
-			
-			DotNetTool(
-				$"{baseName}.Persistence.csproj", 
-				"ef", 
-				new ProcessArgumentBuilder()
-					.Append("migrations")
-					.Append("script")
-					.Append("-o ../../build/publish/MigrationScript.sql"), 
-				new DotNetToolSettings  {
-					WorkingDirectory = persistenceProjectPath, 
-					DiagnosticOutput = true
-				});
-		} finally {
-			System.Environment.CurrentDirectory = workingDirectory;
-		}
-	
+		DotNetTool(
+			$"{baseName}.Persistence.csproj", 
+			"ef", 
+			new ProcessArgumentBuilder()
+				.Append("migrations")
+				.Append("script")
+				.Append("-o ../../build/publish/MigrationScript.sql"), 
+			new DotNetToolSettings  {
+				WorkingDirectory = persistenceProjectPath, 
+				DiagnosticOutput = true
+			});
 	}
 );
 
