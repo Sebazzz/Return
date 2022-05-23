@@ -13,7 +13,7 @@ namespace Return.Common {
         public static IServiceCollection ChainInterfaceImplementation<TInterface, TImplementor>(this IServiceCollection services) where TInterface : class where TImplementor : TInterface {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddScoped<TInterface>(implementationFactory: provider => provider.GetService<TImplementor>());
+            return services.AddScoped<TInterface>(implementationFactory: provider => provider.GetRequiredService<TImplementor>());
         }
 
     }

@@ -63,7 +63,7 @@ namespace Return.Web.Services {
 
             var identity = new ClaimsIdentity();
             identity.AddClaim(new Claim(ParticipantClaimType, participantId.ToString(Culture.Invariant), participantId.GetType().FullName));
-            identity.AddClaim(new Claim(ParticipantNameClaimType, name, typeof(string).FullName));
+            identity.AddClaim(new Claim(ParticipantNameClaimType, name ?? "", typeof(string).FullName));
             if (isFacilitator) {
                 identity.AddClaim(new Claim(FacilitatorClaimType, FacilitatorClaimContent, FacilitatorClaimContent.GetType().FullName));
             }

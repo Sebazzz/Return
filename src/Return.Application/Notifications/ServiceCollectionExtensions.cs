@@ -32,7 +32,7 @@ namespace Return.Application.Notifications {
             }
 
             // Register services:
-            object ImplementationFactory(IServiceProvider sp) => sp.GetService(dispatcherType);
+            object ImplementationFactory(IServiceProvider sp) => sp.GetRequiredService(dispatcherType);
 
             // 1. The dispatcher itself
             services.AddSingleton(dispatcherType);

@@ -58,12 +58,11 @@ namespace Return.Application.Votes.Commands {
                 throw new NotFoundException(nameof(NoteGroup), noteGroupId);
             }
 
-            NoteVote vote = await (mutationType switch
-            {
-                VoteMutationType.Added => this.HandleNoteGroupVoteAdd(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
-                VoteMutationType.Removed => this.HandleNoteGroupVoteRemove(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
+            NoteVote? vote = mutationType switch {
+                VoteMutationType.Added => await this.HandleNoteGroupVoteAdd(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
+                VoteMutationType.Removed => await this.HandleNoteGroupVoteRemove(noteGroup: noteGroup, dbContext: dbContext, cancellationToken: cancellationToken),
                 _ => throw new InvalidOperationException("Invalid vote mutation type: " + mutationType)
-            });
+            };
 
             if (vote == null) {
                 return Unit.Value;
@@ -126,12 +125,12 @@ namespace Return.Application.Votes.Commands {
                 throw new NotFoundException(nameof(Note), noteId);
             }
 
-            NoteVote vote = await (mutationType switch
+            NoteVote? vote = mutationType switch
             {
-                VoteMutationType.Added => this.HandleNoteVoteAdd(note, dbContext: dbContext, cancellationToken: cancellationToken),
-                VoteMutationType.Removed => this.HandleNoteVoteRemove(note, dbContext: dbContext, cancellationToken: cancellationToken),
+                VoteMutationType.Added => await this.HandleNoteVoteAdd(note, dbContext: dbContext, cancellationToken: cancellationToken),
+                VoteMutationType.Removed => await this.HandleNoteVoteRemove(note, dbContext: dbContext, cancellationToken: cancellationToken),
                 _ => throw new InvalidOperationException("Invalid vote mutation type: " + mutationType)
-            });
+            };
 
             if (vote == null) {
                 return Unit.Value;
