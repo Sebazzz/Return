@@ -147,7 +147,7 @@ namespace Return.Web.Tests.Integration.Pages {
 
             // When
             var selectList = new SelectElement(this.Page.ColorSelect);
-            Assert.That(() => selectList.Options.Select(x => x.GetProperty("value")).Where(x => !String.IsNullOrEmpty(x)), Is.EquivalentTo(availableColors.Select(x => "#" + x.HexString)).Retry(),
+            Assert.That(() => selectList.Options.Select(x => x.GetDomProperty("value")).Where(x => !String.IsNullOrEmpty(x)), Is.EquivalentTo(availableColors.Select(x => "#" + x.HexString)).Retry(),
                 "Cannot find all available colors in the selection list");
             selectList.SelectByValue("#" + colorToSelect.HexString);
 

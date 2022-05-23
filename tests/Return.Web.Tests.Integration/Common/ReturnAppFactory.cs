@@ -8,14 +8,17 @@
 namespace Return.Web.Tests.Integration.Common {
     using System;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
     using Domain.Abstractions;
     using Microsoft.Data.Sqlite;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Win32;
     using NUnit.Framework;
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
+    using OpenQA.Selenium.Edge;
     using OpenQA.Selenium.Support.Events;
     using Persistence;
     using WebDriverManager;
@@ -43,19 +46,25 @@ namespace Return.Web.Tests.Integration.Common {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
         private IWebDriver CreateWebDriver() {
-            new DriverManager().SetUpDriver(new ChromeConfig());
+            new DriverManager().SetUpDriver(new EdgeConfig());
 
-            var webDriverOptions = new ChromeOptions {
+            EdgeOptions webDriverOptions = new() {
                 PageLoadStrategy = PageLoadStrategy.Normal,
                 AcceptInsecureCertificates = true,
             };
 
-            if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
-                TestContext.WriteLine("Going to run Chrome headless");
-                webDriverOptions.AddArguments("--headless");
+            // Take the correct browser
+            string binaryLocation = OperatingSystem.IsWindows() ? Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe", "", "")?.ToString() : null;
+            if (!String.IsNullOrEmpty(binaryLocation) && File.Exists(binaryLocation)) {
+                webDriverOptions.BinaryLocation = binaryLocation;
             }
 
-            var webDriver = new ChromeDriver(webDriverOptions);
+            if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
+                TestContext.WriteLine("Going to run Chrome headless");
+                webDriverOptions.AddArgument("--headless");
+            }
+
+            var webDriver = new EdgeDriver(webDriverOptions);
 
             var window = webDriver.Manage().Window;
             try {
@@ -100,8 +109,8 @@ namespace Return.Web.Tests.Integration.Common {
             wrapper.FindElementCompleted += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element completed - {args.FindMethod}"));
             wrapper.Navigating += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigating - {args.Url}"), "navigate");
             wrapper.Navigated += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigated - {args.Url}"), "navigate");
-            wrapper.ElementValueChanging += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changing - {args.Element.TagName} [{args.Element.GetProperty("outerHTML")}]"));
-            wrapper.ElementValueChanged += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changed - {args.Element.TagName} [{args.Element.GetProperty("outerHTML")}]"));
+            wrapper.ElementValueChanging += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changing - {args.Element.TagName} [{args.Element.GetDomProperty("outerHTML")}]"));
+            wrapper.ElementValueChanged += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changed - {args.Element.TagName} [{args.Element.GetDomProperty("outerHTML")}]"));
 
             return wrapper;
         }
