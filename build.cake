@@ -1,9 +1,9 @@
-#addin nuget:?package=Cake.Compression&version=0.2.4
-#addin nuget:?package=SharpZipLib&version=1.2.0
-#addin nuget:?package=Cake.GitVersioning&version=3.3.37
-#addin nuget:?package=Cake.Codecov&version=0.8.0
-#addin nuget:?package=Cake.Coverlet&version=2.4.2
-#tool nuget:?package=Codecov&version=1.10.0
+#addin nuget:?package=Cake.Compression&version=0.3.0
+#addin nuget:?package=SharpZipLib&version=1.3.3
+#addin nuget:?package=Cake.GitVersioning&version=3.5.104
+#addin nuget:?package=Cake.Codecov&version=1.0.1
+#addin nuget:?package=Cake.Coverlet&version=2.5.4
+#tool nuget:?package=Codecov&version=1.13.0
 
 //////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -121,7 +121,7 @@ Task("Check-Yarn-Version")
 
 Task("Restore-NuGet-Packages")
     .Does(() => {
-    DotNetCoreRestore(new DotNetCoreRestoreSettings {
+    DotNetRestore(new DotNetRestoreSettings {
 		IgnoreFailedSources = true
 	});
 });
@@ -134,14 +134,14 @@ Task("Generate-MigrationScript")
 		try {
 			System.Environment.CurrentDirectory = MakeAbsolute(persistenceProjectPath).ToString();
 			
-			DotNetCoreTool(
+			DotNetTool(
 				$"{baseName}.Persistence.csproj", 
 				"ef", 
 				new ProcessArgumentBuilder()
 					.Append("migrations")
 					.Append("script")
 					.Append("-o ../../build/publish/MigrationScript.sql"), 
-				new DotNetCoreToolSettings  {
+				new DotNetToolSettings  {
 					WorkingDirectory = persistenceProjectPath, 
 					DiagnosticOutput = true
 				});
@@ -180,29 +180,29 @@ Task("Build")
     .IsDependentOn("Restore-NuGet-Packages")
     .IsDependentOn("Restore-Node-Packages")
     .Does(() => {
-        DotNetCoreBuild($"./{baseName}.sln");
+        DotNetBuild($"./{baseName}.sln");
 });
 
 Task("Run")
     .IsDependentOn("Build")
     .Does(() => {
-        DotNetCoreRun($"{baseName}.Web.csproj", null, new DotNetCoreRunSettings { WorkingDirectory = $"./src/{baseName}.Web" });
+        DotNetRun($"{baseName}.Web.csproj", null, new DotNetRunSettings { WorkingDirectory = $"./src/{baseName}.Web" });
 });
 
 void PublishSelfContained(string platform, string folder) {
 	Information("Publishing self-contained for platform {0}", platform);
 
-	var settings = new DotNetCorePublishSettings
+	var settings = new DotNetPublishSettings
 	 {
 		 Configuration = configuration,
 		 OutputDirectory = publishDir + Directory(folder ?? platform),
 		 Runtime = platform,
-		 MSBuildSettings = new DotNetCoreMSBuildSettings {
+		 MSBuildSettings = new DotNetMSBuildSettings {
 			MaxCpuCount = AppVeyor.IsRunningOnAppVeyor ? (int?) 1 : null
 		 }
 	 };
 	
-    DotNetCorePublish($"./src/{baseName}.Web/{baseName}.Web.csproj", settings);
+    DotNetPublish($"./src/{baseName}.Web/{baseName}.Web.csproj", settings);
 }
 
 Task("Run-FrontendBuild")
@@ -383,6 +383,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 													  .Append("--logger:\"console;verbosity=normal;noprogress=true\"") 
 			};
 
+			// Note: Alias is obsolete, but Cake.CodeCov has not been updated a while
 			if (!useCodeCoverage) {
 				DotNetCoreTest(testPath, testSettings);
 			} else {
