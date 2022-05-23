@@ -7,11 +7,11 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                os: [windows-2019, ubuntu-16.04]
+                os: [windows-2019, ubuntu-22.04]
                 include:
                     - os: windows-2019
                       script_name: .\build.cmd
-                    - os: ubuntu-16.04
+                    - os: ubuntu-22.04
                       script_name: ./build.sh
         steps:
             - name: checkout
@@ -22,10 +22,10 @@ jobs:
               with:
                   node-version: '10.x'
 
-            - name: Install .NET 3.x SDK for build
+            - name: Install .NET 6.x SDK for build
               uses: actions/setup-dotnet@v1
               with:
-                  dotnet-version: '3.1.103'
+                  dotnet-version: '6.0.300'
 
             - name: Output important software versions (node)
               run: node --version
