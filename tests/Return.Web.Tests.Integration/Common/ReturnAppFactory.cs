@@ -18,6 +18,8 @@ namespace Return.Web.Tests.Integration.Common {
     using OpenQA.Selenium.Chrome;
     using OpenQA.Selenium.Support.Events;
     using Persistence;
+    using WebDriverManager;
+    using WebDriverManager.DriverConfigs.Impl;
 
     public sealed class ReturnAppFactory : CustomWebApplicationFactory<Startup> {
         private WebDriverPool _webDriverPool;
@@ -41,6 +43,8 @@ namespace Return.Web.Tests.Integration.Common {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
         private IWebDriver CreateWebDriver() {
+            new DriverManager().SetUpDriver(new ChromeConfig());
+
             var webDriverOptions = new ChromeOptions {
                 PageLoadStrategy = PageLoadStrategy.Normal,
                 AcceptInsecureCertificates = true,
