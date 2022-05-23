@@ -28,7 +28,7 @@ namespace Return.Domain.Services {
             if (passphrase == null) throw new ArgumentNullException(nameof(passphrase));
             if (String.IsNullOrEmpty(passphrase)) throw new ArgumentException("Empty passphrase not allowed", nameof(passphrase));
 
-            using var sha256 = new SHA256Managed();
+            using var sha256 = SHA256.Create();
 
             byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(passphrase));
             var sb = new StringBuilder(hash.Length * 2);
