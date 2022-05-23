@@ -8,22 +8,18 @@ function ensure_success {
 	fi
 }
 
-echo "Installing Chromium prerequisites..."
+echo "Installing Edge prerequisites..."
 apt-get -qqy update
 apt-get -qqy install lsb-release libappindicator3-1
 ensure_success
 
-echo "Downloading Chromium debian package..."
-curl -L -o google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+echo "Downloading MS Edge debian package..."
+curl -L -o msedge.deb http://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_100.0.1185.29-1_amd64.deb
 ensure_success
 
-echo "Installing Chromium debian package..."
-apt -y install ./google-chrome.deb
-ensure_success
-
-echo "Patching for running Chromium without sandbox"
-sed -i 's|HERE/chrome"|HERE/chrome" --no-sandbox|g' /opt/google/chrome/google-chrome
+echo "Installing MS Edge debian package..."
+apt -y install ./msedge.deb
 ensure_success
 
 echo "Clean-up"
-rm google-chrome.deb
+rm msedge.deb
