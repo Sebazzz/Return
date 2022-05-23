@@ -1,5 +1,5 @@
 ### BUILD
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1.201 AS build-env
+FROM mcr.microsoft.com/dotnet/core/sdk:5.0.17 AS build-env
 WORKDIR /source
 
 # Prerequisites
@@ -59,7 +59,7 @@ COPY . .
 RUN ./build.sh --target=Publish-Ubuntu-18.04-x64 --publish-dir=publish --verbosity=verbose --skip-compression=true
 
 ### RUNTIME IMAGE
-FROM mcr.microsoft.com/dotnet/core/runtime-deps:3.1
+FROM mcr.microsoft.com/dotnet/core/runtime-deps:5.0
 WORKDIR /app
 
 # ... Run libgdi install
