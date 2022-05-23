@@ -48,6 +48,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
                     new Participant {Name = "Jane", Color = Color.Aqua},
                 },
                 HashedPassphrase = "abef",
+                FacilitatorHashedPassphrase = "abc",
                 CurrentStage = RetrospectiveStage.Writing,
                 Notes =
                 {
@@ -95,6 +96,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
                     new Participant {Name = "Jane", Color = Color.Aqua},
                 },
                 HashedPassphrase = "abef",
+                FacilitatorHashedPassphrase = "abc",
                 CurrentStage = RetrospectiveStage.Discuss,
                 Notes =
                 {

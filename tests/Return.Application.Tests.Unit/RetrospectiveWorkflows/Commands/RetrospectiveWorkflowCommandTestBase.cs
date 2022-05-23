@@ -34,6 +34,7 @@ namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
                     new Participant { Name = "John", Color = Color.BlueViolet },
                     new Participant { Name = "Jane", Color = Color.Aqua },
                 },
+                FacilitatorHashedPassphrase = "abef",
                 HashedPassphrase = "abef",
                 CurrentStage = RetrospectiveStage.NotStarted
             };

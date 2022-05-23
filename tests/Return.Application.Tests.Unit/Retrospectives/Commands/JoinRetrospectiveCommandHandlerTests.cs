@@ -39,6 +39,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
                     new Participant {Name = "John", Color = Color.BlueViolet},
                     new Participant {Name = "Jane", Color = Color.Aqua},
                 },
+                FacilitatorHashedPassphrase = "abc",
                 HashedPassphrase = "abef"
             };
 

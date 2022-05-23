@@ -32,6 +32,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
                     new Participant {Name = "John", Color = Color.BlueViolet},
                     new Participant {Name = "Jane", Color = Color.Aqua},
                 },
+                FacilitatorHashedPassphrase = "abc",
                 HashedPassphrase = "abef"
             };
             this._retro1Id = retro.UrlId.StringId;
@@ -45,6 +46,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Commands {
                     new Participant {Name = "Foo", Color = Color.BlueViolet},
                     new Participant {Name = "Baz", Color = Color.Aqua},
                 },
+                FacilitatorHashedPassphrase = "abef",
                 HashedPassphrase = "abef"
             };
             this._retro2Id = retro2.UrlId.StringId;

@@ -38,6 +38,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
                     new Participant { Name = "John", Color = Color.BlueViolet },
                     new Participant { Name = "Jane", Color = Color.Aqua },
                 },
+                FacilitatorHashedPassphrase = "abef",
                 HashedPassphrase = "abef",
                 CurrentStage = RetrospectiveStage.Writing
             };

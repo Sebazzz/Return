@@ -37,6 +37,7 @@ namespace Return.Application.Tests.Unit.Retrospectives.Queries {
             var retrospective = new Retrospective {
                 Title = "Hello",
                 CreationTimestamp = DateTimeOffset.Now,
+                FacilitatorHashedPassphrase = "hello",
                 HashedPassphrase = "hello"
             };
             string retroId = retrospective.UrlId.StringId;
