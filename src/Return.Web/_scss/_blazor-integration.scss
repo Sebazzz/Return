@@ -14,5 +14,5 @@
 }
 
 .navbar-item.active {
-    @extend .navbar-item.is-active;
+    @extend .navbar-item, .is-active;
 }

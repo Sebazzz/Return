@@ -10,11 +10,16 @@
         "@fortawesome/fontawesome-free": "^5.12.1",
         "autoprefixer": "^9.7.6",
         "bulma": "^0.8.0",
+        "gulp": "^4.0.2",
+        "gulp-autoprefixer": "^8.0.0",
+        "gulp-cli": "^2.3.0",
+        "gulp-dart-sass": "^1.0.2",
         "husky": "^4.2.5",
-        "node-sass": "^4.13.1",
-        "postcss-cli": "^7.1.0",
+        "postcss": "8.4.12",
+        "postcss-cli": "^9.1.0",
         "prettier": "^1.19.1",
-        "pretty-quick": "^2.0.1"
+        "pretty-quick": "^2.0.1",
+        "sass": "^1.49.9"
     },
     "scripts": {
         "build": "gulp build",
@@ -28,10 +33,6 @@
         }
     },
     "dependencies": {
-        "blazor.polyfill": "^3.0.8",
-        "gulp": "^4.0.2",
-        "gulp-autoprefixer": "^7.0.1",
-        "gulp-cli": "^2.2.0",
-        "gulp-sass": "^4.0.2"
+        "blazor.polyfill": "^3.0.8"
     }
 }

@@ -2,15 +2,22 @@
 'use strict';
 
 const gulp = require('gulp');
-const sass = require('gulp-sass');
+const dartSass = require('gulp-dart-sass');
 const autoprefixer = require('gulp-autoprefixer');
 
-sass.compiler = require('node-sass');
+const devBuild = (process.env.NODE_ENV || 'development').trim().toLowerCase() === 'development';
+const sassOptions = {
+    outputStyle: devBuild ? 'expanded' : 'compressed',
+    sourceMapEmbed: devBuild,
+    sourceMapContents: devBuild,
+    sourceMap: devBuild
+};
+dartSass.compiler = require('sass');
 
 gulp.task('sass', function() {
     return gulp
         .src('./_scss/main.scss')
-        .pipe(sass().on('error', sass.logError))
+        .pipe(dartSass(sassOptions).on('error', dartSass.logError))
         .pipe(autoprefixer({ cascade: false }))
         .pipe(gulp.dest('./wwwroot/build/css/'));
 });
