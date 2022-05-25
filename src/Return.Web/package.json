@@ -18,7 +18,7 @@
     },
     "scripts": {
         "build": "gulp build",
-        "pre-commit": "../../pre-commit",
+        "pre-commit": "pretty-quick --staged",
         "test": "echo 0",
         "watch": "gulp sass:watch"
     },
