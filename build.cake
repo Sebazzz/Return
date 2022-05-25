@@ -393,12 +393,11 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 				var jobId = EnvironmentVariable("APPVEYOR_JOB_ID");
 				var resultsType = "mstest"; // trx is vstest format
 				
-				var wc = new System.Net.WebClient();
 				var url = $"https://ci.appveyor.com/api/testresults/{resultsType}/{jobId}";
 				var fullTestResultsPath = logFilePath.FullPath;
 				
 				Information("Uploading test results from {0} to {1}", fullTestResultsPath, url);
-				wc.UploadFile(url, fullTestResultsPath);
+				UploadFile(url, fullTestResultsPath);
 			}
 
 			if (useCodeCoverage) {
