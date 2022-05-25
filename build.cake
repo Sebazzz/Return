@@ -439,7 +439,7 @@ Task("Test-PreReq-DownloadMSEdgeDriver")
 	var driverDirectory = buildDir + Directory("edgedriver");
 	
 	CreateDirectory(driverDirectory);
-	RunCmd("curl -L -o build/msedgedriver.zip \"https://msedgedriver.azureedge.net/$(microsoft-edge-stable --version | egrep -oih '([0-9]+\.?)+')/edgedriver_linux64.zip\"");
+	RunCmd(@"curl -L -o build/msedgedriver.zip ""https://msedgedriver.azureedge.net/$(microsoft-edge-stable --version | egrep -oih '([0-9]+\.?)+')/edgedriver_linux64.zip""");
 	ZipUncompress("build/msedgedriver.zip", driverDirectory);
 	
 	var edgeDriverDirectory = MakeAbsolute(driverDirectory);
