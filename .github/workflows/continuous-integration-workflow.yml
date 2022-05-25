@@ -20,7 +20,7 @@ jobs:
             - name: Download and install node.js
               uses: actions/setup-node@v1
               with:
-                  node-version: '10.x'
+                  node-version: '14.x'
 
             - name: Install Microsoft Edge (Ubuntu)
               if: matrix.os == 'ubuntu-22.04'
