@@ -1,5 +1,5 @@
 version: 2.0.0.{build}
-image: Visual Studio 2019
+image: Visual Studio 2022
 dotnet_csproj:
     patch: true
     file: '**\*.csproj'
@@ -11,7 +11,7 @@ dotnet_csproj:
 install:
     - ps: Install-Product node LTS x64
     - choco install firefox
-    - choco install googlechrome
+    - choco install microsoft-edge
 cache: '%LOCALAPPDATA%\Yarn'
 environment:
     RETURN_TEST_WAIT_TIME: 30
