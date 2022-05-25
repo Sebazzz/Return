@@ -111,7 +111,7 @@ int StartProjectDirProcess(string processCommandLine) {
 	
 Task("Check-Node-Version")
 	.Does(() => {
-	CheckToolVersion("node.js", "node", "--version", new Version(10,16,0));
+	CheckToolVersion("node.js", "node", "--version", new Version(14,0,0));
 });
 
 Task("Check-Yarn-Version")
