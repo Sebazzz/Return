@@ -439,10 +439,10 @@ Task("Test-PreReq-DownloadMSEdgeDriver")
 	var driverDirectory = buildDir + Directory("edgedriver");
 	
 	CreateDirectory(driverDirectory);
-	var tempFile = DownloadFile("https://www.nuget.org/api/v2/package/Selenium.WebDriver.MSEdgeDriver/101.0.1210.47");
-	ZipUncompress(tempFile, driverDirectory);
+	RunCmd("curl -L -o build/msedgedriver.zip \"https://msedgedriver.azureedge.net/$(microsoft-edge-stable --version | egrep -oih '([0-9]+\.?)+')/edgedriver_linux64.zip\"");
+	ZipUncompress("build/msedgedriver.zip", driverDirectory);
 	
-	var edgeDriverDirectory = MakeAbsolute(driverDirectory + Directory("driver/linux64"));
+	var edgeDriverDirectory = MakeAbsolute(driverDirectory);
 	
 	System.Environment.SetEnvironmentVariable("PATH",
 		edgeDriverDirectory.ToString() + System.IO.Path.PathSeparator + EnvironmentVariable("PATH"));
