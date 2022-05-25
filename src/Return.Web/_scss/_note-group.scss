@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .note-group {
     margin-bottom: 2rem;
 
@@ -33,7 +35,7 @@
     $max-notes-count: 30;
 
     @for $idx from 1 through $max-notes-count {
-        $idx-scale: 1 - (($idx - 1) / 10);
+        $idx-scale: 1 - math.div($idx - 1, 10);
         $z-index: $max-notes-count - $idx;
 
         &__item:nth-child(#{$idx}) {

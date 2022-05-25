@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // VARS
 @import '_variables';
 // mixins
@@ -126,7 +128,7 @@
     // loop to rotate all 100 circles
     @for $i from 1 through 100 {
         &.p#{$i} .bar {
-            $degs: (360/100 * $i);
+            $degs: (math.div(360, 100) * $i);
             @include rotate(#{$degs}deg);
         }
     }
