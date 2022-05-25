@@ -434,7 +434,7 @@ TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration");
 Task("Test-PreReq-DownloadMSEdgeDriver")
     .Description("Download MS Edge driver for Linux")
 	.IsDependeeOf("Test-CS-Integration-Web")
-	//.WithCriteria(isUnix)
+	.WithCriteria(isUnix)
 	.Does(() => {
 	var driverDirectory = buildDir + Directory("edgedriver");
 	
