@@ -54,11 +54,6 @@ namespace Return.Web.Tests.Integration.Common {
             };
 
             // Take the correct browser
-            string binaryLocation = OperatingSystem.IsWindows() ? Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\msedge.exe", "", "")?.ToString() : null;
-            if (!String.IsNullOrEmpty(binaryLocation) && File.Exists(binaryLocation)) {
-                webDriverOptions.BinaryLocation = binaryLocation;
-            }
-
             if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
                 TestContext.WriteLine("Going to run Chrome headless");
                 webDriverOptions.AddArgument("--headless");
