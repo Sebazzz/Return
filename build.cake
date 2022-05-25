@@ -431,6 +431,25 @@ TestTask("Unit-Domain", $"{baseName}.Domain.Tests.Unit");
 TestTask("Unit-Web", $"{baseName}.Web.Tests.Unit");
 TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration");
 
+Task("Test-PreReq-DownloadMSEdgeDriver")
+    .Description("Download MS Edge driver for Linux")
+	.IsDependeeOf("Test-CS-Integration-Web")
+	//.WithCriteria(isUnix)
+	.Does(() => {
+	var driverDirectory = buildDir + Directory("edgedriver");
+	
+	CreateDirectory(driverDirectory);
+	var tempFile = DownloadFile("https://www.nuget.org/api/v2/package/Selenium.WebDriver.MSEdgeDriver/101.0.1210.47");
+	ZipUncompress(tempFile, driverDirectory);
+	
+	var edgeDriverDirectory = MakeAbsolute(driverDirectory + Directory("driver/linux64"));
+	
+	System.Environment.SetEnvironmentVariable("PATH",
+		edgeDriverDirectory.ToString() + System.IO.Path.PathSeparator + EnvironmentVariable("PATH"));
+	
+	RunCmd($"chmod +x {edgeDriverDirectory}/*");
+});
+
 Task("Test-CS")
     .Description("Test backend-end compiled code");
 
