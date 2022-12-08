@@ -39,7 +39,6 @@ using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
-    private WebDriverPool _webDriverPool;
     private IWebHost _webHost;
 
     /// <summary>
@@ -49,16 +48,11 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     private SqliteConnection _sqliteConnection;
 
     public ReturnAppFactory() {
-        this._webDriverPool = new WebDriverPool(this.CreateWebDriver);
-        
         this._sqliteConnection = new SqliteConnection(this.ConnectionString);
         this._sqliteConnection.Open();
     }
 
-
-    public WebDriverContainer GetWebDriver() => new(this._webDriverPool.Get(), this);
-
-    internal void Return(IWebDriver webDriver) => this._webDriverPool.Return(webDriver);
+    public IWebDriver GetWebDriver() => this.CreateWebDriver();
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "API consistency / design")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
@@ -283,9 +277,6 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
             this._webHost?.Dispose();
             this._sqliteConnection?.Dispose();
             this._sqliteConnection = null;
-
-            this._webDriverPool?.Dispose();
-            this._webDriverPool = null;
         }
     }
 }

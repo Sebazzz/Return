@@ -13,14 +13,14 @@ using OpenQA.Selenium;
 
 public abstract class PageObject : IPageObject {
     private bool _ownsWebdriver;
-    private WebDriverContainer _webDriverContainer;
+    private IWebDriver _webDriverContainer;
 
-    public IWebDriver WebDriver => this._webDriverContainer?.WebDriver;
+    public IWebDriver WebDriver => this._webDriverContainer;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
         "CA1033:Interface methods should be callable by child types",
         Justification = "Not necessary for testing framework")]
-    void IPageObject.SetWebDriver(WebDriverContainer webDriver) {
+    void IPageObject.SetWebDriver(IWebDriver webDriver) {
         this._webDriverContainer = webDriver;
         this._ownsWebdriver = true;
     }
@@ -52,7 +52,7 @@ public abstract class PageObject : IPageObject {
 }
 
 public interface IPageObject : IDisposable {
-    void SetWebDriver(WebDriverContainer webDriver);
+    void SetWebDriver(IWebDriver webDriver);
 
     IWebDriver WebDriver { get; }
 }
