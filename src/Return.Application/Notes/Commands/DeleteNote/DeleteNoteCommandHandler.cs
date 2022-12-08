@@ -33,7 +33,7 @@ namespace Return.Application.Notes.Commands.DeleteNote {
             using IReturnDbContext dbContext = this._returnDbContextFactory.CreateForEditContext();
 
             // Get
-            Note note = await dbContext.Notes.Include(x => x.Lane).Include(x => x.Retrospective).FirstOrDefaultAsync(x => x.Id == request.NoteId && x.Retrospective.UrlId.StringId == request.RetroId, cancellationToken);
+            Note? note = await dbContext.Notes.Include(x => x.Lane).Include(x => x.Retrospective).FirstOrDefaultAsync(x => x.Id == request.NoteId && x.Retrospective.UrlId.StringId == request.RetroId, cancellationToken);
 
             if (note == null) {
                 throw new NotFoundException(nameof(Note), request.NoteId);

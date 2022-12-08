@@ -1,14 +1,10 @@
 ### BUILD
-FROM mcr.microsoft.com/dotnet/sdk:6.0.300 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:7.0.100 AS build-env
 WORKDIR /source
 
 # Prerequisites
 COPY utils/* utils/
 RUN utils/install-all-prereqs.sh
-
-# ... libgit2sharp debian 10.x support
-RUN dotnet tool install -g GitVersion.Tool --version 5.2.4
-ENV LD_LIBRARY_PATH=/root/.dotnet/tools/.store/gitversion.tool/5.2.4/gitversion.tool/5.2.4/tools/netcoreapp3.1/any/runtimes/debian.9-x64/native/
 
 # Copy csproj and restore as distinct layers
 # ... sources
@@ -59,7 +55,7 @@ COPY . .
 RUN ./build.sh --target=Publish-Ubuntu-22.04-x64 --publish-dir=publish --verbosity=verbose --skip-compression=true
 
 ### RUNTIME IMAGE
-FROM mcr.microsoft.com/dotnet/runtime-deps:6.0
+FROM mcr.microsoft.com/dotnet/runtime-deps:7.0
 WORKDIR /app
 
 # ... Run libgdi install

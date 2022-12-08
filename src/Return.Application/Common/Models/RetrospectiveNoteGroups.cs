@@ -23,7 +23,8 @@ namespace Return.Application.Common.Models {
         public void Mapping(Profile profile) {
             if (profile == null) throw new ArgumentNullException(nameof(profile));
 
-            profile.CreateMap<NoteGroup, RetrospectiveNoteGroup>();
+            profile.CreateMap<NoteGroup, RetrospectiveNoteGroup>()
+                .ForMember(m => m.Notes, m => m.Ignore());
 
             ICollection<RetrospectiveNoteGroup> GroupNotes(ICollection<RetrospectiveNote> notes, ICollection<RetrospectiveNoteGroup> groups) {
                 var grouped = notes.GroupBy(x => x.GroupId.GetValueOrDefault()).Join(groups, g => g.Key, g => g.Id, (rg, g) => new { NoteGroup = g, Note = rg });

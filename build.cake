@@ -1,8 +1,8 @@
 #addin nuget:?package=Cake.Compression&version=0.3.0
-#addin nuget:?package=SharpZipLib&version=1.3.3
-#addin nuget:?package=Cake.GitVersioning&version=3.5.104
+#addin nuget:?package=SharpZipLib&version=1.4.1
+#addin nuget:?package=Cake.GitVersioning&version=3.5.119
 #addin nuget:?package=Cake.Codecov&version=1.0.1
-#addin nuget:?package=Cake.Coverlet&version=2.5.4
+#addin nuget:?package=Cake.Coverlet&version=3.0.4
 #tool nuget:?package=Codecov&version=1.13.0
 
 //////////////////////////////////////////////////////////////////////
@@ -367,7 +367,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 			System.Environment.SetEnvironmentVariable("TEST_ARTIFACT_DIR", MakeAbsolute(testArtifactsDir).ToString());
 	
 			var testPath = $"./tests/{projectName}/{projectName}.csproj";
-			var testSettings = new DotNetCoreTestSettings {
+			var testSettings = new DotNetTestSettings {
 				Configuration = configuration,
 				ArgumentCustomization = (args) => args.AppendQuoted($"--logger:trx;LogFileName={logFilePath}")
 													  .Append("--logger:\"console;verbosity=normal;noprogress=true\"") 
@@ -375,7 +375,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 
 			// Note: Alias is obsolete, but Cake.CodeCov has not been updated a while
 			if (!useCodeCoverage) {
-				DotNetCoreTest(testPath, testSettings);
+				DotNetTest(testPath, testSettings);
 			} else {
 				var coverletSettings = new CoverletSettings {
 					CollectCoverage = true,
@@ -385,7 +385,7 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 				}.WithFilter("[Return.*.Tests.*]*")
 				 .WithFilter("[Return.Persistence]Return.Persistence.Migrations");
 
-				DotNetCoreTest(testPath, testSettings, coverletSettings);
+				DotNetTest(testPath, testSettings, coverletSettings);
 			}
 		})
 		.Finally(() => {

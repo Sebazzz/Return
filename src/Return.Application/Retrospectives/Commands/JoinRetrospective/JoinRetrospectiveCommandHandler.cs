@@ -38,7 +38,7 @@ namespace Return.Application.Retrospectives.Commands.JoinRetrospective {
 
         public async Task<ParticipantInfo> Handle(JoinRetrospectiveCommand request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
+            Retrospective? retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
 
             if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);

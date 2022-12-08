@@ -14,7 +14,7 @@ namespace Return.Application.Services {
     using Microsoft.EntityFrameworkCore;
 
     public static class RetrospectiveQueryExtensions {
-        public static Task<Retrospective> FindByRetroId(
+        public static Task<Retrospective?> FindByRetroId(
             this IQueryable<Retrospective> queryable,
             string retroIdentifier,
             CancellationToken cancellationToken
@@ -22,6 +22,17 @@ namespace Return.Application.Services {
             if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
 
             return queryable.FirstOrDefaultAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
+                cancellationToken: cancellationToken);
+        }
+
+        public static Task<Retrospective> FindRequiredByRetroId(
+            this IQueryable<Retrospective> queryable,
+            string retroIdentifier,
+            CancellationToken cancellationToken
+        ) {
+            if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
+
+            return queryable.FirstAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
                 cancellationToken: cancellationToken);
         }
     }

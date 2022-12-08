@@ -7,17 +7,17 @@
   <Import Project="../Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.FluentValidation" Version="1.2.0" />
+    <PackageReference Include="Blazored.FluentValidation" />
 
-    <PackageReference Include="NReco.Logging.File" Version="1.0.5" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="8.6.2" />
+    <PackageReference Include="NReco.Logging.File" />
+    <PackageReference Include="FluentValidation.AspNetCore" />
 
     <!--Scrutor provides decorator abilities for IServiceCollection -->
-    <PackageReference Include="Scrutor" Version="3.2.0" />
+    <PackageReference Include="Scrutor" />
   </ItemGroup>
 
   <ItemGroup>

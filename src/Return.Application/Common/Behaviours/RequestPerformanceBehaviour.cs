@@ -14,7 +14,7 @@ namespace Return.Application.Common.Behaviours {
     using MediatR;
     using Microsoft.Extensions.Logging;
 
-    public sealed class RequestPerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> {
+    public sealed class RequestPerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> {
         private readonly ICurrentParticipantService _currentParticipantService;
         private readonly ILogger<TRequest> _logger;
         private readonly Stopwatch _timer;
@@ -31,9 +31,8 @@ namespace Return.Application.Common.Behaviours {
 
         public async Task<TResponse> Handle(
             TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next
-        ) {
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken) {
             if (next == null) throw new ArgumentNullException(nameof(next));
 
             this._timer.Start();

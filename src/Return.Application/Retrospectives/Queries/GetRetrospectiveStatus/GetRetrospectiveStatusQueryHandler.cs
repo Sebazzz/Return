@@ -28,7 +28,7 @@ namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
         public async Task<RetrospectiveStatus> Handle(GetRetrospectiveStatusQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
+            Retrospective? retrospective = await this._returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
 
             if (retrospective == null) {
                 throw new NotFoundException();

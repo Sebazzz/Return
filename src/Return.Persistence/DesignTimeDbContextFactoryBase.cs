@@ -35,7 +35,7 @@ namespace Return.Persistence {
                 .AddEnvironmentVariables()
                 .Build();
 
-            var databaseOptions = (IDatabaseOptions)configuration.GetSection("Database").Get(Type.GetType("Return.Web.Configuration.DatabaseOptions, Return.Web", true));
+            var databaseOptions = (IDatabaseOptions)configuration.GetSection("Database").Get(Type.GetType("Return.Web.Configuration.DatabaseOptions, Return.Web", true)!)!;
             string connectionString = databaseOptions.CreateConnectionString();
 
             return this.Create(connectionString);

@@ -33,7 +33,7 @@ namespace Return.Application.Votes.Queries {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
             using IReturnDbContext dbContext = this._returnDbContextFactory.CreateForEditContext();
-            Retrospective retrospective = await dbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
+            Retrospective? retrospective = await dbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
 
             if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);

@@ -2,7 +2,7 @@
   <Import Project="../Common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <AssemblyName>Return.Web.Tests.Integration</AssemblyName>
     <ApplicationIcon />
@@ -11,14 +11,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.5" />
-    <PackageReference Include="Selenium.Support" Version="4.1.1" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.1.1" />
-    <PackageReference Include="WebDriverManager" Version="2.16.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Selenium.Support" />
+    <PackageReference Include="Selenium.WebDriver" />
+    <PackageReference Include="WebDriverManager" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Return.Application\Return.Application.csproj" />
     <ProjectReference Include="..\..\src\Return.Web\Return.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="coverlet.msbuild">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>

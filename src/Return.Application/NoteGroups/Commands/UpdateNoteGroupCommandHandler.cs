@@ -34,7 +34,7 @@ namespace Return.Application.NoteGroups.Commands {
             using IReturnDbContext dbContext = this._returnDbContextFactory.CreateForEditContext();
 
             // Find entity
-            NoteGroup noteGroup = await dbContext.NoteGroups
+            NoteGroup? noteGroup = await dbContext.NoteGroups
                 .Include(x => x.Retrospective)
                 .Include(x => x.Lane)
                 .FirstOrDefaultAsync(ng => ng.Retrospective.UrlId.StringId == request.RetroId && ng.Id == request.Id, cancellationToken);

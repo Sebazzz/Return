@@ -37,7 +37,7 @@ namespace Return.Application.RetrospectiveLanes.Queries {
         public async Task<RetrospectiveLaneContent> Handle(GetRetrospectiveLaneContentQuery request, CancellationToken cancellationToken) {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
-            Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindByRetroId(request.RetroId, cancellationToken);
+            Retrospective retrospective = await this._returnDbContext.Retrospectives.AsNoTracking().FindRequiredByRetroId(request.RetroId, cancellationToken);
 
             var laneId = (KnownNoteLane)request.LaneId;
             var lane = new RetrospectiveLaneContent();

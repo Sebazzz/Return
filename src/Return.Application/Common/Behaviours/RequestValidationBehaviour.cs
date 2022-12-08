@@ -16,8 +16,7 @@ namespace Return.Application.Common.Behaviours {
     using MediatR;
     using ValidationException = Return.Application.Common.ValidationException;
 
-    public sealed class RequestValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse> {
+    public sealed class RequestValidationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
         public RequestValidationBehaviour(IEnumerable<IValidator<TRequest>> validators) {
@@ -26,11 +25,11 @@ namespace Return.Application.Common.Behaviours {
 
         public Task<TResponse> Handle(
             TRequest request,
-            CancellationToken cancellationToken,
-            RequestHandlerDelegate<TResponse> next
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken
         ) {
             if (next == null) throw new ArgumentNullException(nameof(next));
-            var context = new ValidationContext(instanceToValidate: request);
+            var context = new ValidationContext<TRequest>(instanceToValidate: request);
 
             List<ValidationFailure> failures = this._validators.Select(selector: v => v.Validate(context: context)).
                 SelectMany(selector: result => result.Errors).

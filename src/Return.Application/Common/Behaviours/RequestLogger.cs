@@ -5,7 +5,7 @@
     using MediatR.Pipeline;
     using Microsoft.Extensions.Logging;
 
-    public sealed class RequestLogger<TRequest> : IRequestPreProcessor<TRequest> {
+    public sealed class RequestLogger<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull {
         private readonly ILogger _logger;
         private readonly ICurrentParticipantService _currentUserService;
 

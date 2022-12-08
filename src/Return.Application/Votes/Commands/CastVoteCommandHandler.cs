@@ -51,7 +51,7 @@ namespace Return.Application.Votes.Commands {
             using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
 
             // Get
-            NoteGroup noteGroup = await dbContext.NoteGroups.Include(x => x.Retrospective)
+            NoteGroup? noteGroup = await dbContext.NoteGroups.Include(x => x.Retrospective)
                 .Include(x => x.Lane).FirstOrDefaultAsync(x => x.Id == noteGroupId, cancellationToken);
 
             if (noteGroup == null) {
@@ -77,7 +77,7 @@ namespace Return.Application.Votes.Commands {
         private async Task<NoteVote?> HandleNoteGroupVoteRemove(NoteGroup noteGroup, IReturnDbContext dbContext, CancellationToken cancellationToken) {
             // Find a vote
             Participant owner = await this.GetParticipant(dbContext);
-            NoteVote vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv =>
+            NoteVote? vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv =>
                 nv.ParticipantId == owner.Id && nv.NoteGroup.Id == noteGroup.Id, cancellationToken);
 
             if (vote == null) {
@@ -119,7 +119,7 @@ namespace Return.Application.Votes.Commands {
             using IReturnDbContext dbContext = this._returnDbContext.CreateForEditContext();
 
             // Get
-            Note note = await dbContext.Notes.Include(x => x.Retrospective).Include(x => x.Lane).FirstOrDefaultAsync(x => x.Id == noteId, cancellationToken);
+            Note? note = await dbContext.Notes.Include(x => x.Retrospective).Include(x => x.Lane).FirstOrDefaultAsync(x => x.Id == noteId, cancellationToken);
 
             if (note == null) {
                 throw new NotFoundException(nameof(Note), noteId);
@@ -167,7 +167,7 @@ namespace Return.Application.Votes.Commands {
         private async Task<NoteVote?> HandleNoteVoteRemove(Note note, IReturnDbContext dbContext, CancellationToken cancellationToken) {
             // Find a vote
             Participant owner = await this.GetParticipant(dbContext);
-            NoteVote vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv => nv.ParticipantId == owner.Id && nv.Note.Id == note.Id, cancellationToken);
+            NoteVote? vote = await dbContext.NoteVotes.FirstOrDefaultAsync(nv => nv.ParticipantId == owner.Id && nv.Note.Id == note.Id, cancellationToken);
 
             if (vote == null) {
                 return null;
@@ -189,7 +189,7 @@ namespace Return.Application.Votes.Commands {
             return this._mediator.Publish(new VoteChangeNotification(voteChange), cancellationToken);
         }
 
-        private async ValueTask<Participant> GetParticipant(IReturnDbContext dbContext) => await dbContext.Participants.FindAsync((await this._currentParticipantService.GetParticipant()).Id);
+        private async ValueTask<Participant> GetParticipant(IReturnDbContext dbContext) => (await dbContext.Participants.FindAsync((await this._currentParticipantService.GetParticipant()).Id)) ?? throw new InvalidOperationException("Current participant not found");
 
         private static async Task ValidateNumberOfVotes(IReturnDbContext dbContext, KnownNoteLane laneId, Retrospective retrospective, int participantId)
         {

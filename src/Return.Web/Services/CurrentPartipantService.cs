@@ -107,7 +107,7 @@ namespace Return.Web.Services {
             return this._httpContext.User;
         }
 
-        private static string GetNameLocal(ClaimsPrincipal user) => user.FindFirstValue(ParticipantNameClaimType);
+        private static string GetNameLocal(ClaimsPrincipal user) => user.FindFirstValue(ParticipantNameClaimType)!;
 
         private static bool IsFacilitator(ClaimsPrincipal user)
         {

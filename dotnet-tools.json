@@ -2,7 +2,7 @@
     "isRoot": true,
     "tools": {
         "dotnet-ef": {
-            "version": "6.0.5",
+            "version": "7.0.0",
             "commands": ["dotnet-ef"]
         },
         "dotnet-format": {
@@ -10,7 +10,7 @@
             "commands": ["dotnet-format"]
         },
         "nbgv": {
-            "version": "3.5.104",
+            "version": "3.5.119",
             "commands": ["nbgv"]
         }
     }

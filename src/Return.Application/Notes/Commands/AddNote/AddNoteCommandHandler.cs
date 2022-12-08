@@ -43,12 +43,12 @@ namespace Return.Application.Notes.Commands.AddNote {
             // Get the required entities
             using IReturnDbContext returnDbContext = this._returnDbContextFactory.CreateForEditContext();
 
-            Retrospective retrospective = await returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
+            Retrospective? retrospective = await returnDbContext.Retrospectives.FindByRetroId(request.RetroId, cancellationToken);
             if (retrospective == null) {
                 throw new NotFoundException(nameof(Retrospective), request.RetroId);
             }
 
-            NoteLane noteLane = await returnDbContext.NoteLanes.FindAsync((KnownNoteLane)request.LaneId);
+            NoteLane? noteLane = await returnDbContext.NoteLanes.FindAsync((KnownNoteLane)request.LaneId);
             if (noteLane == null) {
                 throw new NotFoundException(nameof(NoteLane), (KnownNoteLane)request.LaneId);
             }

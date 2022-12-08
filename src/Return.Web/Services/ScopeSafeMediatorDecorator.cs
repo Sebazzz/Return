@@ -7,6 +7,7 @@
 
 namespace Return.Web.Services {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using Application.Common.Behaviours;
@@ -50,12 +51,14 @@ namespace Return.Web.Services {
                 }
             }
         }
-        public Task<object> Send(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotSupportedException("We don't implement this currently. If this exception is thrown, we should probably implement it!");
+        public Task<object?> Send(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotSupportedException("We don't implement this currently. If this exception is thrown, we should probably implement it!");
 
         public Task Publish(object notification, CancellationToken cancellationToken = new CancellationToken()) => this._mediator.Publish(notification, cancellationToken);
 
         public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification => this._mediator.Publish(notification, cancellationToken);
 
         public void Dispose() => this._lock?.Dispose();
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default) => throw new NotSupportedException("We don't implement this currently. If this exception is thrown, we should probably implement it!");
+        public IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default) => throw new NotSupportedException("We don't implement this currently. If this exception is thrown, we should probably implement it!");
     }
 }

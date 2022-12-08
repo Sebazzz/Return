@@ -6,6 +6,7 @@
 // ******************************************************************************
 
 namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
+    using System;
     using System.Drawing;
     using System.Linq;
     using System.Threading;
@@ -21,17 +22,17 @@ namespace Return.Application.Tests.Unit.RetrospectiveLanes.Queries {
     [TestFixture]
     public sealed class GetRetrospectiveLaneContentQueryHandlerTests : QueryTestBase {
         [Test]
-        public async Task GetRetrospectiveLaneContentCommand_ReturnsEmpty_RetrospectiveNotFound() {
+        public void GetRetrospectiveLaneContentCommand_ReturnsEmpty_RetrospectiveNotFound() {
             // Given
             const string retroId = "surely-not-found";
             var query = new GetRetrospectiveLaneContentQuery(retroId, (int)KnownNoteLane.Stop);
             var handler = new GetRetrospectiveLaneContentQueryHandler(this.Context, this.Mapper, Substitute.For<ICurrentParticipantService>(), new TextAnonymizingService());
 
             // When
-            var result = await handler.Handle(query, CancellationToken.None);
+            Task TestAction() => handler.Handle(query, CancellationToken.None);
 
             // Then
-            Assert.That(result.Notes, Is.Empty);
+            Assert.ThrowsAsync<InvalidOperationException>(TestAction);
         }
 
         [Test]

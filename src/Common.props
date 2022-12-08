@@ -28,14 +28,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" />
+        <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
 
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
     </ItemGroup>
 
     <!-- Git versioning -->
     <ItemGroup>
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37">
+        <PackageReference Include="Nerdbank.GitVersioning">
             <PrivateAssets>All</PrivateAssets>
         </PackageReference>
     </ItemGroup>
