@@ -24,7 +24,8 @@ public sealed class UseRunningAppAttribute : Attribute, ITestAction {
         try {
             appFixture.App = UseReturnAppServerAttribute.ServerInstance;
 
-            appFixture.OnInitialized();
+            // Un-async this
+            appFixture.OnInitialized().ConfigureAwait(false).GetAwaiter().GetResult();
         }
         catch (Exception ex) {
             TestContext.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.BeforeTest)}: {ex}");

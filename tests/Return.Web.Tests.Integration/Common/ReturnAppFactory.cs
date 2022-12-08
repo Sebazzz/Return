@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
+using System.Threading.Tasks;
 using Application.Common.Abstractions;
 using Configuration;
 using Domain.Abstractions;
@@ -37,6 +38,7 @@ using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Playwright;
 
 public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     private IWebHost _webHost;
@@ -47,9 +49,40 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     /// </summary>
     private SqliteConnection _sqliteConnection;
 
+    private IBrowser _browser;
+
     public ReturnAppFactory() {
         this._sqliteConnection = new SqliteConnection(this.ConnectionString);
         this._sqliteConnection.Open();
+    }
+
+    public async Task<IBrowserContext> CreateBrowserContext()
+    {
+        IBrowser browser = await this.CreateBrowser();
+        return await browser.NewContextAsync(new()
+        {
+            ViewportSize = new()
+            {
+                Width = 1920,
+                Height = 1080
+            }
+        });
+    }
+
+    private async ValueTask<IBrowser> CreateBrowser()
+    {
+        if (this._browser is not null) return this._browser;
+
+        bool debugMode = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"));
+
+        IPlaywright playwright = await Playwright.CreateAsync();
+        IBrowser browser = await playwright.Firefox.LaunchAsync(new()
+        {
+            Headless = !debugMode,
+            SlowMo = debugMode ? 100 : null
+        });
+
+        return this._browser = browser;
     }
 
     public IWebDriver GetWebDriver() => this.CreateWebDriver();
@@ -128,9 +161,10 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IPageObject is disposable itself")]
-    public TPageObject CreatePageObject<TPageObject>() where TPageObject : IPageObject, new() {
+    public async Task<TPageObject> CreatePageObject<TPageObject>() where TPageObject : IPageObject, new() {
         var pageObject = Activator.CreateInstance<TPageObject>();
         pageObject.SetWebDriver(this.GetWebDriver());
+        pageObject.SetBrowserContext(await this.CreateBrowserContext());
         return pageObject;
     }
 

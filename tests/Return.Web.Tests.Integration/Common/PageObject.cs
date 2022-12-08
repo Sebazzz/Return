@@ -8,11 +8,13 @@
 namespace Return.Web.Tests.Integration.Common;
 
 using System;
+using Microsoft.Playwright;
 using NUnit.Framework;
 using OpenQA.Selenium;
 
 public abstract class PageObject : IPageObject {
     private bool _ownsWebdriver;
+    private IBrowserContext _browserContext;
     private IWebDriver _webDriverContainer;
 
     public IWebDriver WebDriver => this._webDriverContainer;
@@ -25,6 +27,15 @@ public abstract class PageObject : IPageObject {
         this._ownsWebdriver = true;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+        "CA1033:Interface methods should be callable by child types",
+        Justification = "Not necessary for testing framework")]
+    void IPageObject.SetBrowserContext(IBrowserContext browserContext)
+    {
+        this._browserContext = browserContext;
+        this._ownsWebdriver = true;
+    }
+
     public void Unfocus() {
         TestContext.WriteLine("Unfocus by sending tab");
         this.WebDriver.FindElement(By.CssSelector("body")).SendKeys("\t");
@@ -32,6 +43,7 @@ public abstract class PageObject : IPageObject {
 
     public void InitializeFrom(PageObject owner) {
         this._webDriverContainer = owner._webDriverContainer;
+        this._browserContext = owner._browserContext;
         this._ownsWebdriver = false;
     }
 
@@ -39,6 +51,7 @@ public abstract class PageObject : IPageObject {
         if (disposing) {
             if (this._ownsWebdriver) {
                 this._webDriverContainer?.Dispose();
+                _ = this._browserContext?.CloseAsync();
             }
 
             this._webDriverContainer = null;
@@ -53,6 +66,7 @@ public abstract class PageObject : IPageObject {
 
 public interface IPageObject : IDisposable {
     void SetWebDriver(IWebDriver webDriver);
+    void SetBrowserContext(IBrowserContext browserContext);
 
     IWebDriver WebDriver { get; }
 }

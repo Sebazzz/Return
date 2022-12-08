@@ -115,7 +115,7 @@ public sealed class JoinRetrospectiveTests : PageFixture<JoinRetrospectivePage> 
         string myName = Name.Create();
         this.Page.Navigate(this.App, retroId);
 
-        var secondInstance = this.App.CreatePageObject<JoinRetrospectivePage>().RegisterAsTestDisposable();
+        var secondInstance = (await this.App.CreatePageObject<JoinRetrospectivePage>()).RegisterAsTestDisposable();
         secondInstance.Navigate(this.App, retroId);
 
         // When
@@ -135,7 +135,7 @@ public sealed class JoinRetrospectiveTests : PageFixture<JoinRetrospectivePage> 
         string myName = Name.Create();
         this.Page.Navigate(this.App, retroId);
 
-        JoinRetrospectivePage secondInstance = this.App.CreatePageObject<JoinRetrospectivePage>().RegisterAsTestDisposable();
+        JoinRetrospectivePage secondInstance = (await this.App.CreatePageObject<JoinRetrospectivePage>()).RegisterAsTestDisposable();
         secondInstance.Navigate(this.App, retroId);
 
         IList<AvailableParticipantColorModel> availableColors;
@@ -167,7 +167,7 @@ public sealed class JoinRetrospectiveTests : PageFixture<JoinRetrospectivePage> 
         string myName = Name.Create();
         this.Page.Navigate(this.App, retroId);
 
-        var secondInstance = this.App.CreatePageObject<JoinRetrospectivePage>().RegisterAsTestDisposable();
+        var secondInstance = (await this.App.CreatePageObject<JoinRetrospectivePage>()).RegisterAsTestDisposable();
         secondInstance.Navigate(this.App, retroId);
 
         // When

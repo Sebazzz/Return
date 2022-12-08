@@ -17,7 +17,7 @@ public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable wher
 
     protected TPageObject Page { get; private set; }
 
-    public override void OnInitialized() => this.Page = this.App.CreatePageObject<TPageObject>();
+    public override async Task OnInitialized() => this.Page = await this.App.CreatePageObject<TPageObject>();
     protected virtual void Dispose(bool disposing) {
         if (disposing) {
             this.Page?.Dispose();
@@ -40,9 +40,9 @@ public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDispos
     protected TPageObject Client1 { get; private set; }
     protected TPageObject Client2 { get; private set; }
 
-    public override void OnInitialized() {
-        this.Client1 = this.App.CreatePageObject<TPageObject>();
-        this.Client2 = this.App.CreatePageObject<TPageObject>();
+    public override async Task OnInitialized() {
+        this.Client1 = await this.App.CreatePageObject<TPageObject>();
+        this.Client2 = await this.App.CreatePageObject<TPageObject>();
     }
 
     [TearDown]
@@ -74,7 +74,7 @@ public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDispos
 [CleanupDisposables]
 public abstract class ScopedFixture : IAppFixture {
     public ReturnAppFactory App { get; set; }
-    public virtual void OnInitialized() { }
+    public virtual Task OnInitialized() => Task.CompletedTask;
 
     protected IServiceScope ServiceScope { get; private set; }
 

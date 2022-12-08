@@ -1,5 +1,5 @@
 ﻿// ******************************************************************************
-//  ©  Sebastiaan Dammann | damsteen.nl
+//  © 2020 Sebastiaan Dammann | damsteen.nl
 // 
 //  File:           : IAppFixture.cs
 //  Project         : Return.Web.Tests.Integration
@@ -7,9 +7,11 @@
 
 namespace Return.Web.Tests.Integration.Common;
 
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
-public interface IAppFixture {
+public interface IAppFixture
+{
     ReturnAppFactory App { get; set; }
-    void OnInitialized() { }
+
+    Task OnInitialized();
 }
