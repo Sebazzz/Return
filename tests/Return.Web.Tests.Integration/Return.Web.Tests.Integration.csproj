@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.Playwright.NUnit"/>
     <PackageReference Include="Selenium.Support" />
     <PackageReference Include="Selenium.WebDriver" />
     <PackageReference Include="WebDriverManager" />

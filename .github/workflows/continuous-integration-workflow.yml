@@ -22,20 +22,6 @@ jobs:
               with:
                   node-version: '14.x'
 
-            - name: Install Microsoft Edge (Ubuntu)
-              if: matrix.os == 'ubuntu-22.04'
-              run: |
-                  curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
-                  sudo mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg
-                  sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main" > /etc/apt/sources.list.d/microsoft-edge.list'
-                  sudo apt-get update && sudo apt -y install microsoft-edge-stable
-
-            - name: Install Microsoft Edge (Windows)
-              if: matrix.os == 'windows-2019'
-              uses: browser-actions/setup-edge@latest
-              with:
-                  edge-version: 'stable'
-
             - name: Install .NET 7.x SDK for build
               uses: actions/setup-dotnet@v2
               with:

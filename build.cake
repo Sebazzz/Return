@@ -431,23 +431,19 @@ TestTask("Unit-Domain", $"{baseName}.Domain.Tests.Unit");
 TestTask("Unit-Web", $"{baseName}.Web.Tests.Unit");
 TestTask("Integration-Web", $"{baseName}.Web.Tests.Integration");
 
-Task("Test-PreReq-DownloadMSEdgeDriver")
-    .Description("Download MS Edge driver for Linux")
-	.IsDependeeOf("Test-CS-Integration-Web")
-	.WithCriteria(isUnix)
+Task("Test-PreReq-Playwright-Browser-Deps")
+    .Description("Prepare playwright")
+	.IsDependentOn("Build")
 	.Does(() => {
-	var driverDirectory = buildDir + Directory("edgedriver");
-	
-	CreateDirectory(driverDirectory);
-	RunCmd(@"utils/download-edge-webdriver.sh");
-	ZipUncompress("build/msedgedriver.zip", driverDirectory);
-	
-	var edgeDriverDirectory = MakeAbsolute(driverDirectory);
-	
-	System.Environment.SetEnvironmentVariable("PATH",
-		edgeDriverDirectory.ToString() + System.IO.Path.PathSeparator + EnvironmentVariable("PATH"));
-	
-	RunCmd($"chmod +x {edgeDriverDirectory}/*");
+	DotNetTool(".", "playwright", "install-deps firefox chromium");
+});
+
+Task("Test-PreReq-Playwright-Browser")
+    .Description("Prepare playwright")
+	.IsDependentOn("Test-PreReq-Playwright-Browser-Deps")
+	.IsDependeeOf("Test-CS-Integration-Web")
+	.Does(() => {
+	DotNetTool(".", "playwright", "install firefox chromium");
 });
 
 Task("Test-CS")

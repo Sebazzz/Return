@@ -8,9 +8,8 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
-    <PackageReference Include="ConfigureAwait.Fody" />
-    <PackageReference Include="Fody">
-      <PrivateAssets>all</PrivateAssets>
+    <PackageReference Include="ConfigureAwait.Fody" PrivateAssets="All"/>
+    <PackageReference Include="Fody" PrivateAssets="All">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 

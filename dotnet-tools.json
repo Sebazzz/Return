@@ -12,6 +12,10 @@
         "nbgv": {
             "version": "3.5.119",
             "commands": ["nbgv"]
+        },
+        "microsoft.playwright.cli": {
+            "version": "1.2.3",
+            "commands": ["playwright"]
         }
     }
 }

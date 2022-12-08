@@ -14,6 +14,7 @@ fi
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPT_DIR/build.config
 TOOLS_DIR=$SCRIPT_DIR/tools
+BROWSERS_DIR=$SCRIPT_DIR/tools/browsers
 CAKE_EXE=$TOOLS_DIR/dotnet-cake
 CAKE_PATH=$TOOLS_DIR/.store/cake.tool/$CAKE_VERSION
 
@@ -26,6 +27,13 @@ fi
 if [ ! -d "$TOOLS_DIR" ]; then
   mkdir "$TOOLS_DIR"
 fi
+
+# Make sure the tools folder exist.
+if [ ! -d "$BROWSERS_DIR" ]; then
+  mkdir "$BROWSERS_DIR"
+fi
+
+export PLAYWRIGHT_BROWSERS_PATH=$BROWSERS_DIR
 
 ###########################################################################
 # INSTALL .NET CORE CLI

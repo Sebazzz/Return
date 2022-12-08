@@ -28,6 +28,13 @@ if (!(Test-Path $ToolPath)) {
     New-Item -Path $ToolPath -Type Directory -Force | out-null
 }
 
+$PlaywrightBrowserDir = Join-Path $PSScriptRoot "tools/browsers"
+if (!(Test-Path $PlaywrightBrowserDir)) {
+    Write-Verbose "Creating browsers directory..."
+    New-Item -Path $PlaywrightBrowserDir -Type Directory -Force | out-null
+}
+
+$ENV:PLAYWRIGHT_BROWSERS_PATH = $PlaywrightBrowserDir
 
 if ($PSVersionTable.PSEdition -ne 'Core') {
     # Attempt to set highest encryption available for SecurityProtocol.
