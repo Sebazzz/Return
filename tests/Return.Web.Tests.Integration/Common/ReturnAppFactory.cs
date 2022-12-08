@@ -17,7 +17,6 @@ namespace Return.Web.Tests.Integration.Common {
     using Microsoft.Win32;
     using NUnit.Framework;
     using OpenQA.Selenium;
-    using OpenQA.Selenium.Chrome;
     using OpenQA.Selenium.Edge;
     using OpenQA.Selenium.Support.Events;
     using Persistence;
@@ -38,7 +37,7 @@ namespace Return.Web.Tests.Integration.Common {
             this._webDriverPool = null;
         }
 
-        public WebDriverContainer GetWebDriver() => new WebDriverContainer(this._webDriverPool.Get(), this);
+        public WebDriverContainer GetWebDriver() => new(this._webDriverPool.Get(), this);
 
         internal void Return(IWebDriver webDriver) => this._webDriverPool.Return(webDriver);
 
@@ -46,16 +45,21 @@ namespace Return.Web.Tests.Integration.Common {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
         private IWebDriver CreateWebDriver() {
-            new DriverManager().SetUpDriver(new EdgeConfig());
+            new DriverManager().SetUpDriver(new EdgeConfig(), "MatchingBrowser");
 
             EdgeOptions webDriverOptions = new() {
                 PageLoadStrategy = PageLoadStrategy.Normal,
                 AcceptInsecureCertificates = true,
             };
 
-            // Take the correct browser
+            // WebDriverManager looks up Edge Dev by default
+            string binaryLocation = OperatingSystem.IsWindows() ? Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe", "", "")?.ToString() : null;
+            if (!String.IsNullOrEmpty(binaryLocation) && File.Exists(binaryLocation)) {
+                webDriverOptions.BinaryLocation = binaryLocation;
+            }
+
             if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
-                TestContext.WriteLine("Going to run Chrome headless");
+                TestContext.WriteLine("Going to run Edge headless");
                 webDriverOptions.AddArgument("--headless");
             }
 

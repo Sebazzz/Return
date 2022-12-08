@@ -61,6 +61,7 @@ namespace Return.Web.Tests.Integration.Common {
 
             // Configure testing to use Kestel and test services
             builder
+                .UseStaticWebAssets()
                 .ConfigureLogging(lb => {
                     lb.SetMinimumLevel(LogLevel.Trace);
                     lb.AddProvider(new TestContextLoggerProvider());
