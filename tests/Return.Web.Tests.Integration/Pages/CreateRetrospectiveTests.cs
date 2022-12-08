@@ -7,97 +7,107 @@
 
 namespace Return.Web.Tests.Integration.Pages;
 
-using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Common;
+using Microsoft.Playwright;
 using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 [TestFixture]
 public class CreateRetrospectiveTests : PageFixture<CreateRetrospectivePage> {
     [Test]
-    public void CreateRetrospective_SubmitWithoutValidation_ShowsValidationMessages() {
+    public async Task CreateRetrospective_SubmitWithoutValidation_ShowsValidationMessages() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.Submit();
+        await this.Page.Submit();
 
         // Then
-        string[] messages = new DefaultWait<CreateRetrospectivePage>(this.Page)
-            .Until(p => {
-                ReadOnlyCollection<IWebElement> collection = p.GetValidationMessages();
-                if (collection.Count == 0) return null;
-                return collection;
-            })
-            .Select(el => el.Text)
-            .ToArray();
+        string[] messages = await this.Page.GetValidationMessages();
 
         Assert.That(messages, Has.One.Contain("'Title' must not be empty"));
         Assert.That(messages, Has.One.Contain("'Facilitator Passphrase' must not be empty"));
     }
 
     [Test]
-    public void CreateRetrospective_SubmitValidWithBothPassphrases_ShowQrCodeAndLink() {
+    public async Task CreateRetrospective_SubmitValidWithBothPassphrases_ShowQrCodeAndLink() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
-        this.Page.ParticipantPassphraseInput.SendKeys("the participator password");
+        await this.Page.RetrospectiveTitleInput.FillAsync("...");
+        await this.Page.RetrospectiveTitleInput.FillAsync(TestContext.CurrentContext.Test.Name);
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
+        await this.Page.ParticipantPassphraseInput.FillAsync("the participator password");
 
-        this.Page.Submit();
+        await this.Page.Submit();
 
         // Then
-        Assert.That(this.Page.GetUrlShown(), Does.Match(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
+        await this.Page.UrlLocationInput.Expected().ToBeVisibleAsync();
+        await this.Page.UrlLocationInput.Expected().ToHaveValueAsync(new Regex(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
 
-        Assert.That(this.Page.FacilitatorInstructions.Text, Contains.Substring("my secret facilitator password"));
-        Assert.That(this.Page.ParticipatorInstructions.Text, Contains.Substring("the participator password"));
+        await this.Page.FacilitatorInstructions.Expected().ToContainTextAsync("my secret facilitator password");
+        await this.Page.ParticipatorInstructions.Expected().ToContainTextAsync("the participator password");
     }
 
     [Test]
-    public void CreateRetrospective_SubmitValidWithOnlyFacilitatorPassphrase_ShowQrCodeAndLink() {
+    public async Task CreateRetrospective_SubmitValidWithOnlyFacilitatorPassphrase_ShowQrCodeAndLink() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+        await this.Page.RetrospectiveTitleInput.FillAsync(TestContext.CurrentContext.Test.FullName);
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
 
-        this.Page.Submit();
+        await this.Page.Submit();
 
         // Then
-        Assert.That(this.Page.GetUrlShown(), Does.Match(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
+        await this.Page.UrlLocationInput.Expected().ToHaveValueAsync(new Regex(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
 
-        Assert.That(this.Page.FacilitatorInstructions.Text, Contains.Substring("my secret facilitator password"));
-        Assert.That(this.Page.ParticipatorInstructions.Text, Contains.Substring("no password is required"));
+        await this.Page.FacilitatorInstructions.Expected().ToContainTextAsync("my secret facilitator password");
+        await this.Page.ParticipatorInstructions.Expected().ToContainTextAsync("no password is required");
     }
 }
 
 [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global", Justification = "Dynamically instantiated")]
 public sealed class CreateRetrospectivePage : PageObject {
-    public IWebElement RetrospectiveTitleInput => this.WebDriver.FindVisibleElement(By.Id("retro-title"));
-    public IWebElement FacilitatorPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-facilitator-passphrase"));
-    public IWebElement ParticipantPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-passphrase"));
-    public IWebElement SubmitButton => this.WebDriver.FindVisibleElement(By.Id("create-retro-button"));
-    public IWebElement ModalSubmitButton => this.WebDriver.FindVisibleElement(By.Id("modal-create-retro-button"));
+    public ILocator RetrospectiveTitleInput => this.BrowserPage.Locator("#retro-title");
+    public ILocator FacilitatorPassphraseInput => this.BrowserPage.Locator("#retro-facilitator-passphrase");
+    public ILocator ParticipantPassphraseInput => this.BrowserPage.Locator("#retro-passphrase");
+    public ILocator SubmitButton => this.BrowserPage.Locator("#create-retro-button");
+    public ILocator ModalSubmitButton => this.BrowserPage.Locator("#modal-create-retro-button");
 
-    public IWebElement UrlLocationInput => this.WebDriver.FindVisibleElement(By.Id("retro-location"));
-    public IWebElement ParticipatorInstructions => this.WebDriver.FindElementByTestElementId("participator instructions");
-    public IWebElement FacilitatorInstructions => this.WebDriver.FindElementByTestElementId("facilitator instructions");
+    public ILocator UrlLocationInput => this.BrowserPage.Locator("#retro-location");
+    public ILocator ParticipatorInstructions => this.BrowserPage.FindElementByTestElementId("participator-instructions");
+    public ILocator FacilitatorInstructions => this.BrowserPage.FindElementByTestElementId("facilitator-instructions");
 
-    public IWebElement LobbyCreationPassphraseInput => this.WebDriver.FindVisibleElement(By.Id("retro-lobby-creation-passphrase"));
-    public IWebElement LobbyCreationPassphraseModal => this.WebDriver.FindElementByTestElementId("lobby-creation-passphrase-modal");
+    public ILocator LobbyCreationPassphraseInput => this.BrowserPage.Locator("#retro-lobby-creation-passphrase");
+    public ILocator LobbyCreationPassphraseModal => this.BrowserPage.FindElementByTestElementId("lobby-creation-passphrase-modal");
 
-    public bool LobbyCreationPassphraseModalIsDisplayed => this.WebDriver.FindElement(By.CssSelector("[data-test-element-id=\"lobby-creation-passphrase-modal\"]")).Displayed;
+    public ILocator LobbyPassphraseModal => this.BrowserPage.Locator("[data-test-element-id=\"lobby-creation-passphrase-modal\"]");
 
-    public void Navigate(ReturnAppFactory app) => this.WebDriver.NavigateToBlazorPage(app.CreateUri("create-retro"));
-    public void Submit() => this.SubmitButton.Click();
-    public void ModalSubmit() => this.ModalSubmitButton.Click();
+    public async Task Navigate(ReturnAppFactory app)
+    {
+        await this.BrowserPage.GotoBlazorPageAsync(app.CreateUri("create-retro"));
+        await this.RetrospectiveTitleInput.Expected().ToBeVisibleAsync();
+    }
 
-    public string GetUrlShown() => this.WebDriver.Retry(_ => this.UrlLocationInput.GetAttribute("value"));
-    public ReadOnlyCollection<IWebElement> GetValidationMessages() => this.WebDriver.FindElements(By.ClassName("validation-message"));
+    public Task Submit() => this.SubmitButton.ClickAsync();
+    public Task ModalSubmit() => this.ModalSubmitButton.ClickAsync();
+
+    public async Task<string[]> GetValidationMessages()
+    {
+        ILocator locator = this.BrowserPage.Locator(".validation-message");
+
+        int count = await locator.CountAsync();
+        string[] msg = new string[count];
+        for (int i = 0; i < count; i++)
+        {
+            msg[i] = await locator.Nth(i).TextContentAsync();
+        }
+
+        return msg;
+    }
 }

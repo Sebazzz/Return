@@ -8,6 +8,7 @@
 namespace Return.Web.Tests.Integration.Common;
 
 using System;
+using System.Linq;
 using Microsoft.Playwright;
 using NUnit.Framework;
 using OpenQA.Selenium;
@@ -18,6 +19,8 @@ public abstract class PageObject : IPageObject {
     private IWebDriver _webDriverContainer;
 
     public IWebDriver WebDriver => this._webDriverContainer;
+    public IBrowserContext Browser => this._browserContext;
+    public IPage BrowserPage => this._browserContext.Pages.Single();
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
         "CA1033:Interface methods should be callable by child types",
@@ -30,8 +33,7 @@ public abstract class PageObject : IPageObject {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
         "CA1033:Interface methods should be callable by child types",
         Justification = "Not necessary for testing framework")]
-    void IPageObject.SetBrowserContext(IBrowserContext browserContext)
-    {
+    void IPageObject.SetBrowserContext(IBrowserContext browserContext) {
         this._browserContext = browserContext;
         this._ownsWebdriver = true;
     }
@@ -69,4 +71,5 @@ public interface IPageObject : IDisposable {
     void SetBrowserContext(IBrowserContext browserContext);
 
     IWebDriver WebDriver { get; }
+    IPage BrowserPage { get; }
 }

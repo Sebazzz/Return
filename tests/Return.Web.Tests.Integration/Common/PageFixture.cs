@@ -10,11 +10,11 @@ namespace Return.Web.Tests.Integration.Common;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright.NUnit;
 using NUnit.Framework;
 
 [RetryTest(3)]
 public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable where TPageObject : IPageObject, new() {
-
     protected TPageObject Page { get; private set; }
 
     public override async Task OnInitialized() => this.Page = await this.App.CreatePageObject<TPageObject>();
@@ -25,8 +25,9 @@ public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable wher
     }
 
     [TearDown]
-    public void CreateScreenshots() {
+    public Task CreateScreenshots() {
         this.Page?.WebDriver?.TryCreateScreenshot("Client_AfterTest");
+        return this.Page?.BrowserPage?.TryCreateScreenshot("Client_AfterTest");
     }
 
     public void Dispose() {
@@ -72,7 +73,7 @@ public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDispos
 
 [UseRunningApp]
 [CleanupDisposables]
-public abstract class ScopedFixture : IAppFixture {
+public abstract class ScopedFixture : PlaywrightTest, IAppFixture {
     public ReturnAppFactory App { get; set; }
     public virtual Task OnInitialized() => Task.CompletedTask;
 

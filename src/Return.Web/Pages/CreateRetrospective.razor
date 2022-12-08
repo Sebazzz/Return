@@ -40,18 +40,18 @@
 
         if (!String.IsNullOrEmpty(Model.Passphrase))
         {
-            <p data-test-element-id="participator instructions">
+            <p data-test-element-id="participator-instructions">
                 To enter the retrospective, the participants need to enter the following password: <code >@Model.Passphrase</code>.
             </p>
         }
         else
         {
-            <p data-test-element-id="participator instructions">
+            <p data-test-element-id="participator-instructions">
                 To enter the retrospective no password is required.
             </p>
         }
 
-        <p data-test-element-id="facilitator instructions">
+        <p data-test-element-id="facilitator-instructions">
             To start the retrospective, you need to enter the following password: <code>@Model.FacilitatorPassphrase</code>.
         </p>
 

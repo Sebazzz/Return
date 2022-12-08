@@ -8,14 +8,12 @@
 namespace Return.Web.Tests.Integration.Pages;
 
 using System;
-using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Application.Common.Settings;
 using Common;
 using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
 [TestFixture]
 public sealed class CreateRetrospectiveWithLobbyCreationPassphraseTests : PageFixture<CreateRetrospectivePage> {
@@ -34,92 +32,89 @@ public sealed class CreateRetrospectiveWithLobbyCreationPassphraseTests : PageFi
     public void ResetSecuritySettings() => this._temporarySettingsScope.RestoreSettings();
 
     [Test]
-    public void LobbyCreationPassphraseActive_CreatePokerSession_SubmitValid_ShowDialog() {
+    public async Task LobbyCreationPassphraseActive_CreatePokerSession_SubmitValid_ShowDialog() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+        await this.Page.RetrospectiveTitleInput.FillAsync(TestContext.CurrentContext.Test.FullName);
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
 
-        this.Page.Submit();
+        await this.Page.Submit();
 
         // Then
-        Assert.That(this.Page.LobbyCreationPassphraseModal, Has.Property(nameof(IWebElement.Displayed)).EqualTo(true).Retry(),
-            "Expected modal for the passphrase to become visible");
+        await this.Page.LobbyCreationPassphraseModal.Expected().ToBeVisibleAsync();
     }
 
     [Test]
-    public void LobbyCreationPassphraseActive_CreatePokerSession_PasswordDialog_InvalidPassphrase_ShowErrorInsideDialog() {
+    public async Task LobbyCreationPassphraseActive_CreatePokerSession_PasswordDialog_InvalidPassphrase_ShowErrorInsideDialog() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+        await this.Page.RetrospectiveTitleInput.FillAsync(TestContext.CurrentContext.Test.FullName);
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
 
-        this.Page.Submit();
-        this.EnsurePasswordDialogVisible();
+        await this.Page.Submit();
+        await this.EnsurePasswordDialogVisible();
 
-        this.Page.LobbyCreationPassphraseInput.SendKeys("invalid password");
-        this.Page.ModalSubmit();
+        await this.Page.LobbyCreationPassphraseInput.FillAsync("invalid password");
+        await this.Page.ModalSubmit();
 
         // Then
-        string[] messages = new DefaultWait<CreateRetrospectivePage>(this.Page)
-            .Until(p => {
-                ReadOnlyCollection<IWebElement> collection = p.GetValidationMessages();
-                if (collection.Count == 0) return null;
-                return collection;
-            })
-            .Select(el => el.Text)
-            .ToArray();
+        string[] messages = await this.Page.GetValidationMessages();
 
         Assert.That(messages, Has.One.Contains("Invalid pre-shared passphrase entered needed for creating a retrospective"));
 
-        Assert.That(() => this.Page.LobbyCreationPassphraseModal.Displayed, Is.True.Retry(),
-            "Expected the modal to become and stay visible because the validation error is shown inside the modal");
+        await this.Page.LobbyCreationPassphraseModal.Expected().ToBeVisibleAsync();
     }
 
     [Test]
-    public void LobbyCreationPassphraseActive_CreatePokerSessionOnSubmitValidPassphrase_CreateSession() {
+    public async Task LobbyCreationPassphraseActive_CreatePokerSessionOnSubmitValidPassphrase_CreateSession() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
-        this.Page.RetrospectiveTitleInput.SendKeys(TestContext.CurrentContext.Test.FullName);
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+        await this.Page.RetrospectiveTitleInput.FillAsync(TestContext.CurrentContext.Test.FullName);
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
 
-        this.Page.Submit();
-        this.EnsurePasswordDialogVisible();
+        await  this.Page.Submit();
+        await  this.EnsurePasswordDialogVisible();
 
-        this.Page.LobbyCreationPassphraseInput.SendKeys(SecurityPassword);
-        this.Page.ModalSubmit();
+        await  this.Page.LobbyCreationPassphraseInput.FillAsync(SecurityPassword);
+        await  this.Page.ModalSubmit();
 
         // Then
-        Assert.That(this.Page.GetUrlShown(), Does.Match(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
+        await this.Page.UrlLocationInput.Expected().
+            ToHaveValueAsync(new Regex(@"http://localhost:\d+/retrospective/([A-z0-9]+)/join"));
     }
+
     [Test]
-    public void LobbyCreationPassphraseActive_CreatePokerSessionOnSubmitWithValidPassphraseWithFormErrors_HidesModal() {
+    public async Task LobbyCreationPassphraseActive_CreatePokerSessionOnSubmitWithValidPassphraseWithFormErrors_HidesModal() {
         // Given
-        this.Page.Navigate(this.App);
+        await this.Page.Navigate(this.App);
 
         // When
         // ... (don't enter a title, which is a required field)
-        this.Page.FacilitatorPassphraseInput.SendKeys("my secret facilitator password");
+        await this.Page.FacilitatorPassphraseInput.FillAsync("my secret facilitator password");
 
-        this.Page.Submit();
-        this.EnsurePasswordDialogVisible();
+        await this.Page.Submit();
+        await this.EnsurePasswordDialogVisible();
 
-        this.Page.LobbyCreationPassphraseInput.SendKeys(SecurityPassword);
-        this.Page.ModalSubmit();
+        await this.Page.LobbyCreationPassphraseInput.FillAsync(SecurityPassword);
+        await this.Page.ModalSubmit();
 
         // Then
-        Assert.That(() => this.Page.LobbyCreationPassphraseModalIsDisplayed, Is.False.Retry(),
-            "Expected the modal to become hidden because the error is on the form itself");
+        await this.Page.LobbyPassphraseModal.Expected().ToBeHiddenAsync();
     }
 
-    private void EnsurePasswordDialogVisible() =>
-        Assume.That(this.Page.LobbyCreationPassphraseModal,
-            Has.Property(nameof(IWebElement.Displayed)).EqualTo(true).Retry(),
+    private Task EnsurePasswordDialogVisible()
+    {
+        Assume.That(() => this.Page.LobbyCreationPassphraseModal.IsVisibleAsync().GetAwaiter().GetResult(),
+            Is.True.Retry(),
             "Expected modal for the passphrase to become visible");
+
+        return Task.CompletedTask;
+    }
+        
 }

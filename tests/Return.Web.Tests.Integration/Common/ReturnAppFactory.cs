@@ -73,13 +73,13 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     {
         if (this._browser is not null) return this._browser;
 
-        bool debugMode = !String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"));
+        bool debugMode = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"));
 
         IPlaywright playwright = await Playwright.CreateAsync();
         IBrowser browser = await playwright.Firefox.LaunchAsync(new()
         {
             Headless = !debugMode,
-            SlowMo = debugMode ? 100 : null
+            SlowMo = debugMode ? 10 : null
         });
 
         return this._browser = browser;
@@ -162,9 +162,13 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IPageObject is disposable itself")]
     public async Task<TPageObject> CreatePageObject<TPageObject>() where TPageObject : IPageObject, new() {
-        var pageObject = Activator.CreateInstance<TPageObject>();
-        pageObject.SetWebDriver(this.GetWebDriver());
-        pageObject.SetBrowserContext(await this.CreateBrowserContext());
+        TPageObject pageObject = Activator.CreateInstance<TPageObject>();
+
+        IBrowserContext browserContext = await this.CreateBrowserContext();
+        await browserContext.NewPageAsync();
+
+        pageObject.SetBrowserContext(browserContext);
+
         return pageObject;
     }
 

@@ -57,11 +57,11 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
 
     [Test]
     [Order((int)RetrospectiveStage.NotStarted)]
-    public void Screenshot_CreateRetrospective() {
+    public async Task Screenshot_CreateRetrospective() {
         // Given
         using var createRetroPage = new CreateRetrospectivePage();
         createRetroPage.InitializeFrom(this.Client1);
-        createRetroPage.Navigate(this.App);
+        await createRetroPage.Navigate(this.App);
 
         void SetResolution(IWebDriver webDriver) {
             webDriver.Manage().Window.Size = new Size(1280, 1024);
@@ -71,17 +71,17 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         SetResolution(this.Client2.WebDriver);
 
         // When
-        createRetroPage.RetrospectiveTitleInput.SendKeys("Sprint 1: Initial prototype");
-        createRetroPage.FacilitatorPassphraseInput.SendKeys("scrummaster");
-        createRetroPage.ParticipantPassphraseInput.SendKeys("secret");
+        await createRetroPage.RetrospectiveTitleInput.TypeAsync("Sprint 1: Initial prototype");
+        await createRetroPage.FacilitatorPassphraseInput.TypeAsync("scrummaster");
+        await createRetroPage.ParticipantPassphraseInput.TypeAsync("secret");
         createRetroPage.WebDriver.TryCreateScreenshot();
 
         // Then
         CreateDocScreenshot(createRetroPage.WebDriver, "create-retro");
 
-        createRetroPage.Submit();
+        await createRetroPage.Submit();
 
-        string url = createRetroPage.GetUrlShown();
+        string url = createRetroPage.BrowserPage.Url;
         string retroId = Regex.Match(url, "/retrospective/(?<retroId>[A-z0-9]+)/join", RegexOptions.IgnoreCase).
             Groups["retroId"].
             Value;
