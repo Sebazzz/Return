@@ -5,19 +5,19 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.RetrospectiveStatusUpdated {
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
+namespace Return.Application.Notifications.RetrospectiveStatusUpdated;
 
-    public sealed class RetrospectiveStatusUpdatedNotificationDispatcher : NotificationDispatcher<
-        RetrospectiveStatusUpdatedNotification, IRetrospectiveStatusUpdatedSubscriber> {
-        public RetrospectiveStatusUpdatedNotificationDispatcher(ILogger<NotificationDispatcher<RetrospectiveStatusUpdatedNotification, IRetrospectiveStatusUpdatedSubscriber>> logger) : base(logger)
-        {
-        }
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-        protected override Task DispatchCore(
-            IRetrospectiveStatusUpdatedSubscriber subscriber,
-            RetrospectiveStatusUpdatedNotification notification
-        ) => subscriber.OnRetrospectiveStatusUpdated(notification.RetrospectiveStatus);
+public sealed class RetrospectiveStatusUpdatedNotificationDispatcher : NotificationDispatcher<
+    RetrospectiveStatusUpdatedNotification, IRetrospectiveStatusUpdatedSubscriber> {
+    public RetrospectiveStatusUpdatedNotificationDispatcher(ILogger<NotificationDispatcher<RetrospectiveStatusUpdatedNotification, IRetrospectiveStatusUpdatedSubscriber>> logger) : base(logger)
+    {
     }
+
+    protected override Task DispatchCore(
+        IRetrospectiveStatusUpdatedSubscriber subscriber,
+        RetrospectiveStatusUpdatedNotification notification
+    ) => subscriber.OnRetrospectiveStatusUpdated(notification.RetrospectiveStatus);
 }

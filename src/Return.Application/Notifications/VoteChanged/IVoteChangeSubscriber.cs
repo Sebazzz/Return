@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.VoteChanged {
-    using System.Threading.Tasks;
+namespace Return.Application.Notifications.VoteChanged;
 
-    public interface IVoteChangeSubscriber : ISubscriber {
-        Task OnVoteChange(VoteChange notification);
-    }
+using System.Threading.Tasks;
+
+public interface IVoteChangeSubscriber : ISubscriber {
+    Task OnVoteChange(VoteChange notification);
 }

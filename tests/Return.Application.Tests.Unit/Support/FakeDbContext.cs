@@ -5,39 +5,39 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Support {
-    using System;
-    using System.Threading;
-    using App.Commands.SeedBaseData;
-    using Microsoft.EntityFrameworkCore;
-    using Persistence;
+namespace Return.Application.Tests.Unit.Support;
 
-    public static class ReturnDbContextFactory {
-        public static ReturnDbContext Create() {
-            DbContextOptions<ReturnDbContext> options = new DbContextOptionsBuilder<ReturnDbContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+using System;
+using System.Threading;
+using App.Commands.SeedBaseData;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
-            var context = new ReturnDbContext(options);
+public static class ReturnDbContextFactory {
+    public static ReturnDbContext Create() {
+        DbContextOptions<ReturnDbContext> options = new DbContextOptionsBuilder<ReturnDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
 
-            context.Database.EnsureCreated();
+        var context = new ReturnDbContext(options);
 
-            new SeedBaseDataCommandHandler(context).Handle(new SeedBaseDataCommand(), CancellationToken.None).
-                ConfigureAwait(false).
-                GetAwaiter().
-                GetResult();
+        context.Database.EnsureCreated();
 
-            context.SaveChanges();
+        new SeedBaseDataCommandHandler(context).Handle(new SeedBaseDataCommand(), CancellationToken.None).
+            ConfigureAwait(false).
+            GetAwaiter().
+            GetResult();
 
-            return context;
-        }
+        context.SaveChanges();
 
-        public static void Destroy(ReturnDbContext context) {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        return context;
+    }
 
-            context.Database.EnsureDeleted();
+    public static void Destroy(ReturnDbContext context) {
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-            context.Dispose();
-        }
+        context.Database.EnsureDeleted();
+
+        context.Dispose();
     }
 }

@@ -5,49 +5,49 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Common;
-    using Application.RetrospectiveWorkflows.Commands;
-    using Domain.Entities;
-    using NSubstitute;
-    using NUnit.Framework;
+namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands;
 
-    [TestFixture]
-    public sealed class InitiateGroupingStageCommandHandlerTests : RetrospectiveWorkflowCommandTestBase {
-        [Test]
-        public void InitiateGroupingStageCommandHandler_InvalidRetroId_ThrowsNotFoundException() {
-            // Given
-            const string retroId = "not found surely :)";
-            var handler = new InitiateGroupingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock);
-            var request = new InitiateGroupingStageCommand { RetroId = retroId };
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common;
+using Application.RetrospectiveWorkflows.Commands;
+using Domain.Entities;
+using NSubstitute;
+using NUnit.Framework;
 
-            // When
-            TestDelegate action = () => handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
+[TestFixture]
+public sealed class InitiateGroupingStageCommandHandlerTests : RetrospectiveWorkflowCommandTestBase {
+    [Test]
+    public void InitiateGroupingStageCommandHandler_InvalidRetroId_ThrowsNotFoundException() {
+        // Given
+        const string retroId = "not found surely :)";
+        var handler = new InitiateGroupingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock);
+        var request = new InitiateGroupingStageCommand { RetroId = retroId };
 
-            // Then
-            Assert.That(action, Throws.InstanceOf<NotFoundException>());
-        }
+        // When
+        TestDelegate action = () => handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
 
-        [Test]
-        public async Task InitiateGroupingStageCommandHandler_OnStatusChange_UpdatesRetroStageAndInvokesNotification() {
-            // Given
-            var handler = new InitiateGroupingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock);
-            var request = new InitiateGroupingStageCommand { RetroId = this.RetroId };
+        // Then
+        Assert.That(action, Throws.InstanceOf<NotFoundException>());
+    }
 
-            this.SystemClockMock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
+    [Test]
+    public async Task InitiateGroupingStageCommandHandler_OnStatusChange_UpdatesRetroStageAndInvokesNotification() {
+        // Given
+        var handler = new InitiateGroupingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock);
+        var request = new InitiateGroupingStageCommand { RetroId = this.RetroId };
 
-            // When
-            await handler.Handle(request, CancellationToken.None);
+        this.SystemClockMock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
 
-            this.RefreshObject();
+        // When
+        await handler.Handle(request, CancellationToken.None);
 
-            // Then
-            Assert.That(this.Retrospective.CurrentStage, Is.EqualTo(RetrospectiveStage.Grouping));
+        this.RefreshObject();
 
-            await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(Arg.Any<Retrospective>(), CancellationToken.None);
-        }
+        // Then
+        Assert.That(this.Retrospective.CurrentStage, Is.EqualTo(RetrospectiveStage.Grouping));
+
+        await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(Arg.Any<Retrospective>(), CancellationToken.None);
     }
 }

@@ -5,38 +5,38 @@
 //  Project         : Return.Domain.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Domain.Tests.Unit {
-    using System.Drawing;
-    using Domain.ValueObjects;
-    using NUnit.Framework;
+namespace Return.Domain.Tests.Unit;
 
-    [TestFixture]
-    public static class ParticipantColorTests {
-        [Test]
-        public static void ParticipantColor_FromColor_AssignsComponentsCorrectly() {
-            // Given
-            Color source = Color.BlueViolet;
+using System.Drawing;
+using Domain.ValueObjects;
+using NUnit.Framework;
 
-            // When
-            ParticipantColor target = source;
+[TestFixture]
+public static class ParticipantColorTests {
+    [Test]
+    public static void ParticipantColor_FromColor_AssignsComponentsCorrectly() {
+        // Given
+        Color source = Color.BlueViolet;
 
-            // Then
-            Assert.That(target.R, Is.EqualTo(source.R));
-            Assert.That(target.G, Is.EqualTo(source.G));
-            Assert.That(target.B, Is.EqualTo(source.B));
-        }
+        // When
+        ParticipantColor target = source;
 
-        [Test]
-        public static void ParticipantColor_ToHex_FormatsCorrectly() {
-            // Given
-            Color source = Color.BlueViolet;
-            ParticipantColor target = source;
+        // Then
+        Assert.That(target.R, Is.EqualTo(source.R));
+        Assert.That(target.G, Is.EqualTo(source.G));
+        Assert.That(target.B, Is.EqualTo(source.B));
+    }
 
-            // When
-            string hexStr = target.ToHex();
+    [Test]
+    public static void ParticipantColor_ToHex_FormatsCorrectly() {
+        // Given
+        Color source = Color.BlueViolet;
+        ParticipantColor target = source;
 
-            // Then
-            Assert.That(hexStr, Is.EqualTo("8A2BE2"));
-        }
+        // When
+        string hexStr = target.ToHex();
+
+        // Then
+        Assert.That(hexStr, Is.EqualTo("8A2BE2"));
     }
 }

@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteDeleted {
-    using System.Threading.Tasks;
+namespace Return.Application.Notifications.NoteDeleted;
 
-    public interface INoteDeletedSubscriber : ISubscriber {
-        Task OnNoteDeleted(NoteDeletedNotification notification);
-    }
+using System.Threading.Tasks;
+
+public interface INoteDeletedSubscriber : ISubscriber {
+    Task OnNoteDeleted(NoteDeletedNotification notification);
 }

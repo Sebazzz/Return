@@ -1,40 +1,40 @@
-﻿namespace Return.Persistence {
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Data.Sqlite;
-    using Microsoft.EntityFrameworkCore;
+﻿namespace Return.Persistence;
 
-    [ExcludeFromCodeCoverage]
-    internal static class SqliteConfigurator {
-        private static SqliteConnection? InMemoryConnection;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "EF will manage lifetime")]
-        public static void ConfigureDbContext(
-            DbContextOptionsBuilder optionsBuilder,
-            IDatabaseOptions databaseOptions
-        ) {
-            string connString = databaseOptions.CreateConnectionString();
+[ExcludeFromCodeCoverage]
+internal static class SqliteConfigurator {
+    private static SqliteConnection? InMemoryConnection;
 
-            if (IsInMemory(connString)) {
-                // Create a static connection simply to keep the connection alive
-                if (InMemoryConnection == null) {
-                    InMemoryConnection = new SqliteConnection(connString);
-                    InMemoryConnection.Open();
-                }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "EF will manage lifetime")]
+    public static void ConfigureDbContext(
+        DbContextOptionsBuilder optionsBuilder,
+        IDatabaseOptions databaseOptions
+    ) {
+        string connString = databaseOptions.CreateConnectionString();
 
-                optionsBuilder.UseSqlite(connString);
+        if (IsInMemory(connString)) {
+            // Create a static connection simply to keep the connection alive
+            if (InMemoryConnection == null) {
+                InMemoryConnection = new SqliteConnection(connString);
+                InMemoryConnection.Open();
             }
-            else {
-                // Create a connection ourselves because we run into timeouts when seeding
-                // https://github.com/aspnet/EntityFrameworkCore/issues/18607
 
-                var conn = new SqliteConnection(connString) {
-                    DefaultTimeout = 180
-                };
-
-                optionsBuilder.UseSqlite(conn);
-            }
+            optionsBuilder.UseSqlite(connString);
         }
+        else {
+            // Create a connection ourselves because we run into timeouts when seeding
+            // https://github.com/aspnet/EntityFrameworkCore/issues/18607
 
-        private static bool IsInMemory(string connectionString) => new SqliteConnectionStringBuilder(connectionString).Mode == SqliteOpenMode.Memory;
+            var conn = new SqliteConnection(connString) {
+                DefaultTimeout = 180
+            };
+
+            optionsBuilder.UseSqlite(conn);
+        }
     }
+
+    private static bool IsInMemory(string connectionString) => new SqliteConnectionStringBuilder(connectionString).Mode == SqliteOpenMode.Memory;
 }

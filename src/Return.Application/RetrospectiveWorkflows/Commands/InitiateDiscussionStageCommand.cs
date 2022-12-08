@@ -5,9 +5,9 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.RetrospectiveWorkflows.Commands {
-    using MediatR;
+namespace Return.Application.RetrospectiveWorkflows.Commands;
 
-    public sealed class InitiateDiscussionStageCommand : AbstractStageCommand, IRequest {
-    }
+using MediatR;
+
+public sealed class InitiateDiscussionStageCommand : AbstractStageCommand, IRequest {
 }

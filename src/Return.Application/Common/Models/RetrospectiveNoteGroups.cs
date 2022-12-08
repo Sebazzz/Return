@@ -5,42 +5,42 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Models {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using AutoMapper;
-    using Domain.Entities;
-    using Mapping;
+namespace Return.Application.Common.Models;
 
-    public sealed class RetrospectiveNoteGroup : IMapFrom<NoteGroup> {
-        public int Id { get; set; }
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
+using Domain.Entities;
+using Mapping;
 
-        public string Title { get; set; } = String.Empty;
+public sealed class RetrospectiveNoteGroup : IMapFrom<NoteGroup> {
+    public int Id { get; set; }
 
-        public IList<RetrospectiveNote> Notes { get; } = new List<RetrospectiveNote>();
+    public string Title { get; set; } = String.Empty;
 
-        public void Mapping(Profile profile) {
-            if (profile == null) throw new ArgumentNullException(nameof(profile));
+    public IList<RetrospectiveNote> Notes { get; } = new List<RetrospectiveNote>();
 
-            profile.CreateMap<NoteGroup, RetrospectiveNoteGroup>()
-                .ForMember(m => m.Notes, m => m.Ignore());
+    public void Mapping(Profile profile) {
+        if (profile == null) throw new ArgumentNullException(nameof(profile));
 
-            ICollection<RetrospectiveNoteGroup> GroupNotes(ICollection<RetrospectiveNote> notes, ICollection<RetrospectiveNoteGroup> groups) {
-                var grouped = notes.GroupBy(x => x.GroupId.GetValueOrDefault()).Join(groups, g => g.Key, g => g.Id, (rg, g) => new { NoteGroup = g, Note = rg });
+        profile.CreateMap<NoteGroup, RetrospectiveNoteGroup>()
+            .ForMember(m => m.Notes, m => m.Ignore());
 
-                foreach (var grouping in grouped) {
-                    foreach (RetrospectiveNote note in grouping.Note) {
-                        grouping.NoteGroup.Notes.Add(note);
-                        notes.Remove(note);
-                    }
+        ICollection<RetrospectiveNoteGroup> GroupNotes(ICollection<RetrospectiveNote> notes, ICollection<RetrospectiveNoteGroup> groups) {
+            var grouped = notes.GroupBy(x => x.GroupId.GetValueOrDefault()).Join(groups, g => g.Key, g => g.Id, (rg, g) => new { NoteGroup = g, Note = rg });
+
+            foreach (var grouping in grouped) {
+                foreach (RetrospectiveNote note in grouping.Note) {
+                    grouping.NoteGroup.Notes.Add(note);
+                    notes.Remove(note);
                 }
-
-                return groups;
             }
 
-            profile.CreateMap<ICollection<RetrospectiveNote>, ICollection<RetrospectiveNoteGroup>>()
-                .ConvertUsing(GroupNotes);
+            return groups;
         }
+
+        profile.CreateMap<ICollection<RetrospectiveNote>, ICollection<RetrospectiveNoteGroup>>()
+            .ConvertUsing(GroupNotes);
     }
 }

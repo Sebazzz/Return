@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteLaneUpdated {
-    using System.Threading.Tasks;
+namespace Return.Application.Notifications.NoteLaneUpdated;
 
-    public interface INoteLaneUpdatedSubscriber : ISubscriber {
-        Task OnNoteLaneUpdated(NoteLaneUpdatedNotification note);
-    }
+using System.Threading.Tasks;
+
+public interface INoteLaneUpdatedSubscriber : ISubscriber {
+    Task OnNoteLaneUpdated(NoteLaneUpdatedNotification note);
 }

@@ -5,20 +5,20 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Support {
-    using System;
-    using Persistence;
+namespace Return.Application.Tests.Unit.Support;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test base class")]
-    public class CommandTestBase : IDisposable {
-        protected ReturnDbContext Context { get; }
+using System;
+using Persistence;
 
-        public CommandTestBase() {
-            this.Context = ReturnDbContextFactory.Create();
-        }
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test base class")]
+public class CommandTestBase : IDisposable {
+    protected ReturnDbContext Context { get; }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Not necessary for test")]
-        public void Dispose() => ReturnDbContextFactory.Destroy(this.Context);
+    public CommandTestBase() {
+        this.Context = ReturnDbContextFactory.Create();
     }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Not necessary for test")]
+    public void Dispose() => ReturnDbContextFactory.Destroy(this.Context);
 }

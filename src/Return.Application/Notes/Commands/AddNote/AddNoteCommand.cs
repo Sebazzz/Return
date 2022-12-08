@@ -5,20 +5,20 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notes.Commands.AddNote {
-    using Common.Models;
-    using MediatR;
+namespace Return.Application.Notes.Commands.AddNote;
 
-    public sealed class AddNoteCommand : IRequest<RetrospectiveNote> {
-        public string RetroId { get; }
+using Common.Models;
+using MediatR;
 
-        public int LaneId { get; }
+public sealed class AddNoteCommand : IRequest<RetrospectiveNote> {
+    public string RetroId { get; }
 
-        public AddNoteCommand(string retroId, int laneId) {
-            this.RetroId = retroId;
-            this.LaneId = laneId;
-        }
+    public int LaneId { get; }
 
-        public override string ToString() => $"[{nameof(AddNoteCommand)}] RetroId: {this.RetroId}; LaneId: {this.LaneId}";
+    public AddNoteCommand(string retroId, int laneId) {
+        this.RetroId = retroId;
+        this.LaneId = laneId;
     }
+
+    public override string ToString() => $"[{nameof(AddNoteCommand)}] RetroId: {this.RetroId}; LaneId: {this.LaneId}";
 }

@@ -5,11 +5,11 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Abstractions {
-    using System.Threading;
-    using System.Threading.Tasks;
+namespace Return.Application.Common.Abstractions;
 
-    public interface IEntityStateFacilitator {
-        Task Reload(object entity, CancellationToken cancellationToken);
-    }
+using System.Threading;
+using System.Threading.Tasks;
+
+public interface IEntityStateFacilitator {
+    Task Reload(object entity, CancellationToken cancellationToken);
 }

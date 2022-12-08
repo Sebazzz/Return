@@ -5,32 +5,32 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Security.TypeHandling {
-    using System;
-    using Domain.Entities;
-    using Models;
+namespace Return.Application.Common.Security.TypeHandling;
 
-    internal abstract class AbstractTypeSecurityHandler<TEntity> : ITypeSecurityHandler where TEntity : class {
-        public void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entityObject, in CurrentParticipantModel currentParticipant) {
-            var entity = entityObject as TEntity;
+using System;
+using Domain.Entities;
+using Models;
 
-            if (entity == null) {
-                return;
-            }
+internal abstract class AbstractTypeSecurityHandler<TEntity> : ITypeSecurityHandler where TEntity : class {
+    public void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entityObject, in CurrentParticipantModel currentParticipant) {
+        var entity = entityObject as TEntity;
 
-            switch (operation) {
-                case SecurityOperation.AddOrUpdate:
-                    this.HandleAddOrUpdate(retrospective, entity, currentParticipant);
-                    break;
-                case SecurityOperation.Delete:
-                    this.HandleDelete(retrospective, entity, currentParticipant);
-                    break;
-                default:
-                    throw new NotImplementedException(operation.ToString());
-            }
+        if (entity == null) {
+            return;
         }
 
-        protected abstract void HandleAddOrUpdate(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
-        protected abstract void HandleDelete(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
+        switch (operation) {
+            case SecurityOperation.AddOrUpdate:
+                this.HandleAddOrUpdate(retrospective, entity, currentParticipant);
+                break;
+            case SecurityOperation.Delete:
+                this.HandleDelete(retrospective, entity, currentParticipant);
+                break;
+            default:
+                throw new NotImplementedException(operation.ToString());
+        }
     }
+
+    protected abstract void HandleAddOrUpdate(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
+    protected abstract void HandleDelete(Retrospective retrospective, TEntity entity, in CurrentParticipantModel currentParticipant);
 }

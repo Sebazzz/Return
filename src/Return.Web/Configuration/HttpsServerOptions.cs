@@ -5,16 +5,16 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Configuration {
-    using System.Diagnostics.CodeAnalysis;
+namespace Return.Web.Configuration;
 
-    [ExcludeFromCodeCoverage] // No use including this in coverage in integration tests
-    public sealed class HttpsServerOptions {
-        public string? CertificatePath { get; set; }
-        public string? CertificatePassword { get; set; }
+using System.Diagnostics.CodeAnalysis;
 
-        public bool EnableRedirect { get; set; }
+[ExcludeFromCodeCoverage] // No use including this in coverage in integration tests
+public sealed class HttpsServerOptions {
+    public string? CertificatePath { get; set; }
+    public string? CertificatePassword { get; set; }
 
-        public bool UseStrongHttps { get; set; }
-    }
+    public bool EnableRedirect { get; set; }
+
+    public bool UseStrongHttps { get; set; }
 }

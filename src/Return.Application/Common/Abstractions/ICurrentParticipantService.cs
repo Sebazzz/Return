@@ -5,12 +5,12 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Abstractions {
-    using System.Threading.Tasks;
-    using Models;
+namespace Return.Application.Common.Abstractions;
 
-    public interface ICurrentParticipantService {
-        ValueTask<CurrentParticipantModel> GetParticipant();
-        void SetParticipant(CurrentParticipantModel participant);
-    }
+using System.Threading.Tasks;
+using Models;
+
+public interface ICurrentParticipantService {
+    ValueTask<CurrentParticipantModel> GetParticipant();
+    void SetParticipant(CurrentParticipantModel participant);
 }

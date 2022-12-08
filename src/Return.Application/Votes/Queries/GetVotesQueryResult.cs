@@ -5,12 +5,12 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Votes.Queries {
-    public sealed class GetVotesQueryResult {
-        public RetrospectiveVoteStatus VoteStatus { get; }
+namespace Return.Application.Votes.Queries;
 
-        public GetVotesQueryResult(RetrospectiveVoteStatus voteStatus) {
-            this.VoteStatus = voteStatus;
-        }
+public sealed class GetVotesQueryResult {
+    public RetrospectiveVoteStatus VoteStatus { get; }
+
+    public GetVotesQueryResult(RetrospectiveVoteStatus voteStatus) {
+        this.VoteStatus = voteStatus;
     }
 }

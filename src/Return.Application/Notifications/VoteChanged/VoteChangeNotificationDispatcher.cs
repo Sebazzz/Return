@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.VoteChanged {
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
+namespace Return.Application.Notifications.VoteChanged;
 
-    public sealed class VoteChangeNotificationDispatcher : NotificationDispatcher<VoteChangeNotification, IVoteChangeSubscriber> {
-        public VoteChangeNotificationDispatcher(ILogger<NotificationDispatcher<VoteChangeNotification, IVoteChangeSubscriber>> logger) : base(logger) {
-        }
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-        protected override Task DispatchCore(
-            IVoteChangeSubscriber subscriber,
-            VoteChangeNotification notification
-        ) => subscriber.OnVoteChange(notification.VoteChange);
+public sealed class VoteChangeNotificationDispatcher : NotificationDispatcher<VoteChangeNotification, IVoteChangeSubscriber> {
+    public VoteChangeNotificationDispatcher(ILogger<NotificationDispatcher<VoteChangeNotification, IVoteChangeSubscriber>> logger) : base(logger) {
     }
+
+    protected override Task DispatchCore(
+        IVoteChangeSubscriber subscriber,
+        VoteChangeNotification notification
+    ) => subscriber.OnVoteChange(notification.VoteChange);
 }

@@ -5,40 +5,40 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using AutoMapper;
-    using AutoMapper.QueryableExtensions;
-    using Common.Abstractions;
-    using MediatR;
-    using Microsoft.EntityFrameworkCore;
+namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo;
 
-    public sealed class GetParticipantsInfoQueryHandler : IRequestHandler<GetParticipantsInfoQuery, ParticipantsInfoList> {
-        private readonly IReturnDbContext _returnDbContext;
-        private readonly IMapper _mapper;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Common.Abstractions;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
 
-        public GetParticipantsInfoQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
-            this._returnDbContext = returnDbContext;
-            this._mapper = mapper;
-        }
+public sealed class GetParticipantsInfoQueryHandler : IRequestHandler<GetParticipantsInfoQuery, ParticipantsInfoList> {
+    private readonly IReturnDbContext _returnDbContext;
+    private readonly IMapper _mapper;
 
-        public async Task<ParticipantsInfoList> Handle(GetParticipantsInfoQuery request, CancellationToken cancellationToken) {
-            if (request == null) throw new ArgumentNullException(nameof(request));
+    public GetParticipantsInfoQueryHandler(IReturnDbContext returnDbContext, IMapper mapper) {
+        this._returnDbContext = returnDbContext;
+        this._mapper = mapper;
+    }
 
-            var returnValue = new ParticipantsInfoList();
-            returnValue.Participants.AddRange(
-                await this._returnDbContext.Retrospectives
-                    .Where(r => r.UrlId.StringId == request.RetroId)
-                    .SelectMany(r => r.Participants)
-                    .ProjectTo<ParticipantInfo>(this._mapper.ConfigurationProvider)
-                    .OrderBy(x => x.Name)
-                    .ToListAsync(cancellationToken)
-            );
+    public async Task<ParticipantsInfoList> Handle(GetParticipantsInfoQuery request, CancellationToken cancellationToken) {
+        if (request == null) throw new ArgumentNullException(nameof(request));
 
-            return returnValue;
-        }
+        var returnValue = new ParticipantsInfoList();
+        returnValue.Participants.AddRange(
+            await this._returnDbContext.Retrospectives
+                .Where(r => r.UrlId.StringId == request.RetroId)
+                .SelectMany(r => r.Participants)
+                .ProjectTo<ParticipantInfo>(this._mapper.ConfigurationProvider)
+                .OrderBy(x => x.Name)
+                .ToListAsync(cancellationToken)
+        );
+
+        return returnValue;
     }
 }

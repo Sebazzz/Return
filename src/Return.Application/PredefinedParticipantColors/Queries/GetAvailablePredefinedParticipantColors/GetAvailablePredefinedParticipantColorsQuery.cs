@@ -5,18 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors {
-    using System.Collections.Generic;
-    using MediatR;
+namespace Return.Application.PredefinedParticipantColors.Queries.GetAvailablePredefinedParticipantColors;
 
-    public class GetAvailablePredefinedParticipantColorsQuery : IRequest<IList<AvailableParticipantColorModel>> {
-        public string RetrospectiveId { get; }
+using System.Collections.Generic;
+using MediatR;
 
-        public GetAvailablePredefinedParticipantColorsQuery(string retrospectiveId) {
-            this.RetrospectiveId = retrospectiveId;
-        }
+public class GetAvailablePredefinedParticipantColorsQuery : IRequest<IList<AvailableParticipantColorModel>> {
+    public string RetrospectiveId { get; }
 
-        public override string ToString() => $"[{nameof(GetAvailablePredefinedParticipantColorsQuery)}] {this.RetrospectiveId}";
+    public GetAvailablePredefinedParticipantColorsQuery(string retrospectiveId) {
+        this.RetrospectiveId = retrospectiveId;
     }
 
+    public override string ToString() => $"[{nameof(GetAvailablePredefinedParticipantColorsQuery)}] {this.RetrospectiveId}";
 }

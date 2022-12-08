@@ -5,72 +5,72 @@
 //  Project         : Return.Web.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Web.Tests.Unit.Services {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using MediatR;
-    using Microsoft.Extensions.Logging.Abstractions;
-    using NUnit.Framework;
-    using Web.Services;
+namespace Return.Web.Tests.Unit.Services;
 
-    [TestFixture]
-    public sealed class ScopeSafeMediatorDecoratorTests {
-        [Test]
-        [Repeat(10)]
-        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-        public async Task ScopeSafeMediatorDecoratorTest_OnlyAllowsOneThread() {
-            // Given
-            using var mediator = new ScopeSafeMediatorDecorator(new MediatorWorker(), new NullLogger<ScopeSafeMediatorDecorator>());
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
+using Microsoft.Extensions.Logging.Abstractions;
+using NUnit.Framework;
+using Web.Services;
 
-            // When
-            Task CreateTasks() {
-                return Task.Run(() => mediator.Send(new FakeRequest()));
+[TestFixture]
+public sealed class ScopeSafeMediatorDecoratorTests {
+    [Test]
+    [Repeat(10)]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    public async Task ScopeSafeMediatorDecoratorTest_OnlyAllowsOneThread() {
+        // Given
+        using var mediator = new ScopeSafeMediatorDecorator(new MediatorWorker(), new NullLogger<ScopeSafeMediatorDecorator>());
+
+        // When
+        Task CreateTasks() {
+            return Task.Run(() => mediator.Send(new FakeRequest()));
+        }
+
+        await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => CreateTasks()));
+
+        // Then
+        Assert.Pass("No exception happened");
+    }
+
+    private sealed class MediatorWorker : IMediator {
+        private int _ref;
+
+        public async Task<TResponse> Send<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = new CancellationToken()
+        ) {
+            if (Interlocked.CompareExchange(ref this._ref, 1, 0) != 0) {
+                throw new InvalidOperationException("Threading issues!");
             }
 
-            await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => CreateTasks()));
+            await Task.Delay(10, cancellationToken).ConfigureAwait(false);
 
-            // Then
-            Assert.Pass("No exception happened");
+            this._ref = 0;
+
+            return (TResponse)Activator.CreateInstance(typeof(TResponse));
         }
 
-        private sealed class MediatorWorker : IMediator {
-            private int _ref;
+        public Task<object> Send(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
 
-            public async Task<TResponse> Send<TResponse>(
-                IRequest<TResponse> request,
-                CancellationToken cancellationToken = new CancellationToken()
-            ) {
-                if (Interlocked.CompareExchange(ref this._ref, 1, 0) != 0) {
-                    throw new InvalidOperationException("Threading issues!");
-                }
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            IStreamRequest<TResponse> request,
+            CancellationToken cancellationToken = new CancellationToken()
+        ) =>
+            throw new NotImplementedException();
 
-                await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+        public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
 
-                this._ref = 0;
+        public Task Publish(object notification, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
 
-                return (TResponse)Activator.CreateInstance(typeof(TResponse));
-            }
+        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification => throw new System.NotImplementedException();
+    }
 
-            public Task<object> Send(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
-
-            public IAsyncEnumerable<TResponse> CreateStream<TResponse>(
-                IStreamRequest<TResponse> request,
-                CancellationToken cancellationToken = new CancellationToken()
-            ) =>
-                throw new NotImplementedException();
-
-            public IAsyncEnumerable<object> CreateStream(object request, CancellationToken cancellationToken = new CancellationToken()) => throw new NotImplementedException();
-
-            public Task Publish(object notification, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
-
-            public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = new CancellationToken()) where TNotification : INotification => throw new System.NotImplementedException();
-        }
-
-        private sealed class FakeRequest : IRequest {
-        }
+    private sealed class FakeRequest : IRequest {
     }
 }

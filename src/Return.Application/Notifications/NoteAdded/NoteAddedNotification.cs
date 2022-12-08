@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteAdded {
-    using Common.Models;
+namespace Return.Application.Notifications.NoteAdded;
 
-    public sealed class NoteAddedNotification : RetrospectiveNotification {
-        public int LaneId { get; }
+using Common.Models;
 
-        public RetrospectiveNote Note { get; }
+public sealed class NoteAddedNotification : RetrospectiveNotification {
+    public int LaneId { get; }
 
-        public NoteAddedNotification(string retroId, int laneId, RetrospectiveNote note) : base(retroId) {
-            this.LaneId = laneId;
-            this.Note = note;
-        }
+    public RetrospectiveNote Note { get; }
+
+    public NoteAddedNotification(string retroId, int laneId, RetrospectiveNote note) : base(retroId) {
+        this.LaneId = laneId;
+        this.Note = note;
     }
 }

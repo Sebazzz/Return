@@ -5,41 +5,41 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Middleware.Https {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Configuration;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Options;
+namespace Return.Web.Middleware.Https;
 
-    [ExcludeFromCodeCoverage] // Not much use to including HTTPS config in code coverage
-    public static class ApplicationBuilderExtensions {
-        public static IApplicationBuilder UseHttps(this IApplicationBuilder app, IHostEnvironment hostEnvironment) {
-            if (app == null) throw new ArgumentNullException(nameof(app));
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
-            var httpsOptions = app.ApplicationServices.GetService<IOptions<HttpsServerOptions>>();
+[ExcludeFromCodeCoverage] // Not much use to including HTTPS config in code coverage
+public static class ApplicationBuilderExtensions {
+    public static IApplicationBuilder UseHttps(this IApplicationBuilder app, IHostEnvironment hostEnvironment) {
+        if (app == null) throw new ArgumentNullException(nameof(app));
 
-            if (httpsOptions != null && httpsOptions.Value != null) {
-                if (httpsOptions.Value.EnableRedirect) {
-                    app.UseHttpsRedirection();
-                }
+        var httpsOptions = app.ApplicationServices.GetService<IOptions<HttpsServerOptions>>();
 
-                if (!hostEnvironment.IsDevelopment()) {
-                    if (httpsOptions.Value.UseStrongHttps) {
-                        app.UseHsts();
-
-                        app.Use((ctx, next) => {
-                            ctx.Response.Headers.Append("Content-Security-Policy", "upgrade-insecure-requests");
-                            return next.Invoke();
-                        });
-                    }
-                }
+        if (httpsOptions != null && httpsOptions.Value != null) {
+            if (httpsOptions.Value.EnableRedirect) {
+                app.UseHttpsRedirection();
             }
 
-            return app;
+            if (!hostEnvironment.IsDevelopment()) {
+                if (httpsOptions.Value.UseStrongHttps) {
+                    app.UseHsts();
+
+                    app.Use((ctx, next) => {
+                        ctx.Response.Headers.Append("Content-Security-Policy", "upgrade-insecure-requests");
+                        return next.Invoke();
+                    });
+                }
+            }
         }
+
+        return app;
     }
 }

@@ -5,32 +5,32 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application {
-    using System.Reflection;
-    using AutoMapper;
-    using Common.Behaviours;
-    using Common.Security;
-    using MediatR;
-    using Microsoft.Extensions.DependencyInjection;
-    using Notifications;
-    using Retrospectives.Queries.GetRetrospectiveStatus;
-    using RetrospectiveWorkflows.Common;
+namespace Return.Application;
 
-    public static class ServiceCollectionExtensions {
-        public static IServiceCollection AddApplication(this IServiceCollection services) {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddMediatR(opts => opts.AsScoped(), Assembly.GetExecutingAssembly());
+using System.Reflection;
+using AutoMapper;
+using Common.Behaviours;
+using Common.Security;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Notifications;
+using Retrospectives.Queries.GetRetrospectiveStatus;
+using RetrospectiveWorkflows.Common;
 
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
-            services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
+public static class ServiceCollectionExtensions {
+    public static IServiceCollection AddApplication(this IServiceCollection services) {
+        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddMediatR(opts => opts.AsScoped(), Assembly.GetExecutingAssembly());
 
-            services.AddScoped<IRetrospectiveStatusMapper, RetrospectiveStatusMapper>();
-            services.AddScoped<IRetrospectiveStatusUpdateDispatcher, RetrospectiveStatusUpdateDispatcher>();
-            services.AddScoped<ISecurityValidator, SecurityValidator>();
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(RequestValidationBehaviour<,>));
 
-            services.AddNotificationDispatchers();
+        services.AddScoped<IRetrospectiveStatusMapper, RetrospectiveStatusMapper>();
+        services.AddScoped<IRetrospectiveStatusUpdateDispatcher, RetrospectiveStatusUpdateDispatcher>();
+        services.AddScoped<ISecurityValidator, SecurityValidator>();
 
-            return services;
-        }
+        services.AddNotificationDispatchers();
+
+        return services;
     }
 }

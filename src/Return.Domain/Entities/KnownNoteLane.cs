@@ -5,11 +5,11 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Entities {
-    public enum KnownNoteLane {
-        Invalid = 0,
-        Start,
-        Stop,
-        Continue
-    }
+namespace Return.Domain.Entities;
+
+public enum KnownNoteLane {
+    Invalid = 0,
+    Start,
+    Stop,
+    Continue
 }

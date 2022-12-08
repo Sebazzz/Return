@@ -5,20 +5,20 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.VoteChanged {
-    using Common.Models;
+namespace Return.Application.Notifications.VoteChanged;
 
-    public sealed class VoteChange {
-        public VoteModel Vote { get; }
+using Common.Models;
 
-        public string RetroId { get; }
+public sealed class VoteChange {
+    public VoteModel Vote { get; }
 
-        public VoteMutationType Mutation { get; }
+    public string RetroId { get; }
 
-        public VoteChange(string retroId, VoteModel vote, VoteMutationType mutation) {
-            this.RetroId = retroId;
-            this.Vote = vote;
-            this.Mutation = mutation;
-        }
+    public VoteMutationType Mutation { get; }
+
+    public VoteChange(string retroId, VoteModel vote, VoteMutationType mutation) {
+        this.RetroId = retroId;
+        this.Vote = vote;
+        this.Mutation = mutation;
     }
 }

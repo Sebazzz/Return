@@ -5,54 +5,54 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Votes.Queries {
-    using System.Linq;
-    using Application.Common.Models;
-    using Application.Notifications.VoteChanged;
-    using Application.Votes.Queries;
-    using NUnit.Framework;
+namespace Return.Application.Tests.Unit.Votes.Queries;
 
-    [TestFixture]
-    public static class RetrospectiveVoteStatusTests {
-        [Test]
-        public static void RetrospectiveVoteStatus_AddVote_AddsVote() {
-            // Given
-            var voteStatus = new RetrospectiveVoteStatus(3);
-            voteStatus.Votes.Add(new VoteModel { ParticipantId = 1, NoteId = 2, LaneId = 3 });
-            voteStatus.Votes.Add(new VoteModel { ParticipantId = 1 });
-            voteStatus.Initialize();
+using System.Linq;
+using Application.Common.Models;
+using Application.Notifications.VoteChanged;
+using Application.Votes.Queries;
+using NUnit.Framework;
 
-            Assume.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(1));
+[TestFixture]
+public static class RetrospectiveVoteStatusTests {
+    [Test]
+    public static void RetrospectiveVoteStatus_AddVote_AddsVote() {
+        // Given
+        var voteStatus = new RetrospectiveVoteStatus(3);
+        voteStatus.Votes.Add(new VoteModel { ParticipantId = 1, NoteId = 2, LaneId = 3 });
+        voteStatus.Votes.Add(new VoteModel { ParticipantId = 1 });
+        voteStatus.Initialize();
 
-            // When
-            voteStatus.Apply(new VoteChange("not-relevant", new VoteModel {
-                ParticipantId = 1,
-                NoteGroupId = 3
-            }, VoteMutationType.Added));
+        Assume.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(1));
 
-            // Then
-            Assert.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(0));
-        }
+        // When
+        voteStatus.Apply(new VoteChange("not-relevant", new VoteModel {
+            ParticipantId = 1,
+            NoteGroupId = 3
+        }, VoteMutationType.Added));
 
-        [Test]
-        public static void RetrospectiveVoteStatus_RemoveVote_RemovesVote() {
-            // Given
-            var voteStatus = new RetrospectiveVoteStatus(3);
-            voteStatus.Votes.Add(new VoteModel { Id = 3, ParticipantId = 1, NoteId = 2, LaneId = 3 });
-            voteStatus.Votes.Add(new VoteModel { Id = 4, ParticipantId = 1 });
-            voteStatus.Initialize();
+        // Then
+        Assert.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(0));
+    }
 
-            Assume.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(1));
+    [Test]
+    public static void RetrospectiveVoteStatus_RemoveVote_RemovesVote() {
+        // Given
+        var voteStatus = new RetrospectiveVoteStatus(3);
+        voteStatus.Votes.Add(new VoteModel { Id = 3, ParticipantId = 1, NoteId = 2, LaneId = 3 });
+        voteStatus.Votes.Add(new VoteModel { Id = 4, ParticipantId = 1 });
+        voteStatus.Initialize();
 
-            // When
-            voteStatus.Apply(new VoteChange("not-relevant", new VoteModel {
-                Id = 3,
-                ParticipantId = 1,
-                NoteId = 2
-            }, VoteMutationType.Removed));
+        Assume.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(1));
 
-            // Then
-            Assert.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(2));
-        }
+        // When
+        voteStatus.Apply(new VoteChange("not-relevant", new VoteModel {
+            Id = 3,
+            ParticipantId = 1,
+            NoteId = 2
+        }, VoteMutationType.Removed));
+
+        // Then
+        Assert.That(voteStatus.Votes.Count(x => x.IsCast == false), Is.EqualTo(2));
     }
 }

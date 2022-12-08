@@ -5,8 +5,8 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Abstractions {
-    public interface IIdPrimaryKey {
-        int Id { get; }
-    }
+namespace Return.Domain.Abstractions;
+
+public interface IIdPrimaryKey {
+    int Id { get; }
 }

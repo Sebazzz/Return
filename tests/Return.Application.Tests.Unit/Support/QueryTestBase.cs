@@ -5,28 +5,28 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Support {
-    using System;
-    using Application.Common.Mapping;
-    using AutoMapper;
-    using Persistence;
+namespace Return.Application.Tests.Unit.Support;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]
-    public class QueryTestBase : IDisposable {
-        public QueryTestBase() {
-            this.Context = ReturnDbContextFactory.Create();
+using System;
+using Application.Common.Mapping;
+using AutoMapper;
+using Persistence;
 
-            var configurationProvider = new MapperConfiguration(configure: cfg => {
-                cfg.AddProfile<MappingProfile>();
-            });
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Not necessary for test")]
+public class QueryTestBase : IDisposable {
+    public QueryTestBase() {
+        this.Context = ReturnDbContextFactory.Create();
 
-            this.Mapper = configurationProvider.CreateMapper();
-        }
+        var configurationProvider = new MapperConfiguration(configure: cfg => {
+            cfg.AddProfile<MappingProfile>();
+        });
 
-        public ReturnDbContext Context { get; }
-        public IMapper Mapper { get; }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Not necessary for test")]
-        public void Dispose() => ReturnDbContextFactory.Destroy(context: this.Context);
+        this.Mapper = configurationProvider.CreateMapper();
     }
+
+    public ReturnDbContext Context { get; }
+    public IMapper Mapper { get; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize", Justification = "Not necessary for test")]
+    public void Dispose() => ReturnDbContextFactory.Destroy(context: this.Context);
 }

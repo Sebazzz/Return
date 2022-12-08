@@ -5,18 +5,18 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteLaneUpdated {
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
+namespace Return.Application.Notifications.NoteLaneUpdated;
 
-    public sealed class NoteLaneUpdatedNotificationDispatcher : NotificationDispatcher<NoteLaneUpdatedNotification, INoteLaneUpdatedSubscriber> {
-        public NoteLaneUpdatedNotificationDispatcher(ILogger<NotificationDispatcher<NoteLaneUpdatedNotification, INoteLaneUpdatedSubscriber>> logger) : base(logger)
-        {
-        }
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-        protected override Task DispatchCore(
-            INoteLaneUpdatedSubscriber subscriber,
-            NoteLaneUpdatedNotification notification
-        ) => subscriber.OnNoteLaneUpdated(notification);
+public sealed class NoteLaneUpdatedNotificationDispatcher : NotificationDispatcher<NoteLaneUpdatedNotification, INoteLaneUpdatedSubscriber> {
+    public NoteLaneUpdatedNotificationDispatcher(ILogger<NotificationDispatcher<NoteLaneUpdatedNotification, INoteLaneUpdatedSubscriber>> logger) : base(logger)
+    {
     }
+
+    protected override Task DispatchCore(
+        INoteLaneUpdatedSubscriber subscriber,
+        NoteLaneUpdatedNotification notification
+    ) => subscriber.OnNoteLaneUpdated(notification);
 }

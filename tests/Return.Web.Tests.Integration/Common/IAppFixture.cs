@@ -5,11 +5,11 @@
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
 
-namespace Return.Web.Tests.Integration.Common {
-    using Microsoft.Extensions.DependencyInjection;
+namespace Return.Web.Tests.Integration.Common;
 
-    public interface IAppFixture {
-        ReturnAppFactory App { get; set; }
-        void OnInitialized() { }
-    }
+using Microsoft.Extensions.DependencyInjection;
+
+public interface IAppFixture {
+    ReturnAppFactory App { get; set; }
+    void OnInitialized() { }
 }

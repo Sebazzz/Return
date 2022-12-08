@@ -5,18 +5,18 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteLaneUpdated {
-    using MediatR;
+namespace Return.Application.Notifications.NoteLaneUpdated;
 
-    public sealed class NoteLaneUpdatedNotification : INotification {
-        public string RetroId { get; }
-        public int LaneId { get; }
-        public int GroupId { get; }
+using MediatR;
 
-        public NoteLaneUpdatedNotification(string retroId, int laneId, int groupId) {
-            this.RetroId = retroId;
-            this.LaneId = laneId;
-            this.GroupId = groupId;
-        }
+public sealed class NoteLaneUpdatedNotification : INotification {
+    public string RetroId { get; }
+    public int LaneId { get; }
+    public int GroupId { get; }
+
+    public NoteLaneUpdatedNotification(string retroId, int laneId, int groupId) {
+        this.RetroId = retroId;
+        this.LaneId = laneId;
+        this.GroupId = groupId;
     }
 }

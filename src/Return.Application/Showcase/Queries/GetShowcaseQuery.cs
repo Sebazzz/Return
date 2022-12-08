@@ -5,15 +5,15 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Showcase.Queries {
-    using Common.Behaviours;
-    using MediatR;
+namespace Return.Application.Showcase.Queries;
 
-    public sealed class GetShowcaseQuery : IRequest<GetShowcaseQueryResult>, ILockFreeRequest {
-        public string RetroId { get; }
+using Common.Behaviours;
+using MediatR;
 
-        public GetShowcaseQuery(string retroId) {
-            this.RetroId = retroId;
-        }
+public sealed class GetShowcaseQuery : IRequest<GetShowcaseQueryResult>, ILockFreeRequest {
+    public string RetroId { get; }
+
+    public GetShowcaseQuery(string retroId) {
+        this.RetroId = retroId;
     }
 }

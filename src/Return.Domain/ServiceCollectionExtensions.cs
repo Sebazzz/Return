@@ -5,16 +5,16 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Domain {
-    using Services;
-    using Microsoft.Extensions.DependencyInjection;
+namespace Return.Domain;
 
-    public static class ServiceCollectionExtensions {
-        public static IServiceCollection AddDomain(this IServiceCollection services) {
-            services.AddTransient<IPassphraseService, PassphraseService>();
-            services.AddScoped<ITextAnonymizingService, TextAnonymizingService>();
+using Services;
+using Microsoft.Extensions.DependencyInjection;
 
-            return services;
-        }
+public static class ServiceCollectionExtensions {
+    public static IServiceCollection AddDomain(this IServiceCollection services) {
+        services.AddTransient<IPassphraseService, PassphraseService>();
+        services.AddScoped<ITextAnonymizingService, TextAnonymizingService>();
+
+        return services;
     }
 }

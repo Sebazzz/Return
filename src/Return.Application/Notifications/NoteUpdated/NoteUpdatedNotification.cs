@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteUpdated {
-    using MediatR;
+namespace Return.Application.Notifications.NoteUpdated;
 
-    public sealed class NoteUpdatedNotification : INotification {
-        public NoteUpdatedNotification(NoteUpdate note) {
-            this.Note = note;
-        }
+using MediatR;
 
-        public NoteUpdate Note { get; }
+public sealed class NoteUpdatedNotification : INotification {
+    public NoteUpdatedNotification(NoteUpdate note) {
+        this.Note = note;
     }
+
+    public NoteUpdate Note { get; }
 }

@@ -5,19 +5,19 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.NoteGroups.Commands {
-    using Common.Models;
-    using Domain.Entities;
-    using MediatR;
+namespace Return.Application.NoteGroups.Commands;
 
-    public sealed class AddNoteGroupCommand : IRequest<RetrospectiveNoteGroup> {
-        public string RetroId { get; }
-        public int LaneId { get; }
+using Common.Models;
+using Domain.Entities;
+using MediatR;
 
-        public AddNoteGroupCommand(string retroId, int laneId) {
-            this.RetroId = retroId;
-            this.LaneId = laneId;
-        }
-        public override string ToString() => $"[{nameof(AddNoteGroupCommand)}] {this.RetroId} on lane {(KnownNoteLane)this.LaneId}";
+public sealed class AddNoteGroupCommand : IRequest<RetrospectiveNoteGroup> {
+    public string RetroId { get; }
+    public int LaneId { get; }
+
+    public AddNoteGroupCommand(string retroId, int laneId) {
+        this.RetroId = retroId;
+        this.LaneId = laneId;
     }
+    public override string ToString() => $"[{nameof(AddNoteGroupCommand)}] {this.RetroId} on lane {(KnownNoteLane)this.LaneId}";
 }

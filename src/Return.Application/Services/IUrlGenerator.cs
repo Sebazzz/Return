@@ -5,11 +5,11 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Services {
-    using System;
-    using Domain.ValueObjects;
+namespace Return.Application.Services;
 
-    public interface IUrlGenerator {
-        Uri GenerateUrlToRetrospectiveLobby(RetroIdentifier urlId);
-    }
+using System;
+using Domain.ValueObjects;
+
+public interface IUrlGenerator {
+    Uri GenerateUrlToRetrospectiveLobby(RetroIdentifier urlId);
 }

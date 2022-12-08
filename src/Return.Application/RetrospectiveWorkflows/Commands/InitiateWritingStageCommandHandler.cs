@@ -5,35 +5,35 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.RetrospectiveWorkflows.Commands {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Common.Abstractions;
-    using Common;
-    using Domain.Entities;
-    using MediatR;
-    using Return.Common;
+namespace Return.Application.RetrospectiveWorkflows.Commands;
 
-    public sealed class InitiateWritingStageCommandHandler : AbstractStageCommandHandler<InitiateWritingStageCommand> {
-        private readonly ISystemClock _systemClock;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common.Abstractions;
+using Common;
+using Domain.Entities;
+using MediatR;
+using Return.Common;
 
-        public InitiateWritingStageCommandHandler(IReturnDbContext returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher, ISystemClock systemClock) : base(returnDbContext, retrospectiveStatusUpdateDispatcher) {
-            this._systemClock = systemClock;
-        }
+public sealed class InitiateWritingStageCommandHandler : AbstractStageCommandHandler<InitiateWritingStageCommand> {
+    private readonly ISystemClock _systemClock;
 
-        protected override async Task<Unit> HandleCore(InitiateWritingStageCommand request, Retrospective retrospective, CancellationToken cancellationToken) {
-            if (retrospective == null) throw new ArgumentNullException(nameof(retrospective));
+    public InitiateWritingStageCommandHandler(IReturnDbContext returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher, ISystemClock systemClock) : base(returnDbContext, retrospectiveStatusUpdateDispatcher) {
+        this._systemClock = systemClock;
+    }
 
-            retrospective.CurrentStage = RetrospectiveStage.Writing;
-            retrospective.WorkflowData.CurrentWorkflowInitiationTimestamp = this._systemClock.CurrentTimeOffset;
-            retrospective.WorkflowData.CurrentWorkflowTimeLimitInMinutes = request.TimeInMinutes;
+    protected override async Task<Unit> HandleCore(InitiateWritingStageCommand request, Retrospective retrospective, CancellationToken cancellationToken) {
+        if (retrospective == null) throw new ArgumentNullException(nameof(retrospective));
 
-            await this.DbContext.SaveChangesAsync(cancellationToken);
+        retrospective.CurrentStage = RetrospectiveStage.Writing;
+        retrospective.WorkflowData.CurrentWorkflowInitiationTimestamp = this._systemClock.CurrentTimeOffset;
+        retrospective.WorkflowData.CurrentWorkflowTimeLimitInMinutes = request.TimeInMinutes;
 
-            await this.DispatchUpdate(retrospective, cancellationToken);
+        await this.DbContext.SaveChangesAsync(cancellationToken);
 
-            return Unit.Value;
-        }
+        await this.DispatchUpdate(retrospective, cancellationToken);
+
+        return Unit.Value;
     }
 }

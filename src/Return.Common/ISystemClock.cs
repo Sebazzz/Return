@@ -5,14 +5,13 @@
 //  Project         : Return.Common
 // ******************************************************************************
 
-namespace Return.Common
+namespace Return.Common;
+
+using System;
+
+public interface ISystemClock
 {
-    using System;
+    DateTime Now { get; }
 
-    public interface ISystemClock
-    {
-        DateTime Now { get; }
-
-        DateTimeOffset CurrentTimeOffset { get; }
-    }
+    DateTimeOffset CurrentTimeOffset { get; }
 }

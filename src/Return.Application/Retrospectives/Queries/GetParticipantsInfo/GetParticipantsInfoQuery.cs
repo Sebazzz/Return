@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
-    using MediatR;
+namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo;
 
-    public sealed class GetParticipantsInfoQuery : IRequest<ParticipantsInfoList> {
-        public GetParticipantsInfoQuery(string retroId) {
-            this.RetroId = retroId;
-        }
+using MediatR;
 
-        public string RetroId { get; }
+public sealed class GetParticipantsInfoQuery : IRequest<ParticipantsInfoList> {
+    public GetParticipantsInfoQuery(string retroId) {
+        this.RetroId = retroId;
     }
+
+    public string RetroId { get; }
 }

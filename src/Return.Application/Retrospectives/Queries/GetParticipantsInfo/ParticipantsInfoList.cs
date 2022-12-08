@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo {
-    using System.Collections.Generic;
+namespace Return.Application.Retrospectives.Queries.GetParticipantsInfo;
 
-    public class ParticipantsInfoList {
-        public List<ParticipantInfo> Participants { get; } = new List<ParticipantInfo>();
-    }
+using System.Collections.Generic;
+
+public class ParticipantsInfoList {
+    public List<ParticipantInfo> Participants { get; } = new List<ParticipantInfo>();
 }

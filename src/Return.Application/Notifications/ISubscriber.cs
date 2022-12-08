@@ -5,16 +5,16 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications {
-    using System;
+namespace Return.Application.Notifications;
 
+using System;
+
+/// <summary>
+/// Base interface for notification receiving entities
+/// </summary>
+public interface ISubscriber {
     /// <summary>
-    /// Base interface for notification receiving entities
+    /// A per-instance unique ID used for tracking the subscriber
     /// </summary>
-    public interface ISubscriber {
-        /// <summary>
-        /// A per-instance unique ID used for tracking the subscriber
-        /// </summary>
-        Guid UniqueId { get; }
-    }
+    Guid UniqueId { get; }
 }

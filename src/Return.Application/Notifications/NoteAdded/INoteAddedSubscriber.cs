@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteAdded {
-    using System.Threading.Tasks;
+namespace Return.Application.Notifications.NoteAdded;
 
-    public interface INoteAddedSubscriber : ISubscriber {
-        Task OnNoteAdded(NoteAddedNotification notification);
-    }
+using System.Threading.Tasks;
+
+public interface INoteAddedSubscriber : ISubscriber {
+    Task OnNoteAdded(NoteAddedNotification notification);
 }

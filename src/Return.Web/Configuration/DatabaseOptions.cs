@@ -5,95 +5,95 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Configuration {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Data.SqlClient;
-    using Microsoft.Data.Sqlite;
-    using Persistence;
+namespace Return.Web.Configuration;
 
-    [ExcludeFromCodeCoverage] // Not much use including this in code coverage
-    public class DatabaseOptions : IDatabaseOptions {
-        private string? _cachedConnectionString;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
+using Persistence;
 
-        public string? Server { get; set; }
-        public string? Database { get; set; }
-        public string? UserId { get; set; }
-        public string? Password { get; set; }
-        public bool? Encrypt { get; set; }
-        public bool? IntegratedSecurity { get; set; }
-        public int? ConnectionTimeout { get; set; }
-        public string? ConnectionString { get; set; }
-        public DatabaseProvider DatabaseProvider { get; set; }
+[ExcludeFromCodeCoverage] // Not much use including this in code coverage
+public class DatabaseOptions : IDatabaseOptions {
+    private string? _cachedConnectionString;
 
-        public string CreateConnectionString() {
-            if (this._cachedConnectionString != null) {
-                return this._cachedConnectionString;
-            }
+    public string? Server { get; set; }
+    public string? Database { get; set; }
+    public string? UserId { get; set; }
+    public string? Password { get; set; }
+    public bool? Encrypt { get; set; }
+    public bool? IntegratedSecurity { get; set; }
+    public int? ConnectionTimeout { get; set; }
+    public string? ConnectionString { get; set; }
+    public DatabaseProvider DatabaseProvider { get; set; }
 
-            // Create new conn string
-            switch (this.DatabaseProvider) {
-                case DatabaseProvider.SqlServer:
-                    return this.CreateSqlServerConnectionString();
-                case DatabaseProvider.Sqlite:
-                    return this.CreateSqliteConnectionString();
-                default:
-                    throw new InvalidOperationException($"Invalid database provider: {this.DatabaseProvider}");
-            }
+    public string CreateConnectionString() {
+        if (this._cachedConnectionString != null) {
+            return this._cachedConnectionString;
         }
 
-        private string CreateSqliteConnectionString() {
-            var connStringBuilder = new SqliteConnectionStringBuilder();
+        // Create new conn string
+        switch (this.DatabaseProvider) {
+            case DatabaseProvider.SqlServer:
+                return this.CreateSqlServerConnectionString();
+            case DatabaseProvider.Sqlite:
+                return this.CreateSqliteConnectionString();
+            default:
+                throw new InvalidOperationException($"Invalid database provider: {this.DatabaseProvider}");
+        }
+    }
 
-            // Set values current connection string
-            if (this.Database != null) connStringBuilder.DataSource = this.Database;
-            connStringBuilder.ForeignKeys = true;
-            connStringBuilder.Mode = SqliteOpenMode.ReadWriteCreate;
-            connStringBuilder.Cache = SqliteCacheMode.Private;
+    private string CreateSqliteConnectionString() {
+        var connStringBuilder = new SqliteConnectionStringBuilder();
 
-            // Copy current connection string, overriding options here
-            if (!String.IsNullOrEmpty(value: this.ConnectionString)) {
-                var srcConnStringBuilder = new SqliteConnectionStringBuilder(connectionString: this.ConnectionString);
-                foreach (string? key in srcConnStringBuilder.Keys ??
-                                        throw new InvalidOperationException(message: "Invalid connection string")) {
-                    if (key != null && !String.IsNullOrEmpty(srcConnStringBuilder[key]?.ToString())) {
-                        connStringBuilder[key] = srcConnStringBuilder[key];
-                    }
+        // Set values current connection string
+        if (this.Database != null) connStringBuilder.DataSource = this.Database;
+        connStringBuilder.ForeignKeys = true;
+        connStringBuilder.Mode = SqliteOpenMode.ReadWriteCreate;
+        connStringBuilder.Cache = SqliteCacheMode.Private;
+
+        // Copy current connection string, overriding options here
+        if (!String.IsNullOrEmpty(value: this.ConnectionString)) {
+            var srcConnStringBuilder = new SqliteConnectionStringBuilder(connectionString: this.ConnectionString);
+            foreach (string? key in srcConnStringBuilder.Keys ??
+                                    throw new InvalidOperationException(message: "Invalid connection string")) {
+                if (key != null && !String.IsNullOrEmpty(srcConnStringBuilder[key]?.ToString())) {
+                    connStringBuilder[key] = srcConnStringBuilder[key];
                 }
             }
-
-            return connStringBuilder.ToString();
         }
 
-        private string CreateSqlServerConnectionString() {
-            var connStringBuilder = new SqlConnectionStringBuilder();
+        return connStringBuilder.ToString();
+    }
 
-            // Set values current connection string
-            if (this.ConnectionTimeout != null) connStringBuilder.ConnectTimeout = this.ConnectionTimeout.Value;
-            if (this.Encrypt != null) connStringBuilder.Encrypt = this.Encrypt.Value;
-            if (this.IntegratedSecurity != null) connStringBuilder.IntegratedSecurity = this.IntegratedSecurity.Value;
-            if (!String.IsNullOrEmpty(value: this.UserId)) connStringBuilder.UserID = this.UserId;
-            if (!String.IsNullOrEmpty(value: this.Password)) connStringBuilder.Password = this.Password;
-            if (!String.IsNullOrEmpty(value: this.Server)) connStringBuilder.DataSource = this.Server;
-            if (!String.IsNullOrEmpty(value: this.Database)) connStringBuilder.InitialCatalog = this.Database;
+    private string CreateSqlServerConnectionString() {
+        var connStringBuilder = new SqlConnectionStringBuilder();
 
-            // Copy current connection string, overriding options here
-            if (!String.IsNullOrEmpty(value: this.ConnectionString)) {
-                var srcConnStringBuilder = new SqlConnectionStringBuilder(connectionString: this.ConnectionString);
-                foreach (string? key in srcConnStringBuilder.Keys ??
-                                        throw new InvalidOperationException(message: "Invalid connection string")) {
-                    if (key != null) {
-                        connStringBuilder[keyword: key] = srcConnStringBuilder[keyword: key];
-                    }
+        // Set values current connection string
+        if (this.ConnectionTimeout != null) connStringBuilder.ConnectTimeout = this.ConnectionTimeout.Value;
+        if (this.Encrypt != null) connStringBuilder.Encrypt = this.Encrypt.Value;
+        if (this.IntegratedSecurity != null) connStringBuilder.IntegratedSecurity = this.IntegratedSecurity.Value;
+        if (!String.IsNullOrEmpty(value: this.UserId)) connStringBuilder.UserID = this.UserId;
+        if (!String.IsNullOrEmpty(value: this.Password)) connStringBuilder.Password = this.Password;
+        if (!String.IsNullOrEmpty(value: this.Server)) connStringBuilder.DataSource = this.Server;
+        if (!String.IsNullOrEmpty(value: this.Database)) connStringBuilder.InitialCatalog = this.Database;
+
+        // Copy current connection string, overriding options here
+        if (!String.IsNullOrEmpty(value: this.ConnectionString)) {
+            var srcConnStringBuilder = new SqlConnectionStringBuilder(connectionString: this.ConnectionString);
+            foreach (string? key in srcConnStringBuilder.Keys ??
+                                    throw new InvalidOperationException(message: "Invalid connection string")) {
+                if (key != null) {
+                    connStringBuilder[keyword: key] = srcConnStringBuilder[keyword: key];
                 }
             }
-
-            // Ensure MultipleActiveResultSets
-            connStringBuilder.MultipleActiveResultSets = true;
-
-            // Cache and return
-            // (thread safety notice: assignment is atomic)
-            return this._cachedConnectionString = connStringBuilder.ToString();
         }
+
+        // Ensure MultipleActiveResultSets
+        connStringBuilder.MultipleActiveResultSets = true;
+
+        // Cache and return
+        // (thread safety notice: assignment is atomic)
+        return this._cachedConnectionString = connStringBuilder.ToString();
     }
 }

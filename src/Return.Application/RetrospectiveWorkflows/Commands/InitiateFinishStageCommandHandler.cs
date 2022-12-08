@@ -5,29 +5,29 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.RetrospectiveWorkflows.Commands {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Common.Abstractions;
-    using Common;
-    using Domain.Entities;
-    using MediatR;
+namespace Return.Application.RetrospectiveWorkflows.Commands;
 
-    public sealed class InitiateFinishStageCommandHandler : AbstractStageCommandHandler<InitiateFinishStageCommand> {
-        public InitiateFinishStageCommandHandler(IReturnDbContextFactory returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher) : base(returnDbContext, retrospectiveStatusUpdateDispatcher) {
-        }
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common.Abstractions;
+using Common;
+using Domain.Entities;
+using MediatR;
 
-        protected override async Task<Unit> HandleCore(InitiateFinishStageCommand request, Retrospective retrospective, CancellationToken cancellationToken) {
-            if (retrospective == null) throw new ArgumentNullException(nameof(retrospective));
+public sealed class InitiateFinishStageCommandHandler : AbstractStageCommandHandler<InitiateFinishStageCommand> {
+    public InitiateFinishStageCommandHandler(IReturnDbContextFactory returnDbContext, IRetrospectiveStatusUpdateDispatcher retrospectiveStatusUpdateDispatcher) : base(returnDbContext, retrospectiveStatusUpdateDispatcher) {
+    }
 
-            retrospective.CurrentStage = RetrospectiveStage.Finished;
+    protected override async Task<Unit> HandleCore(InitiateFinishStageCommand request, Retrospective retrospective, CancellationToken cancellationToken) {
+        if (retrospective == null) throw new ArgumentNullException(nameof(retrospective));
 
-            await this.DbContext.SaveChangesAsync(cancellationToken);
+        retrospective.CurrentStage = RetrospectiveStage.Finished;
 
-            await this.DispatchUpdate(retrospective, cancellationToken);
+        await this.DbContext.SaveChangesAsync(cancellationToken);
 
-            return Unit.Value;
-        }
+        await this.DispatchUpdate(retrospective, cancellationToken);
+
+        return Unit.Value;
     }
 }

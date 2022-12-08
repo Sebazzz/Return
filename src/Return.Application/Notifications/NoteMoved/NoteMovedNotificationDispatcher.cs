@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteMoved {
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
+namespace Return.Application.Notifications.NoteMoved;
 
-    public sealed class NoteMovedNotificationDispatcher : NotificationDispatcher<NoteMovedNotification, INoteMovedSubscriber> {
-        public NoteMovedNotificationDispatcher(ILogger<NotificationDispatcher<NoteMovedNotification, INoteMovedSubscriber>> logger) : base(logger) {
-        }
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-        protected override Task DispatchCore(
-            INoteMovedSubscriber subscriber,
-            NoteMovedNotification notification
-        ) => subscriber.OnNoteMoved(notification);
+public sealed class NoteMovedNotificationDispatcher : NotificationDispatcher<NoteMovedNotification, INoteMovedSubscriber> {
+    public NoteMovedNotificationDispatcher(ILogger<NotificationDispatcher<NoteMovedNotification, INoteMovedSubscriber>> logger) : base(logger) {
     }
+
+    protected override Task DispatchCore(
+        INoteMovedSubscriber subscriber,
+        NoteMovedNotification notification
+    ) => subscriber.OnNoteMoved(notification);
 }

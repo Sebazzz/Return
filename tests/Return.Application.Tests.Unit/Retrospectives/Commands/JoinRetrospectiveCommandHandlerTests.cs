@@ -5,141 +5,141 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospectives.Commands {
-    using System;
-    using System.Drawing;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Common;
-    using Application.Common.Abstractions;
-    using Application.Common.Models;
-    using Application.Notifications.RetrospectiveJoined;
-    using Application.Retrospectives.Commands.JoinRetrospective;
-    using AutoMapper;
-    using Domain.Entities;
-    using MediatR;
-    using Microsoft.EntityFrameworkCore;
-    using NSubstitute;
-    using NSubstitute.ReceivedExtensions;
-    using NUnit.Framework;
-    using Services;
-    using Support;
+namespace Return.Application.Tests.Unit.Retrospectives.Commands;
 
-    [TestFixture]
-    public sealed class JoinRetrospectiveCommandHandlerTests : CommandTestBase {
-        private Retrospective _retrospective;
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common;
+using Application.Common.Abstractions;
+using Application.Common.Models;
+using Application.Notifications.RetrospectiveJoined;
+using Application.Retrospectives.Commands.JoinRetrospective;
+using AutoMapper;
+using Domain.Entities;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using NSubstitute;
+using NSubstitute.ReceivedExtensions;
+using NUnit.Framework;
+using Services;
+using Support;
 
-        [OneTimeSetUp]
-        public async Task OneTimeSetUp() {
-            var retro = new Retrospective {
-                Title = "What",
-                Participants =
-                {
-                    new Participant {Name = "John", Color = Color.BlueViolet},
-                    new Participant {Name = "Jane", Color = Color.Aqua},
-                },
-                FacilitatorHashedPassphrase = "abc",
-                HashedPassphrase = "abef"
-            };
+[TestFixture]
+public sealed class JoinRetrospectiveCommandHandlerTests : CommandTestBase {
+    private Retrospective _retrospective;
 
-            this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None);
+    [OneTimeSetUp]
+    public async Task OneTimeSetUp() {
+        var retro = new Retrospective {
+            Title = "What",
+            Participants =
+            {
+                new Participant {Name = "John", Color = Color.BlueViolet},
+                new Participant {Name = "Jane", Color = Color.Aqua},
+            },
+            FacilitatorHashedPassphrase = "abc",
+            HashedPassphrase = "abef"
+        };
 
-            this._retrospective = retro;
-        }
+        this.Context.Retrospectives.Add(retro);
+        await this.Context.SaveChangesAsync(CancellationToken.None);
 
-        [Test]
-        public void JoinRetrospectiveCommand_ThrowsException_WhenNotFound() {
-            // Given
-            var command = new JoinRetrospectiveCommand {
-                RetroId = "not found"
-            };
-            var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>(), Substitute.For<IMediator>(), Substitute.For<IMapper>());
+        this._retrospective = retro;
+    }
 
-            // When
-            TestDelegate action = () => handler.Handle(command, CancellationToken.None).GetAwaiter().GetResult();
+    [Test]
+    public void JoinRetrospectiveCommand_ThrowsException_WhenNotFound() {
+        // Given
+        var command = new JoinRetrospectiveCommand {
+            RetroId = "not found"
+        };
+        var handler = new JoinRetrospectiveCommandHandler(this.Context, Substitute.For<ICurrentParticipantService>(), Substitute.For<IMediator>(), Substitute.For<IMapper>());
 
-            // Then
-            Assert.That(action, Throws.InstanceOf<NotFoundException>());
-        }
+        // When
+        TestDelegate action = () => handler.Handle(command, CancellationToken.None).GetAwaiter().GetResult();
 
-        [Test]
-        public async Task JoinRetrospectiveCommand_SetsParticipantId_WhenJoiningRetrospective() {
-            // Given
-            var retro = this._retrospective ?? throw new InvalidOperationException("OneTimeSetup not executed");
+        // Then
+        Assert.That(action, Throws.InstanceOf<NotFoundException>());
+    }
 
-            var mediator = Substitute.For<IMediator>();
-            var mapper = Substitute.For<IMapper>();
+    [Test]
+    public async Task JoinRetrospectiveCommand_SetsParticipantId_WhenJoiningRetrospective() {
+        // Given
+        var retro = this._retrospective ?? throw new InvalidOperationException("OneTimeSetup not executed");
 
-            var currentParticipantService = Substitute.For<ICurrentParticipantService>();
-            var handler = new JoinRetrospectiveCommandHandler(
-                this.Context,
-                currentParticipantService,
-                mediator,
-                mapper
-            );
+        var mediator = Substitute.For<IMediator>();
+        var mapper = Substitute.For<IMapper>();
 
-            var command = new JoinRetrospectiveCommand {
-                RetroId = retro.UrlId.StringId,
-                Color = "ABCDEF",
-                JoiningAsFacilitator = true,
-                Name = "The BOSS",
-                Passphrase = "Not relevant"
-            };
+        var currentParticipantService = Substitute.For<ICurrentParticipantService>();
+        var handler = new JoinRetrospectiveCommandHandler(
+            this.Context,
+            currentParticipantService,
+            mediator,
+            mapper
+        );
 
-            // When
-            await handler.Handle(command, CancellationToken.None);
+        var command = new JoinRetrospectiveCommand {
+            RetroId = retro.UrlId.StringId,
+            Color = "ABCDEF",
+            JoiningAsFacilitator = true,
+            Name = "The BOSS",
+            Passphrase = "Not relevant"
+        };
 
-            // Then
-            currentParticipantService.ReceivedWithAnyArgs(Quantity.Exactly(1))
-                .SetParticipant(Arg.Any<CurrentParticipantModel>());
+        // When
+        await handler.Handle(command, CancellationToken.None);
 
-            Retrospective checkRetro = await this.Context.Retrospectives.AsNoTracking().
-                Include(x => x.Participants).
-                FindByRetroId(retro.UrlId.StringId, CancellationToken.None).
-                ConfigureAwait(false);
+        // Then
+        currentParticipantService.ReceivedWithAnyArgs(Quantity.Exactly(1))
+            .SetParticipant(Arg.Any<CurrentParticipantModel>());
 
-            Assert.That(checkRetro.Participants.Select(x => x.Name), Contains.Item("The BOSS"));
+        Retrospective checkRetro = await this.Context.Retrospectives.AsNoTracking().
+            Include(x => x.Participants).
+            FindByRetroId(retro.UrlId.StringId, CancellationToken.None).
+            ConfigureAwait(false);
 
-            await mediator.Received().
-                Publish(Arg.Any<RetrospectiveJoinedNotification>(), Arg.Any<CancellationToken>());
-        }
+        Assert.That(checkRetro.Participants.Select(x => x.Name), Contains.Item("The BOSS"));
 
-        [Test]
-        public async Task JoinRetrospectiveCommand_DuplicateJoin_DoesNotCreateNewParticipant() {
-            // Given
-            var retro = this._retrospective ?? throw new InvalidOperationException("OneTimeSetup not executed");
+        await mediator.Received().
+            Publish(Arg.Any<RetrospectiveJoinedNotification>(), Arg.Any<CancellationToken>());
+    }
 
-            var mediator = Substitute.For<IMediator>();
-            var mapper = Substitute.For<IMapper>();
+    [Test]
+    public async Task JoinRetrospectiveCommand_DuplicateJoin_DoesNotCreateNewParticipant() {
+        // Given
+        var retro = this._retrospective ?? throw new InvalidOperationException("OneTimeSetup not executed");
 
-            var currentParticipantService = Substitute.For<ICurrentParticipantService>();
-            var handler = new JoinRetrospectiveCommandHandler(
-                this.Context,
-                currentParticipantService,
-                mediator,
-                mapper
-            );
+        var mediator = Substitute.For<IMediator>();
+        var mapper = Substitute.For<IMapper>();
 
-            var command = new JoinRetrospectiveCommand {
-                RetroId = retro.UrlId.StringId,
-                Color = "ABCDEF",
-                JoiningAsFacilitator = true,
-                Name = "Duplicate joiner",
-                Passphrase = "Not relevant"
-            };
+        var currentParticipantService = Substitute.For<ICurrentParticipantService>();
+        var handler = new JoinRetrospectiveCommandHandler(
+            this.Context,
+            currentParticipantService,
+            mediator,
+            mapper
+        );
 
-            // When
-            await handler.Handle(command, CancellationToken.None);
+        var command = new JoinRetrospectiveCommand {
+            RetroId = retro.UrlId.StringId,
+            Color = "ABCDEF",
+            JoiningAsFacilitator = true,
+            Name = "Duplicate joiner",
+            Passphrase = "Not relevant"
+        };
 
-            await handler.Handle(command, CancellationToken.None);
+        // When
+        await handler.Handle(command, CancellationToken.None);
 
-            // Then
-            var participants = await this.Context.Retrospectives.
-                 SelectMany(x => x.Participants).AsNoTracking().ToListAsync();
+        await handler.Handle(command, CancellationToken.None);
 
-            Assert.That(participants.Count(x => x.Name == "Duplicate joiner"), Is.EqualTo(1));
-        }
+        // Then
+        var participants = await this.Context.Retrospectives.
+            SelectMany(x => x.Participants).AsNoTracking().ToListAsync();
+
+        Assert.That(participants.Count(x => x.Name == "Duplicate joiner"), Is.EqualTo(1));
     }
 }

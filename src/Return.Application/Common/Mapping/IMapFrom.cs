@@ -5,15 +5,15 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Mapping {
-    using System;
-    using AutoMapper;
+namespace Return.Application.Common.Mapping;
 
-    public interface IMapFrom<T> {
-        void Mapping(Profile profile) {
-            if (profile == null) throw new ArgumentNullException(nameof(profile));
+using System;
+using AutoMapper;
 
-            profile.CreateMap(typeof(T), this.GetType());
-        }
+public interface IMapFrom<T> {
+    void Mapping(Profile profile) {
+        if (profile == null) throw new ArgumentNullException(nameof(profile));
+
+        profile.CreateMap(typeof(T), this.GetType());
     }
 }

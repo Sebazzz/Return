@@ -5,19 +5,19 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notes.Commands.MoveNote {
-    using MediatR;
+namespace Return.Application.Notes.Commands.MoveNote;
 
-    /// <summary>
-    /// Essential a group command
-    /// </summary>
-    public sealed class MoveNoteCommand : IRequest {
-        public int NoteId { get; }
-        public int? GroupId { get; }
+using MediatR;
 
-        public MoveNoteCommand(int noteId, int? groupId) {
-            this.NoteId = noteId;
-            this.GroupId = groupId;
-        }
+/// <summary>
+/// Essential a group command
+/// </summary>
+public sealed class MoveNoteCommand : IRequest {
+    public int NoteId { get; }
+    public int? GroupId { get; }
+
+    public MoveNoteCommand(int noteId, int? groupId) {
+        this.NoteId = noteId;
+        this.GroupId = groupId;
     }
 }

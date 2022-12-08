@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notes.Commands.DeleteNote {
-    using MediatR;
+namespace Return.Application.Notes.Commands.DeleteNote;
 
-    public sealed class DeleteNoteCommand : IRequest {
-        public string RetroId { get; }
+using MediatR;
 
-        public int NoteId { get; }
+public sealed class DeleteNoteCommand : IRequest {
+    public string RetroId { get; }
 
-        public DeleteNoteCommand(string retroId, int noteId) {
-            this.RetroId = retroId;
-            this.NoteId = noteId;
-        }
+    public int NoteId { get; }
+
+    public DeleteNoteCommand(string retroId, int noteId) {
+        this.RetroId = retroId;
+        this.NoteId = noteId;
     }
 }

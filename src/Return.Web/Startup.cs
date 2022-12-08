@@ -4,103 +4,103 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Return.Web {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Application;
-    using Application.Common.Abstractions;
-    using Application.Common.Settings;
-    using Application.Services;
-    using Configuration;
-    using Domain;
-    using FluentValidation;
-    using Infrastructure;
-    using MediatR;
-    using Microsoft.Extensions.Logging;
-    using Microsoft.Extensions.Options;
-    using Middleware;
-    using Middleware.Https;
-    using Persistence;
-    using Services;
+namespace Return.Web;
 
-    [ExcludeFromCodeCoverage]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "ASP.NET Core conventions")]
-    public class Startup {
-        public Startup(IConfiguration configuration) {
-            this.Configuration = configuration;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using Application;
+using Application.Common.Abstractions;
+using Application.Common.Settings;
+using Application.Services;
+using Configuration;
+using Domain;
+using FluentValidation;
+using Infrastructure;
+using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Middleware;
+using Middleware.Https;
+using Persistence;
+using Services;
+
+[ExcludeFromCodeCoverage]
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "ASP.NET Core conventions")]
+public class Startup {
+    public Startup(IConfiguration configuration) {
+        this.Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+
+    public void ConfigureServices(IServiceCollection services) {
+        // App
+        services.AddInfrastructure();
+        services.AddPersistence();
+        services.AddApplication();
+        services.AddDomain();
+
+        services.AddScoped<ICurrentParticipantService, CurrentParticipantService>();
+        services.AddSingleton<ISiteUrlDetectionService, SiteUrlDetectionService>();
+
+        services.AddSingleton<IUrlGenerator, WebUrlGenerator>();
+
+        // ... Blazor does on an await InitializeAsync/ParametersSetAsync already render children.
+        //     so scope services may actually be called concurrently. Wrap the Mediator
+        //     with a semaphore to mitigate and fix the locks
+        services.Decorate<IMediator, ScopeSafeMediatorDecorator>();
+
+        // ... Config
+        services.Configure<DatabaseOptions>(this.Configuration.GetSection("database"));
+        services.AddTransient<IDatabaseOptions>(sp => sp.GetRequiredService<IOptions<DatabaseOptions>>().Value);
+
+        services.Configure<HttpsServerOptions>(this.Configuration.GetSection("server").GetSection("https"));
+        services.Configure<ServerOptions>(this.Configuration.GetSection("server"));
+
+        services.Configure<SecuritySettings>(this.Configuration.GetSection("Security"));
+
+        // Framework
+        services.AddRazorPages();
+        services.AddServerSideBlazor();
+        services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly, ServiceLifetime.Scoped);
+        services.AddDataProtection();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory) {
+        if (app == null) throw new ArgumentNullException(nameof(app));
+        if (env == null) throw new ArgumentNullException(nameof(env));
+        if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+
+        // Log hosting environment
+        {
+            ILogger logger = loggerFactory.CreateLogger("Startup");
+            logger.LogInformation("Using content root: {0}", env.ContentRootPath);
+            logger.LogInformation("Using web root: {0}", env.WebRootPath);
         }
 
-        public IConfiguration Configuration { get; }
+        // Set-up application pipeline
+        app.UseRequestEnvironmentDetection();
+        app.UseCurrentParticipantService();
 
-
-        public void ConfigureServices(IServiceCollection services) {
-            // App
-            services.AddInfrastructure();
-            services.AddPersistence();
-            services.AddApplication();
-            services.AddDomain();
-
-            services.AddScoped<ICurrentParticipantService, CurrentParticipantService>();
-            services.AddSingleton<ISiteUrlDetectionService, SiteUrlDetectionService>();
-
-            services.AddSingleton<IUrlGenerator, WebUrlGenerator>();
-
-            // ... Blazor does on an await InitializeAsync/ParametersSetAsync already render children.
-            //     so scope services may actually be called concurrently. Wrap the Mediator
-            //     with a semaphore to mitigate and fix the locks
-            services.Decorate<IMediator, ScopeSafeMediatorDecorator>();
-
-            // ... Config
-            services.Configure<DatabaseOptions>(this.Configuration.GetSection("database"));
-            services.AddTransient<IDatabaseOptions>(sp => sp.GetRequiredService<IOptions<DatabaseOptions>>().Value);
-
-            services.Configure<HttpsServerOptions>(this.Configuration.GetSection("server").GetSection("https"));
-            services.Configure<ServerOptions>(this.Configuration.GetSection("server"));
-
-            services.Configure<SecuritySettings>(this.Configuration.GetSection("Security"));
-
-            // Framework
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-            services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly, ServiceLifetime.Scoped);
-            services.AddDataProtection();
+        if (env.IsDevelopment()) {
+            app.UseDeveloperExceptionPage();
+        }
+        else {
+            app.UseExceptionHandler("/Error");
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory) {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (env == null) throw new ArgumentNullException(nameof(env));
-            if (loggerFactory == null) throw new ArgumentNullException(nameof(loggerFactory));
+        app.UseHttps(env);
+        app.UseStaticFiles();
 
-            // Log hosting environment
-            {
-                ILogger logger = loggerFactory.CreateLogger("Startup");
-                logger.LogInformation("Using content root: {0}", env.ContentRootPath);
-                logger.LogInformation("Using web root: {0}", env.WebRootPath);
-            }
+        app.UseRouting();
 
-            // Set-up application pipeline
-            app.UseRequestEnvironmentDetection();
-            app.UseCurrentParticipantService();
+        app.UseEndpoints(endpoints => {
+            endpoints.MapHealthChecks("/health");
 
-            if (env.IsDevelopment()) {
-                app.UseDeveloperExceptionPage();
-            }
-            else {
-                app.UseExceptionHandler("/Error");
-            }
+            endpoints.MapBlazorHub();
 
-            app.UseHttps(env);
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints => {
-                endpoints.MapHealthChecks("/health");
-
-                endpoints.MapBlazorHub();
-
-                endpoints.MapFallbackToPage("/_Host");
-            });
-        }
+            endpoints.MapFallbackToPage("/_Host");
+        });
     }
 }

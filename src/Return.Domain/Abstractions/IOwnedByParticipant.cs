@@ -5,8 +5,8 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Abstractions {
-    public interface IOwnedByParticipant {
-        int ParticipantId { get; }
-    }
+namespace Return.Domain.Abstractions;
+
+public interface IOwnedByParticipant {
+    int ParticipantId { get; }
 }

@@ -5,12 +5,12 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Abstractions {
-    public interface IReturnDbContextFactory {
-        /// <summary>
-        ///     Creates a disposable copy for edit operations
-        /// </summary>
-        /// <returns></returns>
-        IReturnDbContext CreateForEditContext();
-    }
+namespace Return.Application.Common.Abstractions;
+
+public interface IReturnDbContextFactory {
+    /// <summary>
+    ///     Creates a disposable copy for edit operations
+    /// </summary>
+    /// <returns></returns>
+    IReturnDbContext CreateForEditContext();
 }

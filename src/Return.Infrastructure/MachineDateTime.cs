@@ -5,12 +5,12 @@
 //  Project         : Return.Infrastructure
 // ******************************************************************************
 
-namespace Return.Infrastructure {
-    using System;
-    using Common;
+namespace Return.Infrastructure;
 
-    public sealed class MachineSystemClock : ISystemClock {
-        public DateTime Now => DateTime.Now;
-        public DateTimeOffset CurrentTimeOffset => DateTimeOffset.Now;
-    }
+using System;
+using Common;
+
+public sealed class MachineSystemClock : ISystemClock {
+    public DateTime Now => DateTime.Now;
+    public DateTimeOffset CurrentTimeOffset => DateTimeOffset.Now;
 }

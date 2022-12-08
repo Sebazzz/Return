@@ -5,20 +5,20 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Settings {
-    using System;
+namespace Return.Application.Common.Settings;
 
-    public sealed class SecuritySettings {
-        /// <summary>
-        /// Passphrase for creating lobby's - set on server side to prevent just anyone from hosting retrospectives
-        /// </summary>
-        public string? LobbyCreationPassphrase { get; set; }
+using System;
 
-        public bool LobbyCreationNeedsPassphrase => !String.IsNullOrEmpty(this.LobbyCreationPassphrase);
+public sealed class SecuritySettings {
+    /// <summary>
+    /// Passphrase for creating lobby's - set on server side to prevent just anyone from hosting retrospectives
+    /// </summary>
+    public string? LobbyCreationPassphrase { get; set; }
 
-        /// <summary>
-        /// Enable detection of X-HTTP-Forwarded-For HTTP headers
-        /// </summary>
-        public bool EnableProxyMode { get; set; }
-    }
+    public bool LobbyCreationNeedsPassphrase => !String.IsNullOrEmpty(this.LobbyCreationPassphrase);
+
+    /// <summary>
+    /// Enable detection of X-HTTP-Forwarded-For HTTP headers
+    /// </summary>
+    public bool EnableProxyMode { get; set; }
 }

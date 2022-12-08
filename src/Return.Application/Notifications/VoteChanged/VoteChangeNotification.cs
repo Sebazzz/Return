@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.VoteChanged {
-    using MediatR;
+namespace Return.Application.Notifications.VoteChanged;
 
-    public sealed class VoteChangeNotification : INotification {
-        public VoteChange VoteChange { get; }
+using MediatR;
 
-        public VoteChangeNotification(VoteChange voteChange) {
-            this.VoteChange = voteChange;
-        }
+public sealed class VoteChangeNotification : INotification {
+    public VoteChange VoteChange { get; }
+
+    public VoteChangeNotification(VoteChange voteChange) {
+        this.VoteChange = voteChange;
     }
 }

@@ -5,9 +5,9 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Behaviours {
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1040:Avoid empty interfaces",
-        Justification = "Performance and due to later refactoring")]
-    public interface ILockFreeRequest {
-    }
+namespace Return.Application.Common.Behaviours;
+
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1040:Avoid empty interfaces",
+    Justification = "Performance and due to later refactoring")]
+public interface ILockFreeRequest {
 }

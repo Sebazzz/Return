@@ -5,36 +5,36 @@
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
 
-namespace Return.Web.Tests.Integration.Components {
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using Common;
-    using OpenQA.Selenium;
+namespace Return.Web.Tests.Integration.Components;
 
-    public sealed class VoteStatusPanelComponent {
-        private readonly IWebElement _webElement;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Common;
+using OpenQA.Selenium;
 
-        public VoteStatusPanelComponent(IWebElement webElement) {
-            this._webElement = webElement;
-        }
+public sealed class VoteStatusPanelComponent {
+    private readonly IWebElement _webElement;
 
-        public IEnumerable<VoteStatusForParticipant> VoteStatusPerParticipant =>
-            this._webElement.FindElementsByTestElementId("participant-vote-status").
-                Select(x => new VoteStatusForParticipant(x));
+    public VoteStatusPanelComponent(IWebElement webElement) {
+        this._webElement = webElement;
     }
 
-    public sealed class VoteStatusForParticipant {
-        private readonly IWebElement _webElement;
+    public IEnumerable<VoteStatusForParticipant> VoteStatusPerParticipant =>
+        this._webElement.FindElementsByTestElementId("participant-vote-status").
+            Select(x => new VoteStatusForParticipant(x));
+}
 
-        public VoteStatusForParticipant(IWebElement webElement) {
-            this._webElement = webElement;
-        }
+public sealed class VoteStatusForParticipant {
+    private readonly IWebElement _webElement;
 
-        public int ParticipantId => this._webElement.GetAttribute<int>("data-id");
-
-        public ReadOnlyCollection<IWebElement> CastVotes => this._webElement.FindElementsByTestElementId("cast-vote");
-        public ReadOnlyCollection<IWebElement> UncastVotes => this._webElement.FindElementsByTestElementId("uncast-vote");
-        public ReadOnlyCollection<IWebElement> TotalVotes => this._webElement.FindElements(By.ClassName("vote-indicator"));
+    public VoteStatusForParticipant(IWebElement webElement) {
+        this._webElement = webElement;
     }
+
+    public int ParticipantId => this._webElement.GetAttribute<int>("data-id");
+
+    public ReadOnlyCollection<IWebElement> CastVotes => this._webElement.FindElementsByTestElementId("cast-vote");
+    public ReadOnlyCollection<IWebElement> UncastVotes => this._webElement.FindElementsByTestElementId("uncast-vote");
+    public ReadOnlyCollection<IWebElement> TotalVotes => this._webElement.FindElements(By.ClassName("vote-indicator"));
 }

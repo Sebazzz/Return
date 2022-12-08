@@ -5,9 +5,9 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.VoteChanged {
-    public enum VoteMutationType {
-        Added,
-        Removed
-    }
+namespace Return.Application.Notifications.VoteChanged;
+
+public enum VoteMutationType {
+    Added,
+    Removed
 }

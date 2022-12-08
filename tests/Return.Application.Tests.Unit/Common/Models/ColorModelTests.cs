@@ -5,50 +5,50 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Common.Models {
-    using System.Drawing;
-    using Application.Common.Models;
-    using NUnit.Framework;
+namespace Return.Application.Tests.Unit.Common.Models;
 
-    [TestFixture]
-    public static class ColorModelTests {
-        [Test]
-        public static void ColorModel_HasSameColors_ReturnsTrue() {
-            // Given
-            var derivedColor = new DerivedColorModel(Color.BlueViolet);
-            var color = new ColorModel { R = derivedColor.R, B = derivedColor.B, G = derivedColor.G };
+using System.Drawing;
+using Application.Common.Models;
+using NUnit.Framework;
 
-            // When
-            bool result = color.HasSameColors(derivedColor);
+[TestFixture]
+public static class ColorModelTests {
+    [Test]
+    public static void ColorModel_HasSameColors_ReturnsTrue() {
+        // Given
+        var derivedColor = new DerivedColorModel(Color.BlueViolet);
+        var color = new ColorModel { R = derivedColor.R, B = derivedColor.B, G = derivedColor.G };
 
-            // Then
-            Assert.That(result, Is.True);
-        }
+        // When
+        bool result = color.HasSameColors(derivedColor);
 
-        [Test]
-        public static void ColorModel_HasSameColors_ReturnsFalse() {
-            // Given
-            var derivedColor = new DerivedColorModel(Color.BlueViolet);
-            var color = new ColorModel { R = derivedColor.R, B = derivedColor.B, G = derivedColor.G };
+        // Then
+        Assert.That(result, Is.True);
+    }
 
-            derivedColor.G = 0;
+    [Test]
+    public static void ColorModel_HasSameColors_ReturnsFalse() {
+        // Given
+        var derivedColor = new DerivedColorModel(Color.BlueViolet);
+        var color = new ColorModel { R = derivedColor.R, B = derivedColor.B, G = derivedColor.G };
 
-            // When
-            bool result = color.HasSameColors(derivedColor);
+        derivedColor.G = 0;
 
-            // Then
-            Assert.That(result, Is.False);
-        }
+        // When
+        bool result = color.HasSameColors(derivedColor);
 
-        private sealed class DerivedColorModel : ColorModel {
-            public string KnownName { get; }
+        // Then
+        Assert.That(result, Is.False);
+    }
 
-            public DerivedColorModel(Color color) {
-                this.KnownName = color.Name;
-                this.R = color.R;
-                this.G = color.G;
-                this.B = color.B;
-            }
+    private sealed class DerivedColorModel : ColorModel {
+        public string KnownName { get; }
+
+        public DerivedColorModel(Color color) {
+            this.KnownName = color.Name;
+            this.R = color.R;
+            this.G = color.G;
+            this.B = color.B;
         }
     }
 }

@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications {
-    using MediatR;
+namespace Return.Application.Notifications;
 
-    public abstract class RetrospectiveNotification : INotification {
-        protected RetrospectiveNotification(string retroId) {
-            this.RetroId = retroId;
-        }
+using MediatR;
 
-        public string RetroId { get; }
+public abstract class RetrospectiveNotification : INotification {
+    protected RetrospectiveNotification(string retroId) {
+        this.RetroId = retroId;
     }
+
+    public string RetroId { get; }
 }

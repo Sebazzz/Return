@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.RetrospectiveJoined {
-    using Retrospectives.Queries.GetParticipantsInfo;
+namespace Return.Application.Notifications.RetrospectiveJoined;
 
-    public sealed class RetrospectiveJoinedNotification : RetrospectiveNotification {
-        public ParticipantInfo ParticipantInfo { get; }
+using Retrospectives.Queries.GetParticipantsInfo;
 
-        public RetrospectiveJoinedNotification(string retroId, ParticipantInfo participantInfo) : base(retroId) {
-            this.ParticipantInfo = participantInfo;
-        }
+public sealed class RetrospectiveJoinedNotification : RetrospectiveNotification {
+    public ParticipantInfo ParticipantInfo { get; }
+
+    public RetrospectiveJoinedNotification(string retroId, ParticipantInfo participantInfo) : base(retroId) {
+        this.ParticipantInfo = participantInfo;
     }
 }

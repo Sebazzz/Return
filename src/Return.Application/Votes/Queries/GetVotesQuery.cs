@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Votes.Queries {
-    using MediatR;
+namespace Return.Application.Votes.Queries;
 
-    public sealed class GetVotesQuery : IRequest<GetVotesQueryResult> {
-        public string RetroId { get; }
+using MediatR;
 
-        public GetVotesQuery(string retroId) {
-            this.RetroId = retroId;
-        }
+public sealed class GetVotesQuery : IRequest<GetVotesQueryResult> {
+    public string RetroId { get; }
+
+    public GetVotesQuery(string retroId) {
+        this.RetroId = retroId;
     }
 }

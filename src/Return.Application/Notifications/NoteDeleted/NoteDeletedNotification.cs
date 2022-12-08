@@ -5,18 +5,18 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteDeleted {
-    using MediatR;
+namespace Return.Application.Notifications.NoteDeleted;
 
-    public class NoteDeletedNotification : INotification {
-        public NoteDeletedNotification(string retroId, int laneId, in int noteId) {
-            this.RetroId = retroId;
-            this.LaneId = laneId;
-            this.NoteId = noteId;
-        }
+using MediatR;
 
-        public string RetroId { get; }
-        public int LaneId { get; }
-        public int NoteId { get; }
+public class NoteDeletedNotification : INotification {
+    public NoteDeletedNotification(string retroId, int laneId, in int noteId) {
+        this.RetroId = retroId;
+        this.LaneId = laneId;
+        this.NoteId = noteId;
     }
+
+    public string RetroId { get; }
+    public int LaneId { get; }
+    public int NoteId { get; }
 }

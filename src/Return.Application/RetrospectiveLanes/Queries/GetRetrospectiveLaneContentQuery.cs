@@ -5,16 +5,16 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.RetrospectiveLanes.Queries {
-    using MediatR;
+namespace Return.Application.RetrospectiveLanes.Queries;
 
-    public sealed class GetRetrospectiveLaneContentQuery : IRequest<RetrospectiveLaneContent> {
-        public string RetroId { get; }
-        public int LaneId { get; }
+using MediatR;
 
-        public GetRetrospectiveLaneContentQuery(string retroId, int laneId) {
-            this.RetroId = retroId;
-            this.LaneId = laneId;
-        }
+public sealed class GetRetrospectiveLaneContentQuery : IRequest<RetrospectiveLaneContent> {
+    public string RetroId { get; }
+    public int LaneId { get; }
+
+    public GetRetrospectiveLaneContentQuery(string retroId, int laneId) {
+        this.RetroId = retroId;
+        this.LaneId = laneId;
     }
 }

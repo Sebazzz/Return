@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.NoteUpdated {
-    using Domain.Entities;
+namespace Return.Application.Notifications.NoteUpdated;
 
-    public class NoteUpdate {
-        public int Id { get; }
-        public string Text { get; }
+using Domain.Entities;
 
-        public NoteUpdate(int id, string text) {
-            this.Id = id;
-            this.Text = text;
-        }
-        internal static NoteUpdate FromNote(Note note) => new NoteUpdate(note.Id, note.Text);
+public class NoteUpdate {
+    public int Id { get; }
+    public string Text { get; }
+
+    public NoteUpdate(int id, string text) {
+        this.Id = id;
+        this.Text = text;
     }
+    internal static NoteUpdate FromNote(Note note) => new NoteUpdate(note.Id, note.Text);
 }

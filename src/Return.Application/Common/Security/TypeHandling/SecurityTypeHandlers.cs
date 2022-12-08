@@ -5,39 +5,39 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Security.TypeHandling {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-    using Domain.Entities;
-    using Models;
+namespace Return.Application.Common.Security.TypeHandling;
 
-    internal static class SecurityTypeHandlers {
-        private static readonly ITypeSecurityHandler[] All;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Domain.Entities;
+using Models;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "There is only a single field and this is for clarity too.")]
-        static SecurityTypeHandlers() {
-            Assembly searchAssembly = typeof(SecurityTypeHandlers).Assembly;
-            Type typeInterface = typeof(ITypeSecurityHandler);
+internal static class SecurityTypeHandlers {
+    private static readonly ITypeSecurityHandler[] All;
 
-            All =
-                (from type in searchAssembly.GetTypes()
-                 where type.IsClass
-                 where type.IsAbstract == false
-                 where typeInterface.IsAssignableFrom(type)
-                 let inst = Activator.CreateInstance(type)
-                 select (ITypeSecurityHandler)inst).ToArray();
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1810:Initialize reference type static fields inline", Justification = "There is only a single field and this is for clarity too.")]
+    static SecurityTypeHandlers() {
+        Assembly searchAssembly = typeof(SecurityTypeHandlers).Assembly;
+        Type typeInterface = typeof(ITypeSecurityHandler);
 
-            if (All.Length == 0) {
-                Debug.Fail($"Unable to find {typeInterface} implementations");
-            }
+        All =
+            (from type in searchAssembly.GetTypes()
+                where type.IsClass
+                where type.IsAbstract == false
+                where typeInterface.IsAssignableFrom(type)
+                let inst = Activator.CreateInstance(type)
+                select (ITypeSecurityHandler)inst).ToArray();
+
+        if (All.Length == 0) {
+            Debug.Fail($"Unable to find {typeInterface} implementations");
         }
+    }
 
-        public static void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entity, in CurrentParticipantModel currentParticipant) {
-            foreach (ITypeSecurityHandler handler in All) {
-                handler.HandleOperation(operation, retrospective, entity, currentParticipant);
-            }
+    public static void HandleOperation(SecurityOperation operation, Retrospective retrospective, object entity, in CurrentParticipantModel currentParticipant) {
+        foreach (ITypeSecurityHandler handler in All) {
+            handler.HandleOperation(operation, retrospective, entity, currentParticipant);
         }
     }
 }

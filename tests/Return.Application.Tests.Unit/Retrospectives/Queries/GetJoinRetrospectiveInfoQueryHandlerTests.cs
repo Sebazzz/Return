@@ -5,57 +5,57 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospectives.Queries {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Retrospectives.Queries.GetJoinRetrospectiveInfo;
-    using Domain.Entities;
-    using Microsoft.Extensions.Logging.Abstractions;
-    using NUnit.Framework;
-    using Support;
+namespace Return.Application.Tests.Unit.Retrospectives.Queries;
 
-    [TestFixture]
-    public sealed class GetJoinRetrospectiveInfoQueryHandlerTests : QueryTestBase {
-        [Test]
-        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsNull_OnRetrospectiveNotFound() {
-            // Given
-            string retroId = "whatever-whatever";
-            var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
-            var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Retrospectives.Queries.GetJoinRetrospectiveInfo;
+using Domain.Entities;
+using Microsoft.Extensions.Logging.Abstractions;
+using NUnit.Framework;
+using Support;
 
-            // When
-            var result = await handler.Handle(command, CancellationToken.None);
+[TestFixture]
+public sealed class GetJoinRetrospectiveInfoQueryHandlerTests : QueryTestBase {
+    [Test]
+    public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsNull_OnRetrospectiveNotFound() {
+        // Given
+        string retroId = "whatever-whatever";
+        var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
+        var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
-            // Then
-            Assert.That(result, Is.Null);
-        }
+        // When
+        var result = await handler.Handle(command, CancellationToken.None);
 
-        [Test]
-        public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsInfo_OnRetrospectiveFound() {
-            // Given
-            var retrospective = new Retrospective {
-                Title = "Hello",
-                CreationTimestamp = DateTimeOffset.Now,
-                FacilitatorHashedPassphrase = "hello",
-                HashedPassphrase = "hello"
-            };
-            string retroId = retrospective.UrlId.StringId;
-            this.Context.Retrospectives.Add(retrospective);
-            await this.Context.SaveChangesAsync(CancellationToken.None);
+        // Then
+        Assert.That(result, Is.Null);
+    }
 
-            var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
-            var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
+    [Test]
+    public async Task GetJoinRetrospectiveInfoCommandHandler_ReturnsInfo_OnRetrospectiveFound() {
+        // Given
+        var retrospective = new Retrospective {
+            Title = "Hello",
+            CreationTimestamp = DateTimeOffset.Now,
+            FacilitatorHashedPassphrase = "hello",
+            HashedPassphrase = "hello"
+        };
+        string retroId = retrospective.UrlId.StringId;
+        this.Context.Retrospectives.Add(retrospective);
+        await this.Context.SaveChangesAsync(CancellationToken.None);
 
-            // When
-            var result = await handler.Handle(command, CancellationToken.None);
+        var handler = new GetJoinRetrospectiveInfoQueryHandler(this.Context, new NullLogger<GetJoinRetrospectiveInfoQueryHandler>());
+        var command = new GetJoinRetrospectiveInfoQuery { RetroId = retroId };
 
-            // Then
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Title, Is.EqualTo("Hello"));
-            Assert.That(result.IsStarted, Is.False);
-            Assert.That(result.IsFinished, Is.False);
-            Assert.That(result.NeedsParticipantPassphrase, Is.True);
-        }
+        // When
+        var result = await handler.Handle(command, CancellationToken.None);
+
+        // Then
+        Assert.That(result, Is.Not.Null);
+        Assert.That(result.Title, Is.EqualTo("Hello"));
+        Assert.That(result.IsStarted, Is.False);
+        Assert.That(result.IsFinished, Is.False);
+        Assert.That(result.NeedsParticipantPassphrase, Is.True);
     }
 }

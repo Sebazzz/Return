@@ -5,9 +5,9 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Security {
-    public enum SecurityOperation {
-        AddOrUpdate,
-        Delete
-    }
+namespace Return.Application.Common.Security;
+
+public enum SecurityOperation {
+    AddOrUpdate,
+    Delete
 }

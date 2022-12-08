@@ -1,21 +1,21 @@
-﻿namespace Return.Web.Middleware {
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Http;
-    using Services;
+﻿namespace Return.Web.Middleware;
 
-    public sealed class SiteUrlDetectionMiddleware {
-        private readonly ISiteUrlDetectionService _siteUrlDetectionService;
-        private readonly RequestDelegate _next;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Services;
 
-        public SiteUrlDetectionMiddleware(ISiteUrlDetectionService siteUrlDetectionService, RequestDelegate next) {
-            this._siteUrlDetectionService = siteUrlDetectionService;
-            this._next = next;
-        }
+public sealed class SiteUrlDetectionMiddleware {
+    private readonly ISiteUrlDetectionService _siteUrlDetectionService;
+    private readonly RequestDelegate _next;
 
-        public Task Invoke(HttpContext context) {
-            this._siteUrlDetectionService.Update(context);
+    public SiteUrlDetectionMiddleware(ISiteUrlDetectionService siteUrlDetectionService, RequestDelegate next) {
+        this._siteUrlDetectionService = siteUrlDetectionService;
+        this._next = next;
+    }
 
-            return this._next.Invoke(context);
-        }
+    public Task Invoke(HttpContext context) {
+        this._siteUrlDetectionService.Update(context);
+
+        return this._next.Invoke(context);
     }
 }

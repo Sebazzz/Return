@@ -5,19 +5,19 @@
 //  Project         : Return.Persistence
 // ******************************************************************************
 
-namespace Return.Persistence.Configurations {
-    using System;
-    using Domain.Entities;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+namespace Return.Persistence.Configurations;
 
-    public sealed class ParticipantConfiguration : IEntityTypeConfiguration<Participant> {
-        public void Configure(EntityTypeBuilder<Participant> builder) {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+using System;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-            builder.OwnsOne(e => e.Color);
+public sealed class ParticipantConfiguration : IEntityTypeConfiguration<Participant> {
+    public void Configure(EntityTypeBuilder<Participant> builder) {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(e => e.Name).HasMaxLength(256).IsRequired();
-        }
+        builder.OwnsOne(e => e.Color);
+
+        builder.Property(e => e.Name).HasMaxLength(256).IsRequired();
     }
 }

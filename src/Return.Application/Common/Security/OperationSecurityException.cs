@@ -5,17 +5,17 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Common.Security {
-    using System;
+namespace Return.Application.Common.Security;
 
-    public sealed class OperationSecurityException : Exception {
-        public OperationSecurityException() {
-        }
+using System;
 
-        public OperationSecurityException(string message) : base(message) {
-        }
+public sealed class OperationSecurityException : Exception {
+    public OperationSecurityException() {
+    }
 
-        public OperationSecurityException(string message, Exception innerException) : base(message, innerException) {
-        }
+    public OperationSecurityException(string message) : base(message) {
+    }
+
+    public OperationSecurityException(string message, Exception innerException) : base(message, innerException) {
     }
 }

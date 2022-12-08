@@ -5,35 +5,35 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Services {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Domain.Entities;
-    using Microsoft.EntityFrameworkCore;
+namespace Return.Application.Services;
 
-    public static class RetrospectiveQueryExtensions {
-        public static Task<Retrospective?> FindByRetroId(
-            this IQueryable<Retrospective> queryable,
-            string retroIdentifier,
-            CancellationToken cancellationToken
-        ) {
-            if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
-            return queryable.FirstOrDefaultAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
-                cancellationToken: cancellationToken);
-        }
+public static class RetrospectiveQueryExtensions {
+    public static Task<Retrospective?> FindByRetroId(
+        this IQueryable<Retrospective> queryable,
+        string retroIdentifier,
+        CancellationToken cancellationToken
+    ) {
+        if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
 
-        public static Task<Retrospective> FindRequiredByRetroId(
-            this IQueryable<Retrospective> queryable,
-            string retroIdentifier,
-            CancellationToken cancellationToken
-        ) {
-            if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
+        return queryable.FirstOrDefaultAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
+            cancellationToken: cancellationToken);
+    }
 
-            return queryable.FirstAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
-                cancellationToken: cancellationToken);
-        }
+    public static Task<Retrospective> FindRequiredByRetroId(
+        this IQueryable<Retrospective> queryable,
+        string retroIdentifier,
+        CancellationToken cancellationToken
+    ) {
+        if (retroIdentifier == null) throw new ArgumentNullException(nameof(retroIdentifier));
+
+        return queryable.FirstAsync(predicate: x => x.UrlId.StringId == retroIdentifier,
+            cancellationToken: cancellationToken);
     }
 }

@@ -5,11 +5,11 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Queries.GetJoinRetrospectiveInfo {
-    using MediatR;
+namespace Return.Application.Retrospectives.Queries.GetJoinRetrospectiveInfo;
 
-    public sealed class GetJoinRetrospectiveInfoQuery : IRequest<JoinRetrospectiveInfo?> {
+using MediatR;
+
+public sealed class GetJoinRetrospectiveInfoQuery : IRequest<JoinRetrospectiveInfo?> {
 #nullable disable
-        public string RetroId { get; set; }
-    }
+    public string RetroId { get; set; }
 }

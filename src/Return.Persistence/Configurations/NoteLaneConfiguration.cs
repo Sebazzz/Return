@@ -5,19 +5,19 @@
 //  Project         : Return.Persistence
 // ******************************************************************************
 
-namespace Return.Persistence.Configurations {
-    using System;
-    using Domain.Entities;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+namespace Return.Persistence.Configurations;
 
-    public sealed class NoteLaneConfiguration : IEntityTypeConfiguration<NoteLane> {
-        public void Configure(EntityTypeBuilder<NoteLane> builder) {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+using System;
+using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-            builder.HasKey(e => e.Id);
+public sealed class NoteLaneConfiguration : IEntityTypeConfiguration<NoteLane> {
+    public void Configure(EntityTypeBuilder<NoteLane> builder) {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(e => e.Name).HasMaxLength(256).IsRequired(true);
-        }
+        builder.HasKey(e => e.Id);
+
+        builder.Property(e => e.Name).HasMaxLength(256).IsRequired(true);
     }
 }

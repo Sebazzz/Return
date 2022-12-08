@@ -5,14 +5,14 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus {
-    using MediatR;
+namespace Return.Application.Retrospectives.Queries.GetRetrospectiveStatus;
 
-    public sealed class GetRetrospectiveStatusQuery : IRequest<RetrospectiveStatus> {
-        public string RetroId { get; }
+using MediatR;
 
-        public GetRetrospectiveStatusQuery(string retroId) {
-            this.RetroId = retroId;
-        }
+public sealed class GetRetrospectiveStatusQuery : IRequest<RetrospectiveStatus> {
+    public string RetroId { get; }
+
+    public GetRetrospectiveStatusQuery(string retroId) {
+        this.RetroId = retroId;
     }
 }

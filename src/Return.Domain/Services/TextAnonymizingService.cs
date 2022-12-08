@@ -5,59 +5,59 @@
 //  Project         : Return.Domain
 // ******************************************************************************
 
-namespace Return.Domain.Services {
-    using System;
-    using System.Globalization;
+namespace Return.Domain.Services;
 
-    public interface ITextAnonymizingService {
-        string AnonymizeText(string input);
-    }
+using System;
+using System.Globalization;
 
-    public sealed class TextAnonymizingService : ITextAnonymizingService {
-        private readonly Random _random = new Random();
+public interface ITextAnonymizingService {
+    string AnonymizeText(string input);
+}
 
-        public string AnonymizeText(string input) {
-            if (input == null) throw new ArgumentNullException(nameof(input));
+public sealed class TextAnonymizingService : ITextAnonymizingService {
+    private readonly Random _random = new Random();
 
-            // Prepare buffer
-            Span<char> newText = stackalloc char[input.Length];
-            input.AsSpan().CopyTo(newText);
+    public string AnonymizeText(string input) {
+        if (input == null) throw new ArgumentNullException(nameof(input));
 
-            // Find every word and just mix up the characters
-            Span<char> current = newText;
-            while (true) {
-                int nextSpaceIndex = current.IndexOf(' ');
-                if (nextSpaceIndex == -1) {
-                    Shuffle(this._random, ref current);
-                    break;
-                }
+        // Prepare buffer
+        Span<char> newText = stackalloc char[input.Length];
+        input.AsSpan().CopyTo(newText);
 
-                Span<char> part = current[..nextSpaceIndex];
-                Shuffle(this._random, ref part);
-
-                int nextIndex = nextSpaceIndex + 1;
-                current = current[nextIndex..];
+        // Find every word and just mix up the characters
+        Span<char> current = newText;
+        while (true) {
+            int nextSpaceIndex = current.IndexOf(' ');
+            if (nextSpaceIndex == -1) {
+                Shuffle(this._random, ref current);
+                break;
             }
 
-            return new string(newText);
+            Span<char> part = current[..nextSpaceIndex];
+            Shuffle(this._random, ref part);
+
+            int nextIndex = nextSpaceIndex + 1;
+            current = current[nextIndex..];
         }
 
-        private static void Shuffle(Random random, ref Span<char> part) {
-            if (part.IsEmpty) {
-                return;
-            }
+        return new string(newText);
+    }
 
-            bool firstCharIsUpper = Char.IsUpper(part[0]);
+    private static void Shuffle(Random random, ref Span<char> part) {
+        if (part.IsEmpty) {
+            return;
+        }
 
-            for (int idx = 0; idx < part.Length; idx++) {
-                int toIdx = random.Next(0, part.Length);
+        bool firstCharIsUpper = Char.IsUpper(part[0]);
 
-                (part[idx], part[toIdx]) = (part[toIdx], firstCharIsUpper ? Char.ToLower(part[idx], CultureInfo.CurrentCulture) : part[idx]);
-            }
+        for (int idx = 0; idx < part.Length; idx++) {
+            int toIdx = random.Next(0, part.Length);
 
-            if (firstCharIsUpper) {
-                part[0] = Char.ToUpper(part[0], CultureInfo.CurrentCulture);
-            }
+            (part[idx], part[toIdx]) = (part[toIdx], firstCharIsUpper ? Char.ToLower(part[idx], CultureInfo.CurrentCulture) : part[idx]);
+        }
+
+        if (firstCharIsUpper) {
+            part[0] = Char.ToUpper(part[0], CultureInfo.CurrentCulture);
         }
     }
 }

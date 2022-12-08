@@ -5,11 +5,11 @@
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
 
-namespace Return.Web.Tests.Integration.Common {
-    using System;
-    using Return.Common;
+namespace Return.Web.Tests.Integration.Common;
 
-    public static class Name {
-        public static string Create() => Guid.NewGuid().ToString("N", Culture.Invariant);
-    }
+using System;
+using Return.Common;
+
+public static class Name {
+    public static string Create() => Guid.NewGuid().ToString("N", Culture.Invariant);
 }

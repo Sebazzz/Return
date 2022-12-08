@@ -5,10 +5,10 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.RetrospectiveWorkflows.Commands {
-    using MediatR;
+namespace Return.Application.RetrospectiveWorkflows.Commands;
 
-    public sealed class InitiateVotingStageCommand : AbstractTimedStageCommand, IRequest {
-        public int VotesPerGroup { get; set; }
-    }
+using MediatR;
+
+public sealed class InitiateVotingStageCommand : AbstractTimedStageCommand, IRequest {
+    public int VotesPerGroup { get; set; }
 }

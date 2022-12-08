@@ -5,16 +5,16 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.RetrospectiveJoined {
-    using System.Threading.Tasks;
-    using Microsoft.Extensions.Logging;
-    using Retrospectives.Queries.GetParticipantsInfo;
+namespace Return.Application.Notifications.RetrospectiveJoined;
 
-    public sealed class RetrospectiveJoinedNotificationDispatcher : NotificationDispatcher<RetrospectiveJoinedNotification, IRetrospectiveJoinedSubscriber> {
-        public RetrospectiveJoinedNotificationDispatcher(ILogger<NotificationDispatcher<RetrospectiveJoinedNotification, IRetrospectiveJoinedSubscriber>> logger) : base(logger)
-        {
-        }
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Retrospectives.Queries.GetParticipantsInfo;
 
-        protected override Task DispatchCore(IRetrospectiveJoinedSubscriber subscriber, RetrospectiveJoinedNotification notification) => subscriber.OnParticipantJoinedRetrospective(new RetrospectiveEvent<ParticipantInfo>(notification.RetroId, notification.ParticipantInfo));
+public sealed class RetrospectiveJoinedNotificationDispatcher : NotificationDispatcher<RetrospectiveJoinedNotification, IRetrospectiveJoinedSubscriber> {
+    public RetrospectiveJoinedNotificationDispatcher(ILogger<NotificationDispatcher<RetrospectiveJoinedNotification, IRetrospectiveJoinedSubscriber>> logger) : base(logger)
+    {
     }
+
+    protected override Task DispatchCore(IRetrospectiveJoinedSubscriber subscriber, RetrospectiveJoinedNotification notification) => subscriber.OnParticipantJoinedRetrospective(new RetrospectiveEvent<ParticipantInfo>(notification.RetroId, notification.ParticipantInfo));
 }

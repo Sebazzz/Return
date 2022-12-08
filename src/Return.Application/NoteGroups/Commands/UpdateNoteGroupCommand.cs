@@ -5,22 +5,22 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.NoteGroups.Commands {
-    using Domain.Entities;
-    using MediatR;
+namespace Return.Application.NoteGroups.Commands;
 
-    public sealed class UpdateNoteGroupCommand : IRequest {
-        public string RetroId { get; }
+using Domain.Entities;
+using MediatR;
 
-        public int Id { get; }
+public sealed class UpdateNoteGroupCommand : IRequest {
+    public string RetroId { get; }
 
-        public string Name { get; }
+    public int Id { get; }
 
-        public UpdateNoteGroupCommand(string retroId, int id, string name) {
-            this.RetroId = retroId;
-            this.Id = id;
-            this.Name = name;
-        }
-        public override string ToString() => $"[{nameof(AddNoteGroupCommand)}] {this.RetroId} on lane #{(KnownNoteLane)this.Id} - content: {this.Name}";
+    public string Name { get; }
+
+    public UpdateNoteGroupCommand(string retroId, int id, string name) {
+        this.RetroId = retroId;
+        this.Id = id;
+        this.Name = name;
     }
+    public override string ToString() => $"[{nameof(AddNoteGroupCommand)}] {this.RetroId} on lane #{(KnownNoteLane)this.Id} - content: {this.Name}";
 }

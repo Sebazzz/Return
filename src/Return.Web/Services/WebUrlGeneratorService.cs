@@ -5,26 +5,26 @@
 //  Project         : Return.Web
 // ******************************************************************************
 
-namespace Return.Web.Services {
-    using System;
-    using Application.Services;
-    using Domain.ValueObjects;
+namespace Return.Web.Services;
 
-    public class WebUrlGenerator : IUrlGenerator {
-        private readonly ISiteUrlDetectionService _siteUrlDetectionService;
+using System;
+using Application.Services;
+using Domain.ValueObjects;
 
-        public WebUrlGenerator(ISiteUrlDetectionService siteUrlDetectionService) {
-            this._siteUrlDetectionService = siteUrlDetectionService;
-        }
+public class WebUrlGenerator : IUrlGenerator {
+    private readonly ISiteUrlDetectionService _siteUrlDetectionService;
 
-        public Uri GenerateUrlToRetrospectiveLobby(RetroIdentifier urlId) {
-            if (urlId == null) throw new ArgumentNullException(nameof(urlId));
+    public WebUrlGenerator(ISiteUrlDetectionService siteUrlDetectionService) {
+        this._siteUrlDetectionService = siteUrlDetectionService;
+    }
 
-            var uriBuilder = new UriBuilder(this._siteUrlDetectionService.GetSiteUrl()) {
-                Path = $"/retrospective/{urlId.StringId}/join"
-            };
+    public Uri GenerateUrlToRetrospectiveLobby(RetroIdentifier urlId) {
+        if (urlId == null) throw new ArgumentNullException(nameof(urlId));
 
-            return uriBuilder.Uri;
-        }
+        var uriBuilder = new UriBuilder(this._siteUrlDetectionService.GetSiteUrl()) {
+            Path = $"/retrospective/{urlId.StringId}/join"
+        };
+
+        return uriBuilder.Uri;
     }
 }

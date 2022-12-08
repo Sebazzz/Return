@@ -5,18 +5,18 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Retrospectives.Commands.CreateRetrospective {
-    using MediatR;
+namespace Return.Application.Retrospectives.Commands.CreateRetrospective;
 
-    public class CreateRetrospectiveCommand : IRequest<CreateRetrospectiveCommandResponse> {
+using MediatR;
+
+public class CreateRetrospectiveCommand : IRequest<CreateRetrospectiveCommandResponse> {
 #nullable disable
-        public string Title { get; set; }
+    public string Title { get; set; }
 
-        public string FacilitatorPassphrase { get; set; }
+    public string FacilitatorPassphrase { get; set; }
 
 #nullable enable
-        public string? Passphrase { get; set; }
+    public string? Passphrase { get; set; }
 
-        public string? LobbyCreationPassphrase { get; set; }
-    }
+    public string? LobbyCreationPassphrase { get; set; }
 }

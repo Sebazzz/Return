@@ -5,15 +5,15 @@
 //  Project         : Return.Application
 // ******************************************************************************
 
-namespace Return.Application.Notifications.RetrospectiveStatusUpdated {
-    using MediatR;
-    using Retrospectives.Queries.GetRetrospectiveStatus;
+namespace Return.Application.Notifications.RetrospectiveStatusUpdated;
 
-    public sealed class RetrospectiveStatusUpdatedNotification : INotification {
-        public RetrospectiveStatus RetrospectiveStatus { get; }
+using MediatR;
+using Retrospectives.Queries.GetRetrospectiveStatus;
 
-        public RetrospectiveStatusUpdatedNotification(RetrospectiveStatus retrospectiveStatus) {
-            this.RetrospectiveStatus = retrospectiveStatus;
-        }
+public sealed class RetrospectiveStatusUpdatedNotification : INotification {
+    public RetrospectiveStatus RetrospectiveStatus { get; }
+
+    public RetrospectiveStatusUpdatedNotification(RetrospectiveStatus retrospectiveStatus) {
+        this.RetrospectiveStatus = retrospectiveStatus;
     }
 }

@@ -5,10 +5,10 @@
 //  Project         : Return.Common
 // ******************************************************************************
 
-namespace Return.Common {
-    using System.Globalization;
+namespace Return.Common;
 
-    public static class Culture {
-        public static CultureInfo Invariant => CultureInfo.InvariantCulture;
-    }
+using System.Globalization;
+
+public static class Culture {
+    public static CultureInfo Invariant => CultureInfo.InvariantCulture;
 }

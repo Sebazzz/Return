@@ -5,54 +5,54 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Common;
-    using Application.RetrospectiveWorkflows.Commands;
-    using Domain.Entities;
-    using NSubstitute;
-    using NUnit.Framework;
+namespace Return.Application.Tests.Unit.RetrospectiveWorkflows.Commands;
 
-    [TestFixture]
-    public sealed class InitiateVotingStageCommandHandlerTests : RetrospectiveWorkflowCommandTestBase {
-        [Test]
-        public void InitiateVotingStageCommandHandler_InvalidRetroId_ThrowsNotFoundException() {
-            // Given
-            const string retroId = "not found surely :)";
-            var handler = new InitiateVotingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock, this.SystemClockMock);
-            var request = new InitiateVotingStageCommand { RetroId = retroId, TimeInMinutes = 10 };
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Common;
+using Application.RetrospectiveWorkflows.Commands;
+using Domain.Entities;
+using NSubstitute;
+using NUnit.Framework;
 
-            // When
-            TestDelegate action = () => handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
+[TestFixture]
+public sealed class InitiateVotingStageCommandHandlerTests : RetrospectiveWorkflowCommandTestBase {
+    [Test]
+    public void InitiateVotingStageCommandHandler_InvalidRetroId_ThrowsNotFoundException() {
+        // Given
+        const string retroId = "not found surely :)";
+        var handler = new InitiateVotingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock, this.SystemClockMock);
+        var request = new InitiateVotingStageCommand { RetroId = retroId, TimeInMinutes = 10 };
 
-            // Then
-            Assert.That(action, Throws.InstanceOf<NotFoundException>());
-        }
+        // When
+        TestDelegate action = () => handler.Handle(request, CancellationToken.None).GetAwaiter().GetResult();
 
-        [Test]
-        public async Task InitiateVotingStageCommandHandler_OnStatusChange_UpdatesRetroStageAndInvokesNotification() {
-            // Given
-            var handler = new InitiateVotingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock, this.SystemClockMock);
-            var request = new InitiateVotingStageCommand { RetroId = this.RetroId, TimeInMinutes = 10, VotesPerGroup = 6 };
+        // Then
+        Assert.That(action, Throws.InstanceOf<NotFoundException>());
+    }
 
-            this.SystemClockMock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
+    [Test]
+    public async Task InitiateVotingStageCommandHandler_OnStatusChange_UpdatesRetroStageAndInvokesNotification() {
+        // Given
+        var handler = new InitiateVotingStageCommandHandler(this.Context, this.RetrospectiveStatusUpdateDispatcherMock, this.SystemClockMock);
+        var request = new InitiateVotingStageCommand { RetroId = this.RetroId, TimeInMinutes = 10, VotesPerGroup = 6 };
 
-            // When
-            await handler.Handle(request, CancellationToken.None);
+        this.SystemClockMock.CurrentTimeOffset.Returns(DateTimeOffset.UnixEpoch);
 
-            this.RefreshObject();
+        // When
+        await handler.Handle(request, CancellationToken.None);
 
-            // Then
-            Assert.That(this.Retrospective.CurrentStage, Is.EqualTo(RetrospectiveStage.Voting));
+        this.RefreshObject();
 
-            Assert.That(this.Retrospective.Options.MaximumNumberOfVotes, Is.EqualTo(6));
+        // Then
+        Assert.That(this.Retrospective.CurrentStage, Is.EqualTo(RetrospectiveStage.Voting));
 
-            Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowInitiationTimestamp, Is.EqualTo(this.SystemClockMock.CurrentTimeOffset));
-            Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowTimeLimitInMinutes, Is.EqualTo(request.TimeInMinutes));
+        Assert.That(this.Retrospective.Options.MaximumNumberOfVotes, Is.EqualTo(6));
 
-            await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(Arg.Any<Retrospective>(), CancellationToken.None);
-        }
+        Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowInitiationTimestamp, Is.EqualTo(this.SystemClockMock.CurrentTimeOffset));
+        Assert.That(this.Retrospective.WorkflowData.CurrentWorkflowTimeLimitInMinutes, Is.EqualTo(request.TimeInMinutes));
+
+        await this.RetrospectiveStatusUpdateDispatcherMock.Received().DispatchUpdate(Arg.Any<Retrospective>(), CancellationToken.None);
     }
 }

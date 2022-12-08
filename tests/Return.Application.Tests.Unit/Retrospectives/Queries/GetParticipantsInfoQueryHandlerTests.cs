@@ -5,59 +5,59 @@
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
 
-namespace Return.Application.Tests.Unit.Retrospectives.Queries {
-    using System.Drawing;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Application.Retrospectives.Queries.GetParticipantsInfo;
-    using Domain.Entities;
-    using NUnit.Framework;
-    using Support;
+namespace Return.Application.Tests.Unit.Retrospectives.Queries;
 
-    [TestFixture]
-    public sealed class GetParticipantsInfoQueryHandlerTests : QueryTestBase {
-        [Test]
-        public async Task GetParticipantsInfoCommand_ReturnsEmptyList_OnRetrospectiveNotFound() {
-            // Given
-            const string retroId = "surely-not-found";
-            var query = new GetParticipantsInfoQuery(retroId);
-            var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
+using System.Drawing;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Application.Retrospectives.Queries.GetParticipantsInfo;
+using Domain.Entities;
+using NUnit.Framework;
+using Support;
 
-            // When
-            var result = await handler.Handle(query, CancellationToken.None);
+[TestFixture]
+public sealed class GetParticipantsInfoQueryHandlerTests : QueryTestBase {
+    [Test]
+    public async Task GetParticipantsInfoCommand_ReturnsEmptyList_OnRetrospectiveNotFound() {
+        // Given
+        const string retroId = "surely-not-found";
+        var query = new GetParticipantsInfoQuery(retroId);
+        var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
-            // Then
-            Assert.That(result.Participants, Is.Empty);
-        }
+        // When
+        var result = await handler.Handle(query, CancellationToken.None);
 
-        [Test]
-        public async Task GetParticipantsInfoCommand_ReturnsList_OnRetrospectiveFound() {
-            // Given
-            var retro = new Retrospective {
-                Title = "What",
-                Participants =
-                {
-                    new Participant {Name = "John", Color = Color.BlueViolet},
-                    new Participant {Name = "Jane", Color = Color.Aqua},
-                },
-                FacilitatorHashedPassphrase = "abef",
-                HashedPassphrase = "abef"
-            };
-            string retroId = retro.UrlId.StringId;
-            this.Context.Retrospectives.Add(retro);
-            await this.Context.SaveChangesAsync(CancellationToken.None);
+        // Then
+        Assert.That(result.Participants, Is.Empty);
+    }
 
-            var query = new GetParticipantsInfoQuery(retroId);
-            var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
+    [Test]
+    public async Task GetParticipantsInfoCommand_ReturnsList_OnRetrospectiveFound() {
+        // Given
+        var retro = new Retrospective {
+            Title = "What",
+            Participants =
+            {
+                new Participant {Name = "John", Color = Color.BlueViolet},
+                new Participant {Name = "Jane", Color = Color.Aqua},
+            },
+            FacilitatorHashedPassphrase = "abef",
+            HashedPassphrase = "abef"
+        };
+        string retroId = retro.UrlId.StringId;
+        this.Context.Retrospectives.Add(retro);
+        await this.Context.SaveChangesAsync(CancellationToken.None);
 
-            // When
-            var result = await handler.Handle(query, CancellationToken.None);
+        var query = new GetParticipantsInfoQuery(retroId);
+        var handler = new GetParticipantsInfoQueryHandler(this.Context, this.Mapper);
 
-            // Then
-            Assert.That(result.Participants, Is.Not.Empty);
-            Assert.That(result.Participants.Select(x => x.Name), Contains.Item("John"));
-            Assert.That(result.Participants.Select(x => x.Name), Contains.Item("Jane"));
-        }
+        // When
+        var result = await handler.Handle(query, CancellationToken.None);
+
+        // Then
+        Assert.That(result.Participants, Is.Not.Empty);
+        Assert.That(result.Participants.Select(x => x.Name), Contains.Item("John"));
+        Assert.That(result.Participants.Select(x => x.Name), Contains.Item("Jane"));
     }
 }
