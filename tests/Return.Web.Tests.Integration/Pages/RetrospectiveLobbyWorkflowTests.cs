@@ -38,7 +38,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
         );
 
         // When
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // Then
         this.MultiAssert(client => Assert.That(() => client.NoteLaneElements, Has.Count.EqualTo(3).Retry()));
@@ -52,7 +52,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client1, true)),
             Task.Run(() => this.Join(this.Client2, false))
         );
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         this.Client1.TimeInMinutesInput.SendKeys("5");
@@ -73,7 +73,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         NoteLaneComponent noteLane = this.Client2.GetLane(KnownNoteLane.Continue);
@@ -119,7 +119,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         this.MultiAssert(client => {
             Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
@@ -163,7 +163,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         this.MultiAssert(client => {
             Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
@@ -200,7 +200,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         int laneNumber = (int)KnownNoteLane.Continue;
@@ -263,7 +263,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         /*{
@@ -319,7 +319,7 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);

@@ -9,13 +9,14 @@ namespace Return.Web.Tests.Integration.Pages;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
 using Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright;
 using NUnit.Framework;
-using OpenQA.Selenium.Support.UI;
 
 public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLobby> {
     protected string RetroId { get; set; }
@@ -25,20 +26,20 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
     public void ResetColorIndex() => this._colorIndex = 1;
 
     [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Retry runs while the webdriver runs")]
-    protected void Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false, string colorName = null, Action submitCallback = null) {
+    protected async Task Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false, string colorName = null, Action submitCallback = null) {
         using var joinPage = new JoinRetrospectivePage();
         joinPage.InitializeFrom(pageObject);
-        joinPage.Navigate(this.App, this.RetroId);
+        await joinPage.Navigate(this.App, this.RetroId);
 
-        joinPage.NameInput.SendKeys(name ?? Name.Create());
+        await joinPage.NameInput.FillAsync(name ?? Name.Create());
 
         Thread.Sleep(500);
         if (!alreadyJoined) {
             if (colorName != null) {
-                new SelectElement(joinPage.ColorSelect).SelectByText(colorName, true);
+                await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Label = colorName /*Partial match?*/});
             }
             else {
-                new SelectElement(joinPage.ColorSelect).SelectByIndex(this._colorIndex++);
+                await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Index = this._colorIndex++ });
             }
         }
         else {
@@ -49,39 +50,30 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
 
         if (facilitator) {
             if (!alreadyJoined) {
-                joinPage.IsFacilitatorCheckbox.Click();
+                await joinPage.IsFacilitatorCheckbox.ClickAsync();
                 Thread.Sleep(500);
             }
 
-            joinPage.WebDriver.Retry(_ => {
-                joinPage.FacilitatorPassphraseInput.SendKeys("scrummaster");
-                return true;
-            });
+            await joinPage.FacilitatorPassphraseInput.FillAsync("scrummaster");
         }
 
         submitCallback?.Invoke();
-        Thread.Sleep(500);
-        joinPage.Submit();
-        Thread.Sleep(500);
+        await joinPage.Submit();
     }
 
-    protected void WaitNavigatedToLobby() =>
-        Task.WaitAll(
-            Task.Run(() => WaitNavigatedToLobby(this.Client1)),
-            Task.Run(() => WaitNavigatedToLobby(this.Client2))
-        );
+    protected Task WaitNavigatedToLobby() => Task.WhenAll(WaitNavigatedToLobby(this.Client1), WaitNavigatedToLobby(this.Client2));
 
     protected Task SetRetrospective(Action<Retrospective> action) {
         using IServiceScope scope = this.App.CreateTestServiceScope();
         return scope.SetRetrospective(this.RetroId, action);
     }
 
-    private static void WaitNavigatedToLobby(RetrospectiveLobby pageObject) {
-        var sw = new Stopwatch();
+    private static async Task WaitNavigatedToLobby(RetrospectiveLobby pageObject) {
+        Stopwatch sw = new();
         sw.Start();
 
-        Assume.That(() => pageObject.WebDriver.Url, Does.Match("/lobby").Retry(), "We didn't navigate to the lobby");
-        Assume.That(() => pageObject.WebDriver.Retry(wd => wd.FindElementByTestElementId("main-board").Displayed), Is.True.Retry(count: 2), "The retrospective board does not load");
+        await pageObject.BrowserPage.Expected().ToHaveURLAsync(new Regex("/lobby"));
+        await pageObject.BrowserPage.FindElementByTestElementId("main-board").Expected().ToBeVisibleAsync(); // If this fails: The retrospective board does not load
 
         sw.Stop();
         TestContext.WriteLine($"Navigated to lobby in {sw.Elapsed}");

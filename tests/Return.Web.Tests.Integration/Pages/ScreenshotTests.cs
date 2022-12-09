@@ -98,10 +98,10 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
             await scope.SetRetrospective(this.RetroId, r => r.HashedPassphrase = null);
         }
 
-        this.Join(this.Client1, true, "Roger", colorName: "Driver", submitCallback: () => CreateDocScreenshot(this.Client1.WebDriver, "join-retro"));
-        this.Join(this.Client2, false, "Hong", colorName: "green");
+        await this.Join(this.Client1, true, "Roger", colorName: "Driver", submitCallback: () => CreateDocScreenshot(this.Client1.WebDriver, "join-retro"));
+        await this.Join(this.Client2, false, "Hong", colorName: "green");
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         this.Client1.TimeInMinutesInput.Clear();
         this.Client1.TimeInMinutesInput.SendKeys("5");

@@ -7,17 +7,15 @@
 
 namespace Return.Web.Tests.Integration.Components;
 
-using System.Collections.Generic;
-using Common;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public class RetrospectiveOnlineListComponent {
-    private readonly IWebDriver _webDriver;
+    private readonly IPage _browserPage;
 
-    public RetrospectiveOnlineListComponent(IWebDriver webDriver) {
-        this._webDriver = webDriver;
+    public RetrospectiveOnlineListComponent(IPage browserPage) {
+        this._browserPage = browserPage;
     }
 
-    public IEnumerable<IWebElement> OnlineListItems => this._webDriver.FindElements(By.CssSelector("#retrospective-online-list span[data-participant-id]"));
-    public IWebElement GetListItem(int id) => this._webDriver.FindVisibleElement(By.CssSelector($"#retrospective-online-list span[data-participant-id=\"{id}\"]"));
+    public ILocator OnlineListItems => this._browserPage.Locator("#retrospective-online-list span[data-participant-id]");
+    public ILocator GetListItem(int id) => this._browserPage.Locator($"#retrospective-online-list span[data-participant-id=\"{id}\"]");
 }

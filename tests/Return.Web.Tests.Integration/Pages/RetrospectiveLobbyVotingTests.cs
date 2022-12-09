@@ -49,7 +49,7 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         this.Client1.VoteCountInput.SendKeys("2");
@@ -96,7 +96,7 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
             Task.Run(() => this.Join(this.Client2, false, "Josh", true))
         );
 
-        this.WaitNavigatedToLobby();
+        await this.WaitNavigatedToLobby();
 
         // When
         this.Client1.VoteCountInput.SendKeys("2");
