@@ -5,7 +5,7 @@ updates:
   schedule:
     interval: daily
     time: "04:00"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 10https://github.com/Sebazzz/Return/blob/master/.github/dependabot.yml
   target-branch: develop
 - package-ecosystem: npm
   directory: "/src/Return.Web"
@@ -14,7 +14,3 @@ updates:
     time: "04:00"
   open-pull-requests-limit: 10
   target-branch: develop
-  ignore:
-  - dependency-name: "@fortawesome/fontawesome-free"
-    versions:
-    - 5.15.2
