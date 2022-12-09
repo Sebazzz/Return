@@ -7,19 +7,19 @@
     "license": "GPLv3",
     "private": true,
     "devDependencies": {
-        "@fortawesome/fontawesome-free": "^6.1.1",
-        "autoprefixer": "^9.7.6",
+        "@fortawesome/fontawesome-free": "^6.2.1",
+        "autoprefixer": "^10.4.13",
         "bulma": "^0.9.4",
         "gulp": "^4.0.2",
         "gulp-autoprefixer": "^8.0.0",
         "gulp-cli": "^2.3.0",
         "gulp-dart-sass": "^1.0.2",
         "husky": "^4.2.5",
-        "postcss": "8.4.12",
-        "postcss-cli": "^9.1.0",
-        "prettier": "^1.19.1",
-        "pretty-quick": "^2.0.1",
-        "sass": "^1.49.9"
+        "postcss": "8.4.19",
+        "postcss-cli": "^10.1.0",
+        "prettier": "^2.8.1",
+        "pretty-quick": "^3.1.3",
+        "sass": "^1.56.2"
     },
     "scripts": {
         "build": "gulp build",
@@ -31,8 +31,5 @@
         "hooks": {
             "pre-commit": "yarn pre-commit"
         }
-    },
-    "dependencies": {
-        "blazor.polyfill": "^3.0.8"
     }
 }

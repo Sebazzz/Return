@@ -26,10 +26,11 @@ Licensed: GNU GPL v3.0
 
 Developed and tested on:
 
--   Internet Explorer 11
 -   Microsoft Edge
 -   Google Chrome
 -   Mozilla Firefox
+
+Also works well on mobile devices like tablets.
 
 ## Download
 

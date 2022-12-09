@@ -20,14 +20,6 @@
   @(await Html.RenderComponentAsync<App>(renderMode: RenderMode.ServerPrerendered))
 </app>
   
-<script>
-  window.Promise || (function () {
-    var tag = document.createElement('script');
-    tag.src = 'build/js/compat/blazor.polyfill.min.js';
-    document.body.appendChild(tag);
-    document.body.classList.add('browser-compat');
-  })();
-</script>
 <script src="_framework/blazor.server.js"></script>
 <script src="js/retro.js"></script>
 </body>
