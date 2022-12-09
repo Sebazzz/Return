@@ -56,6 +56,9 @@ export DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 
 export DOTNET_ROOT=$SCRIPT_DIR/.dotnet
 
+# Restore .NET tools
+dotnet tool restore
+
 ###########################################################################
 # INSTALL CAKE
 ###########################################################################
