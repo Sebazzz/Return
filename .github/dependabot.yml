@@ -1,0 +1,20 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/src/Return.Web"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  target-branch: develop
+- package-ecosystem: npm
+  directory: "/src/Return.Web"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  target-branch: develop
+  ignore:
+  - dependency-name: "@fortawesome/fontawesome-free"
+    versions:
+    - 5.15.2
