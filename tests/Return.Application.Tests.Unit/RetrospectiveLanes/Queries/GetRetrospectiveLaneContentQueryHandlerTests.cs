@@ -69,6 +69,9 @@ public sealed class GetRetrospectiveLaneContentQueryHandlerTests : QueryTestBase
             }
         };
         string retroId = retro.UrlId.StringId;
+        this.Context.Participants.AddRange(retro.Participants);
+        await this.Context.SaveChangesAsync(CancellationToken.None);
+
         this.Context.Retrospectives.Add(retro);
         await this.Context.SaveChangesAsync(CancellationToken.None);
 
