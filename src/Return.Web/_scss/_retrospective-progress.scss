@@ -1,4 +1,4 @@
-@use "sass:math";
+@use 'sass:math';
 
 $retro-progress-arrow-width: 12px;
 $retro-progress-arrow-height-modifier: math.div(36px, 2);
@@ -99,4 +99,8 @@ $retro-progress-previous-color: $grey-light;
             display: none;
         }
     }
+}
+
+.workflow-status-timer {
+    text-align: center;
 }
