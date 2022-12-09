@@ -8,21 +8,28 @@
 namespace Return.Web.Tests.Integration.Components;
 
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Common;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public sealed class NoteGroupComponent {
-    public NoteGroupComponent(IWebElement webElement) {
-        this.WebElement = webElement;
+    private NoteGroupComponent(ILocator locator) {
+        this.Locator = locator;
     }
 
-    public IWebElement WebElement { get; }
-    public int Id => this.WebElement.GetAttribute<int>("data-id");
-    public IWebElement Input => this.WebElement.FindElement(By.ClassName("note-group__title-input"));
-    public IWebElement Title => this.WebElement.FindElement(By.ClassName("note-group__title"));
-    public IWebElement Content => this.WebElement.FindElement(By.ClassName("note-group__item-list"));
+    public ILocator Locator { get; }
 
-    public IEnumerable<NoteComponent> Notes => this.WebElement.FindElementsByTestElementId("note").Select(x => new NoteComponent(x));
+    public static async Task<NoteGroupComponent> Create(ILocator locator) =>
+        new(locator)
+        {
+            Id = await locator.GetAttributeAsync<int>("data-id")
+        };
+    public int Id { get; init; }
 
+    public ILocator Input => this.Locator.Locator(".note-group__title-input");
+    public ILocator Title => this.Locator.Locator(".note-group__title");
+    public ILocator Content => this.Locator.Locator(".note-group__item-list");
+
+    public ILocator NoteElements => this.Locator.FindElementByTestElementId("note");
+    public Task<List<NoteComponent>> Notes() => this.Locator.GenerateSubElementsByTestElementId("note", NoteComponent.Create);
 }

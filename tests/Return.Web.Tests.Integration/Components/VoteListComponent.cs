@@ -8,23 +8,33 @@
 namespace Return.Web.Tests.Integration.Components;
 
 using System;
-using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Common;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public sealed class VoteListComponent {
-    private readonly IWebElement _webElement;
+    private readonly ILocator _locator;
 
-    public VoteListComponent(IWebElement webElement) {
-        this._webElement = webElement;
+    private VoteListComponent(ILocator locator) {
+        this._locator = locator;
     }
 
-    public int Id => this._webElement.GetAttribute<int>("data-id");
-    public IWebElement VoteButton => this._webElement.FindElement(By.ClassName("vote-list__vote-button"));
-    public ReadOnlyCollection<IWebElement> Votes => this._webElement.FindElements(By.ClassName("vote-indicator"));
-    public bool IsVoteButtonEnabled => !this.VoteButton.GetAttribute("class").Contains("vote-list__vote-button--disabled", StringComparison.OrdinalIgnoreCase);
+    public static async Task<VoteListComponent> Create(ILocator locator) =>
+        new(locator)
+        {
+            Id = await locator.GetAttributeAsync<int>("data-id")
+        };
 
-    public void ClickVoteButton() {
-        this.VoteButton.Click();
+    public int Id { get; init; }
+
+    public ILocator VoteButton => this._locator.Locator(".vote-list__vote-button");
+    public ILocator Votes => this._locator.Locator(".vote-indicator");
+
+    public async Task IsVoteButtonEnabled(bool enabled)
+    {
+        if (!enabled) await this.VoteButton.Expected().ToHaveAttributeAsync("class", "vote-list__vote-button vote-list__vote-button--disabled");
+        if (enabled) await this.VoteButton.Expected().ToHaveAttributeAsync("class", "vote-list__vote-button");
     }
+
+    public Task ClickVoteButton() => this.VoteButton.ClickAsync();
 }

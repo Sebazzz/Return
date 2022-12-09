@@ -26,38 +26,42 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
     public void ResetColorIndex() => this._colorIndex = 1;
 
     [SuppressMessage("ReSharper", "AccessToDisposedClosure", Justification = "Retry runs while the webdriver runs")]
-    protected async Task Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false, string colorName = null, Action submitCallback = null) {
+    protected async Task Join(RetrospectiveLobby pageObject, bool facilitator, string name = null, bool alreadyJoined = false, string colorName = null, Func<Task> submitCallback = null) {
         using var joinPage = new JoinRetrospectivePage();
         joinPage.InitializeFrom(pageObject);
         await joinPage.Navigate(this.App, this.RetroId);
 
+        await joinPage.NameInput.FocusAsync();
+        await joinPage.NameInput.Expected().ToBeVisibleAsync();
+
         await joinPage.NameInput.FillAsync(name ?? Name.Create());
 
-        Thread.Sleep(500);
         if (!alreadyJoined) {
             if (colorName != null) {
+                TestContext.WriteLine($"Selecting dropdown option: {colorName}");
                 await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Label = colorName /*Partial match?*/});
             }
             else {
+                TestContext.WriteLine($"Selecting dropdown index: {this._colorIndex}");
                 await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Index = this._colorIndex++ });
             }
         }
         else {
             // Force refresh
-            joinPage.Unfocus();
-            Thread.Sleep(500);
+            await joinPage.Unfocus();
         }
 
         if (facilitator) {
             if (!alreadyJoined) {
                 await joinPage.IsFacilitatorCheckbox.ClickAsync();
-                Thread.Sleep(500);
             }
 
             await joinPage.FacilitatorPassphraseInput.FillAsync("scrummaster");
         }
 
-        submitCallback?.Invoke();
+        Task t = submitCallback?.Invoke();
+        if (t is not null) await t;
+
         await joinPage.Submit();
     }
 
@@ -77,5 +81,7 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
 
         sw.Stop();
         TestContext.WriteLine($"Navigated to lobby in {sw.Elapsed}");
+
+        await Task.Delay(500);
     }
 }

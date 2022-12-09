@@ -8,6 +8,8 @@
 namespace Return.Web.Tests.Integration.Pages;
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.Common.Models;
@@ -16,9 +18,8 @@ using Common;
 using Components;
 using Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright;
 using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using Return.Common;
 
 [TestFixture]
@@ -41,8 +42,8 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
         await this.WaitNavigatedToLobby();
 
         // Then
-        this.MultiAssert(client => Assert.That(() => client.NoteLaneElements, Has.Count.EqualTo(3).Retry()));
-        this.MultiAssert(client => Assert.That(() => client.WebDriver.FindElementsByTestElementId("add-note-button"), Has.Count.EqualTo(0).Retry()));
+        await this.MultiAssert(client => client.NoteLaneElements.Expected().ToHaveCountAsync(3));
+        await this.MultiAssert(client => client.BrowserPage.FindElementByTestElementId("add-note-button").Expected().ToHaveCountAsync(0));
     }
 
     [Test]
@@ -55,12 +56,15 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
         await this.WaitNavigatedToLobby();
 
         // When
-        this.Client1.TimeInMinutesInput.SendKeys("5");
-        this.Client1.WorkflowContinueButton.Click();
+        await this.Client1.TimeInMinutesInput.FillAsync("5");
+        await this.Client1.WorkflowContinueButton.ClickAsync();
 
         // Then
-        this.MultiAssert(client => Assert.That(() => TimeSpan.ParseExact(client.TimerText.Text, @"mm\:ss", Culture.Invariant), Is.LessThanOrEqualTo(TimeSpan.FromMinutes(5)).Retry()));
-        this.MultiAssert(client => Assert.That(() => client.WebDriver.FindElementsByTestElementId("add-note-button"), Has.Count.EqualTo(3).Retry()));
+        await this.MultiAssert(client => {
+            Assert.That(() => TimeSpan.ParseExact(client.TimerText.TextContentAsync().GetAwaiter().GetResult()!, @"mm\:ss", Culture.Invariant), Is.LessThanOrEqualTo(TimeSpan.FromMinutes(5)).Retry());
+            return Task.CompletedTask;
+        });
+        await this.MultiAssert(client => client.BrowserPage.FindElementByTestElementId("add-note-button").Expected().ToHaveCountAsync(3));
     }
 
     [Test]
@@ -77,23 +81,27 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
 
         // When
         NoteLaneComponent noteLane = this.Client2.GetLane(KnownNoteLane.Continue);
-        noteLane.AddNoteButton.Click();
+        await noteLane.AddNoteButton.ClickAsync();
 
         // Then
-        this.MultiAssert(client => {
-            Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(0).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+        await this.MultiAssert(async client =>
+        {
+            await client.GetLane(KnownNoteLane.Continue).NoteElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Start).NoteElements.Expected().ToHaveCountAsync(0);
+            await client.GetLane(KnownNoteLane.Stop).NoteElements.Expected().ToHaveCountAsync(0);
         });
 
         // When
-        NoteComponent note = noteLane.Notes.First();
+        NoteComponent note = (await noteLane.Notes()).First();
         string noteText = "some content which does not really matter to me";
-        note.Input.SendKeys(noteText);
+        await note.Input.FillAsync(noteText);
 
         // Then
-        Assert.That(() => this.Client1.GetLane(KnownNoteLane.Continue).Notes.First().Content.Text,
-            Has.Length.EqualTo(noteText.Length).And.Not.EqualTo(noteText).Retry(),
+        NoteComponent client2Note = (await this.Client1.GetLane(KnownNoteLane.Continue).Notes()).First();
+        await client2Note.Content.Expected().ToBeVisibleAsync();
+
+        string text = await client2Note.Content.TextContentAsync();
+        Assert.That(() => text, Has.Length.EqualTo(noteText.Length).And.Not.EqualTo(noteText),
             "Client 1 does not have the the garbled text from client 2");
     }
 
@@ -121,23 +129,25 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
 
         await this.WaitNavigatedToLobby();
 
-        this.MultiAssert(client => {
-            Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+        await this.MultiAssert(async client => {
+            await client.GetLane(KnownNoteLane.Continue).NoteElements.Expected().ToHaveCountAsync(3);
+            await client.GetLane(KnownNoteLane.Start).NoteElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Stop).NoteElements.Expected().ToHaveCountAsync(0);
         });
 
         // When
         NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);
-        NoteComponent note = noteLane.Notes.First(x => x.Id == noteId);
-        note.DeleteButton.Click();
+        NoteComponent note = (await noteLane.Notes()).First(n => n.Id == noteId);
+        await note.DeleteButton.ClickAsync();
 
         // Then
-        this.MultiAssert(client => {
-            NoteLaneComponent clientNoteLane = this.Client1.GetLane(KnownNoteLane.Continue);
+        await this.MultiAssert(async client => {
+            NoteLaneComponent clientNoteLane = client.GetLane(KnownNoteLane.Continue);
 
-            Assert.That(() => clientNoteLane.NoteElements, Has.Count.EqualTo(2).Retry());
-            Assert.That(() => clientNoteLane.Notes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId).Retry());
+            await clientNoteLane.NoteElements.Expected().ToHaveCountAsync(2);
+
+            List<NoteComponent> notes = await clientNoteLane.Notes();
+            Assert.That(() => notes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId).Retry());
         });
     }
 
@@ -165,28 +175,30 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
 
         await this.WaitNavigatedToLobby();
 
-        this.MultiAssert(client => {
-            Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(3).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+        await this.MultiAssert(async client => {
+            await client.GetLane(KnownNoteLane.Continue).NoteElements.Expected().ToHaveCountAsync(3);
+            await client.GetLane(KnownNoteLane.Start).NoteElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Stop).NoteElements.Expected().ToHaveCountAsync(0);
         });
 
         // When
         NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);
-        NoteComponent note = noteLane.Notes.First(x => x.Id == noteId);
+        NoteComponent note = (await noteLane.Notes()).First(n => n.Id == noteId);
 
-        new Actions(this.Client1.WebDriver)
-            .KeyDown(note.Input, Keys.Control)
-            .SendKeys(Keys.Delete)
-            .KeyUp(Keys.Control)
-            .Perform();
+        await note.Input.FocusAsync();
+        IKeyboard keyboard = note.Input.Page.Keyboard;
+        await keyboard.DownAsync("Control");
+        await keyboard.PressAsync("Delete");
+        await keyboard.UpAsync("Control");
 
         // Then
-        this.MultiAssert(client => {
+        await this.MultiAssert(async client => {
             NoteLaneComponent clientNoteLane = client.GetLane(KnownNoteLane.Continue);
 
-            Assert.That(() => clientNoteLane.NoteElements, Has.Count.EqualTo(2).Retry());
-            Assert.That(() => clientNoteLane.Notes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId).Retry());
+            await clientNoteLane.NoteElements.Expected().ToHaveCountAsync(2);
+
+            List<NoteComponent> allNotes = await clientNoteLane.Notes();
+            Assert.That(() => allNotes.Select(x => x.Id).ToArray(), Does.Not.Contain(noteId));
         });
     }
 
@@ -204,28 +216,31 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
 
         // When
         int laneNumber = (int)KnownNoteLane.Continue;
-        new Actions(this.Client2.WebDriver)
-            .KeyDown(Keys.Control)
-            .SendKeys(laneNumber.ToString(Culture.Invariant))
-            .KeyUp(Keys.Control)
-            .Perform();
+
+        IKeyboard keyboard = this.Client2.BrowserPage.Keyboard;
+        await keyboard.DownAsync("Control");
+        await keyboard.PressAsync(laneNumber.ToString(CultureInfo.InvariantCulture));
+        await keyboard.UpAsync("Control");
 
         // Then
-        this.MultiAssert(client => {
-            Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteElements, Has.Count.EqualTo(0).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteElements, Has.Count.EqualTo(0).Retry());
+        await this.MultiAssert(async client => {
+            await client.GetLane(KnownNoteLane.Continue).NoteElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Start).NoteElements.Expected().ToHaveCountAsync(0);
+            await client.GetLane(KnownNoteLane.Stop).NoteElements.Expected().ToHaveCountAsync(0);
         });
 
         // When
         NoteLaneComponent noteLane = this.Client2.GetLane(KnownNoteLane.Continue);
-        NoteComponent note = noteLane.Notes.First();
+        NoteComponent note = (await noteLane.Notes()).First();
         string noteText = "some content which does not really matter to me";
-        note.Input.SendKeys(noteText);
+        await note.Input.FillAsync(noteText);
 
         // Then
-        Assert.That(() => this.Client1.GetLane(KnownNoteLane.Continue).Notes.First().Content.Text,
-            Has.Length.EqualTo(noteText.Length).And.Not.EqualTo(noteText).Retry(),
+        NoteComponent client2Note = (await this.Client1.GetLane(KnownNoteLane.Continue).Notes()).First();
+        await client2Note.Content.Expected().ToBeVisibleAsync();
+
+        string text = await client2Note.Content.TextContentAsync();
+        Assert.That(() => text, Has.Length.EqualTo(noteText.Length).And.Not.EqualTo(noteText),
             "Client 1 does not have the the garbled text from client 2");
     }
 
@@ -283,11 +298,13 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
         }
 
         // Then
-        this.MultiAssert(client => {
+        await this.MultiAssert(async client => {
             NoteLaneComponent noteLane = client.GetLane(KnownNoteLane.Start);
-            NoteGroupComponent noteGroup = noteLane.NoteGroups.First(x => x.Id == noteGroupId);
+            NoteGroupComponent noteGroup = (await noteLane.NoteGroups()).First(x => x.Id == noteGroupId);
 
-            Assert.That(() => noteGroup.Notes.Select(x => x.Id).ToArray(), Contains.Item(note1Id).And.Contain(note2Id).Retry());
+            List<NoteComponent> notes = await noteGroup.Notes();
+            await noteGroup.NoteElements.Expected().ToHaveCountAsync(2);
+            Assert.That(() => notes.Select(x => x.Id).ToArray(), Contains.Item(note1Id).And.Contain(note2Id));
         });
     }
 
@@ -323,25 +340,24 @@ public sealed class RetrospectiveLobbyWorkflowTests : RetrospectiveLobbyTestsBas
 
         // When
         NoteLaneComponent noteLane = this.Client1.GetLane(KnownNoteLane.Continue);
-        noteLane.AddNoteGroupButton.Click();
+        await noteLane.AddNoteGroupButton.ClickAsync();
 
         // Then
-        this.MultiAssert(client => {
-            Assert.That(() => client.GetLane(KnownNoteLane.Continue).NoteGroupElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Start).NoteGroupElements, Has.Count.EqualTo(1).Retry());
-            Assert.That(() => client.GetLane(KnownNoteLane.Stop).NoteGroupElements, Has.Count.EqualTo(0).Retry());
+        await this.MultiAssert(async client => {
+            await client.GetLane(KnownNoteLane.Continue).NoteGroupElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Start).NoteGroupElements.Expected().ToHaveCountAsync(1);
+            await client.GetLane(KnownNoteLane.Stop).NoteGroupElements.Expected().ToHaveCountAsync(0);
         });
 
         // When
         int lastAddedNoteGroupId = this.App.GetLastAddedId<NoteGroup>();
-        NoteGroupComponent note = noteLane.NoteGroups.First(x => x.Id == lastAddedNoteGroupId);
+        NoteGroupComponent note = (await noteLane.NoteGroups()).First(x => x.Id == lastAddedNoteGroupId);
         string noteText = "title of new notegroup";
-        note.Input.SendKeys(noteText);
-        this.Client1.Unfocus(); // Unfocus to propagate change
+        await note.Input.FillAsync(noteText);
+        await this.Client1.Unfocus(); // Unfocus to propagate change
 
         // Then
-        Assert.That(() => this.Client2.GetLane(KnownNoteLane.Continue).NoteGroups.First(x => x.Id == lastAddedNoteGroupId).Title.Text,
-            Has.Length.EqualTo(noteText.Length).And.EqualTo(noteText).Retry(),
-            "Client 1 does not have the the title text from client 2");
+        NoteGroupComponent client2NoteGroup = (await this.Client2.GetLane(KnownNoteLane.Continue).NoteGroups()).First(x => x.Id == lastAddedNoteGroupId);
+        await client2NoteGroup.Title.Expected().ToHaveTextAsync(noteText);
     }
 }

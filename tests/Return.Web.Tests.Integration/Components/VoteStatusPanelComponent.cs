@@ -8,33 +8,37 @@
 namespace Return.Web.Tests.Integration.Components;
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Threading.Tasks;
 using Common;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public sealed class VoteStatusPanelComponent {
-    private readonly IWebElement _webElement;
+    private readonly ILocator _locator;
 
-    public VoteStatusPanelComponent(IWebElement webElement) {
-        this._webElement = webElement;
+    public VoteStatusPanelComponent(ILocator locator) {
+        this._locator = locator;
     }
 
-    public IEnumerable<VoteStatusForParticipant> VoteStatusPerParticipant =>
-        this._webElement.FindElementsByTestElementId("participant-vote-status").
-            Select(x => new VoteStatusForParticipant(x));
+    public ILocator VoteStatusPerParticipantLocator(int id) =>  this._locator.FindElementByTestElementId("participant-vote-status", id);
+    public Task<List<VoteStatusForParticipant>> VoteStatusPerParticipant() =>  this._locator.GenerateSubElementsByTestElementId("participant-vote-status",VoteStatusForParticipant.Create);
 }
 
 public sealed class VoteStatusForParticipant {
-    private readonly IWebElement _webElement;
+    private readonly ILocator _locator;
 
-    public VoteStatusForParticipant(IWebElement webElement) {
-        this._webElement = webElement;
+    private VoteStatusForParticipant(ILocator locator) {
+        this._locator = locator;
     }
 
-    public int ParticipantId => this._webElement.GetAttribute<int>("data-id");
+    public static async Task<VoteStatusForParticipant> Create(ILocator locator) =>
+        new(locator)
+        {
+            ParticipantId = await locator.GetAttributeAsync<int>("data-id")
+        };
 
-    public ReadOnlyCollection<IWebElement> CastVotes => this._webElement.FindElementsByTestElementId("cast-vote");
-    public ReadOnlyCollection<IWebElement> UncastVotes => this._webElement.FindElementsByTestElementId("uncast-vote");
-    public ReadOnlyCollection<IWebElement> TotalVotes => this._webElement.FindElements(By.ClassName("vote-indicator"));
+    public int ParticipantId { get; init; }
+
+    public ILocator CastVotes => this._locator.FindElementByTestElementId("cast-vote");
+    public ILocator UncastVotes => this._locator.FindElementByTestElementId("uncast-vote");
+    public ILocator TotalVotes => this._locator.Locator(".vote-indicator");
 }

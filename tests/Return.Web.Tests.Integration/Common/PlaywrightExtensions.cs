@@ -8,10 +8,13 @@
 namespace Return.Web.Tests.Integration.Common;
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
 using NUnit.Framework;
+using Return.Common;
 
 internal static class PlaywrightExtensions
 {
@@ -23,6 +26,83 @@ internal static class PlaywrightExtensions
     public static ILocator FindElementByTestElementId(this IPage browserPage, string testElementId) {
         if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
         return browserPage.Locator($"[data-test-element-id=\"{testElementId}\"]");
+    }
+
+    public static ILocator FindElementByTestElementId(this ILocator browserPage, string testElementId) {
+        if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
+        return browserPage.Locator($"[data-test-element-id=\"{testElementId}\"]");
+    }
+
+    public static ILocator FindElementByTestElementId(this IPage browserPage, string testElementId, int id) {
+        if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
+        return browserPage.Locator($"[data-test-element-id=\"{testElementId}\"][data-id=\"{id}\"]");
+    }
+
+    public static ILocator FindElementByTestElementId(this ILocator browserPage, string testElementId, int id) {
+        if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
+        return browserPage.Locator($"[data-test-element-id=\"{testElementId}\"][data-id=\"{id}\"]");
+    }
+
+    public static async Task<T> GetAttributeAsync<T>(this ILocator webElement, string attributeName) {
+        try {
+            return (T)Convert.ChangeType(await webElement.GetAttributeAsync(attributeName), typeof(T), Culture.Invariant);
+        }
+        catch (Exception ex) {
+            throw new InvalidOperationException($"Cannot read attribute '{attributeName}' of element {(await webElement.ElementHandleAsync())} as {typeof(T)}", ex);
+        }
+    }
+
+    public static async Task<List<T>> GenerateSubElementsByTestElementId<T>(this ILocator browserPage, string testElementId, Func<ILocator, Task<T>> factory) {
+        if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
+        ILocator locator = browserPage.Locator($"[data-test-element-id=\"{testElementId}\"]");
+        await locator.First.Expected().ToBeVisibleAsync();
+
+        int cnt = await locator.CountAsync();
+        List<T> items = new List<T>(cnt);
+        for (int i = 0; i < cnt; i++)
+        {
+            items.Add(await factory.Invoke(locator.Nth(i)));
+        }
+
+        return items;
+    }
+
+    public static async Task<List<T>> GenerateSubElementsByTestElementId<T>(this ILocator browserPage, string testElementId, Func<ILocator, T> factory) {
+        if (browserPage == null) throw new ArgumentNullException(nameof(browserPage));
+        ILocator locator = browserPage.Locator($"[data-test-element-id=\"{testElementId}\"]");
+        await locator.First.Expected().ToBeVisibleAsync();
+
+        int cnt = await locator.CountAsync();
+        List<T> items = new List<T>(cnt);
+        for (int i = 0; i < cnt; i++)
+        {
+            items.Add(factory.Invoke(locator.Nth(i)));
+        }
+
+        return items;
+    }
+
+    public static Task StartTrace(this IPage page, string suffix = default) {
+        if (!Debugger.IsAttached) return Task.CompletedTask;
+
+        return page.Context.Tracing.StartAsync(new()
+        {
+            Name = "_" + TestContext.CurrentContext.Test.Name + suffix,
+            Screenshots = true,
+            Snapshots = true,
+            Sources = true,
+            Title = TestContext.CurrentContext.Test.FullName
+        });
+    }
+
+    public static Task StopTrace(this IPage page, string suffix = default)
+    {
+        if (!Debugger.IsAttached) return Task.CompletedTask;
+
+        string fileName = Path.Combine(Paths.TracesDirectory, TestContext.CurrentContext.Test.Name + suffix + ".zip");
+        TestContext.WriteLine("Saving trace. Use command to view:");
+        TestContext.WriteLine($"\tplaywright show-trace \"{fileName}\"");
+        return page.Context.Tracing.StopAsync(new() { Path = fileName });
     }
 
     private static int ScreenshotCounter = 0;

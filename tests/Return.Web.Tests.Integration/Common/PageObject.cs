@@ -9,26 +9,16 @@ namespace Return.Web.Tests.Integration.Common;
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Playwright;
 using NUnit.Framework;
-using OpenQA.Selenium;
 
 public abstract class PageObject : IPageObject {
     private bool _ownsWebdriver;
     private IBrowserContext _browserContext;
-    private IWebDriver _webDriverContainer;
 
-    public IWebDriver WebDriver => this._webDriverContainer;
     public IBrowserContext Browser => this._browserContext;
     public IPage BrowserPage => this._browserContext.Pages.Single();
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-        "CA1033:Interface methods should be callable by child types",
-        Justification = "Not necessary for testing framework")]
-    void IPageObject.SetWebDriver(IWebDriver webDriver) {
-        this._webDriverContainer = webDriver;
-        this._ownsWebdriver = true;
-    }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
         "CA1033:Interface methods should be callable by child types",
@@ -38,13 +28,12 @@ public abstract class PageObject : IPageObject {
         this._ownsWebdriver = true;
     }
 
-    public void Unfocus() {
+    public Task Unfocus() {
         TestContext.WriteLine("Unfocus by sending tab");
-        this.WebDriver.FindElement(By.CssSelector("body")).SendKeys("\t");
+        return this.BrowserPage.Keyboard.PressAsync("Tab");
     }
 
     public void InitializeFrom(PageObject owner) {
-        this._webDriverContainer = owner._webDriverContainer;
         this._browserContext = owner._browserContext;
         this._ownsWebdriver = false;
     }
@@ -52,11 +41,8 @@ public abstract class PageObject : IPageObject {
     protected virtual void Dispose(bool disposing) {
         if (disposing) {
             if (this._ownsWebdriver) {
-                this._webDriverContainer?.Dispose();
                 _ = this._browserContext?.CloseAsync();
             }
-
-            this._webDriverContainer = null;
         }
     }
 
@@ -67,9 +53,6 @@ public abstract class PageObject : IPageObject {
 }
 
 public interface IPageObject : IDisposable {
-    void SetWebDriver(IWebDriver webDriver);
     void SetBrowserContext(IBrowserContext browserContext);
-
-    IWebDriver WebDriver { get; }
     IPage BrowserPage { get; }
 }

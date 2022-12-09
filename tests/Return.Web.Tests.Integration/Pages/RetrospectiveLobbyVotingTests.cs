@@ -8,15 +8,14 @@
 namespace Return.Web.Tests.Integration.Pages;
 
 using System;
-using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using Common;
 using Components;
 using Domain.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright;
 using NUnit.Framework;
-using OpenQA.Selenium;
 
 [TestFixture]
 public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase {
@@ -52,20 +51,18 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
         await this.WaitNavigatedToLobby();
 
         // When
-        this.Client1.VoteCountInput.SendKeys("2");
-        this.Client1.TimeInMinutesInput.SendKeys("10");
-        this.Client1.WorkflowContinueButton.Click();
+        await this.Client1.VoteCountInput.FillAsync("2");
+        await this.Client1.TimeInMinutesInput.FillAsync("10");
+        await this.Client1.WorkflowContinueButton.ClickAsync();
 
         // Then
-        this.MultiAssert(client => {
+        await this.MultiAssert(async client => {
             const int expectedVoteCount = 2 * 3 /* Number of lanes */;
-            Assert.That(() => {
-                    VoteStatusPanelComponent voteStatusPanel = client.VoteStatus;
-                    VoteStatusForParticipant bossVoteStatus =
-                        voteStatusPanel.VoteStatusPerParticipant.First(x => x.ParticipantId == bossId);
-                    return bossVoteStatus.TotalVotes;
-                },
-                Has.Count.EqualTo(expectedVoteCount).Retry(),
+            VoteStatusPanelComponent voteStatusPanel = client.VoteStatus;
+            VoteStatusForParticipant bossVoteStatus = (await voteStatusPanel.VoteStatusPerParticipant()).First(x => x.ParticipantId == bossId);
+
+            Assert.That(() => bossVoteStatus.TotalVotes.CountAsync().GetAwaiter().GetResult(),
+                Is.EqualTo(expectedVoteCount).Retry(),
                 $"Either unable to find vote panel, unable to find vote status for participant #{bossId}, or the vote count is incorrect (not {expectedVoteCount})");
         });
     }
@@ -99,17 +96,17 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
         await this.WaitNavigatedToLobby();
 
         // When
-        this.Client1.VoteCountInput.SendKeys("2");
-        this.Client1.TimeInMinutesInput.SendKeys("10");
-        this.Client1.WorkflowContinueButton.Click();
+        await this.Client1.VoteCountInput.FillAsync("2");
+        await this.Client1.TimeInMinutesInput.FillAsync("10");
+        await this.Client1.WorkflowContinueButton.ClickAsync();
 
         var allLanes = new[] { KnownNoteLane.Start, KnownNoteLane.Stop, KnownNoteLane.Continue };
         foreach (KnownNoteLane noteLaneId in allLanes) {
             NoteLaneComponent noteLane = this.Client2.GetLane(noteLaneId);
 
-            foreach (VoteListComponent voteListComponent in noteLane.VoteLists) {
+            foreach (VoteListComponent voteListComponent in await noteLane.VoteLists()) {
                 for (int cnt = 0; cnt < 2; cnt++) {
-                    voteListComponent.ClickVoteButton();
+                    await voteListComponent.ClickVoteButton();
                 }
 
                 break;
@@ -117,18 +114,22 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
         }
 
         // Then
-        this.MultiAssert(client => {
+        await this.MultiAssert(async client => {
             const int expectedVoteCount = 2 * 3 /* Number of lanes */;
 
-            void AssertVoteCount(int pid, int count, Func<VoteStatusForParticipant, IEnumerable> voteListSelector) {
-                Assert.That(() => {
-                        VoteStatusPanelComponent voteStatusPanel = client.VoteStatus;
-                        VoteStatusForParticipant bossVoteStatus =
-                            voteStatusPanel.VoteStatusPerParticipant.First(x => x.ParticipantId == pid);
-                        return voteListSelector(bossVoteStatus);
-                    },
-                    Has.Count.EqualTo(count).Retry(),
-                    $"Either unable to find vote panel, unable to find vote status for participant #{pid}, or the vote count is incorrect (not {count})");
+            async Task AssertVoteCountAsync(int pid, int count, Func<VoteStatusForParticipant, ILocator> voteListSelector) {
+                VoteStatusPanelComponent voteStatusPanel = client.VoteStatus;
+
+                ILocator locator = voteStatusPanel.VoteStatusPerParticipantLocator(pid);
+                await locator.Expected().ToBeVisibleAsync();
+
+                VoteStatusForParticipant participantVoteStatus = await VoteStatusForParticipant.Create(locator);
+
+                await voteListSelector(participantVoteStatus).Expected().ToHaveCountAsync(count);
+            }
+
+            void AssertVoteCount(int pid, int count, Func<VoteStatusForParticipant, ILocator> voteListSelector) {
+                Assert.DoesNotThrowAsync(() => AssertVoteCountAsync(pid,count,voteListSelector), $"Either unable to find vote panel, unable to find vote status for participant #{pid}, or the vote count is incorrect (not {count})");
             }
 
             AssertVoteCount(participantId, expectedVoteCount, v => v.CastVotes);
@@ -139,15 +140,16 @@ public sealed class RetrospectiveLobbyVotingTests : RetrospectiveLobbyTestsBase 
             foreach (KnownNoteLane noteLaneId in allLanes) {
                 NoteLaneComponent noteLane = client.GetLane(noteLaneId);
 
-                foreach (VoteListComponent voteListComponent in noteLane.VoteLists) {
-                    Assert.That(() => voteListComponent.Votes, Has.Count.EqualTo(2),
-                        "Expected to find 2 votes in each lane");
+                foreach (VoteListComponent voteListComponent in await noteLane.VoteLists())
+                {
+                    await voteListComponent.Votes.Expected().ToHaveCountAsync(2);
 
-                    if (client == this.Client2) {
-                        Assert.That(() => voteListComponent.IsVoteButtonEnabled, Is.False, "Vote button should be disabled");
+                    if (client == this.Client2)
+                    {
+                        await voteListComponent.IsVoteButtonEnabled(false);
                     }
                     else {
-                        Assert.That(() => voteListComponent.IsVoteButtonEnabled, Is.True, "Vote button should be enabled");
+                        await voteListComponent.IsVoteButtonEnabled(true);
                     }
 
                     break;

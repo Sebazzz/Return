@@ -7,9 +7,7 @@
 
 namespace Return.Web.Tests.Integration.Pages;
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -22,11 +20,8 @@ using Components;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Playwright;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.Extensions;
 
 /// <summary>
 /// Not really a real test, but more because I'm tired of creating screenshots. Note these tests don't really
@@ -37,13 +32,12 @@ using OpenQA.Selenium.Support.Extensions;
 /// Client2: Hong (participant)
 /// </remarks>
 [TestFixture]
-[FlakyTestFailureTolerance]
 public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
-    private readonly HashSet<int> _startAutomationGroupNoteIds = new HashSet<int>();
-    private readonly HashSet<int> _stopBacklogUnstableNoteIds = new HashSet<int>();
-    private readonly HashSet<int> _stopSprintScopeIncreasedNoteIds = new HashSet<int>();
-    private readonly HashSet<int> _stopKickOffLongNoteIds = new HashSet<int>();
-    private readonly HashSet<int> _continueDailiesNoteIds = new HashSet<int>();
+    private readonly HashSet<int> _startAutomationGroupNoteIds = new();
+    private readonly HashSet<int> _stopBacklogUnstableNoteIds = new();
+    private readonly HashSet<int> _stopSprintScopeIncreasedNoteIds = new();
+    private readonly HashSet<int> _stopKickOffLongNoteIds = new();
+    private readonly HashSet<int> _continueDailiesNoteIds = new();
 
     private int _startAutomationGroupId;
     private int _stopKickOffLongGroupId;
@@ -63,26 +57,27 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         createRetroPage.InitializeFrom(this.Client1);
         await createRetroPage.Navigate(this.App);
 
-        void SetResolution(IWebDriver webDriver) {
-            webDriver.Manage().Window.Size = new Size(1280, 1024);
-        }
+        Task SetResolution(IPage webDriver) => webDriver.SetViewportSizeAsync(1280, 1024);
 
-        SetResolution(this.Client1.WebDriver);
-        SetResolution(this.Client2.WebDriver);
+        await SetResolution(this.Client1.BrowserPage);
+        await SetResolution(this.Client2.BrowserPage);
 
         // When
         await createRetroPage.RetrospectiveTitleInput.TypeAsync("Sprint 1: Initial prototype");
         await createRetroPage.FacilitatorPassphraseInput.TypeAsync("scrummaster");
         await createRetroPage.ParticipantPassphraseInput.TypeAsync("secret");
-        createRetroPage.WebDriver.TryCreateScreenshot();
 
         // Then
-        CreateDocScreenshot(createRetroPage.WebDriver, "create-retro");
+        await CreateDocScreenshot(createRetroPage.BrowserPage, "create-retro");
 
         await createRetroPage.Submit();
 
-        string url = createRetroPage.BrowserPage.Url;
-        string retroId = Regex.Match(url, "/retrospective/(?<retroId>[A-z0-9]+)/join", RegexOptions.IgnoreCase).
+        Regex regex = new("/retrospective/(?<retroId>[A-z0-9]+)/join", RegexOptions.IgnoreCase);
+
+        await createRetroPage.UrlLocationInput.Expected().ToHaveValueAsync(regex);
+
+        string url = await createRetroPage.UrlLocationInput.InputValueAsync();
+        string retroId = regex.Match(url).
             Groups["retroId"].
             Value;
         this.RetroId = retroId;
@@ -98,41 +93,34 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
             await scope.SetRetrospective(this.RetroId, r => r.HashedPassphrase = null);
         }
 
-        await this.Join(this.Client1, true, "Roger", colorName: "Driver", submitCallback: () => CreateDocScreenshot(this.Client1.WebDriver, "join-retro"));
-        await this.Join(this.Client2, false, "Hong", colorName: "green");
+        await this.Join(this.Client1, true, "Roger", colorName: "Driver red", submitCallback: () => CreateDocScreenshot(this.Client1.BrowserPage, "join-retro"));
+        await this.Join(this.Client2, false, "Hong", colorName: "Amiable green");
 
         await this.WaitNavigatedToLobby();
 
-        this.Client1.TimeInMinutesInput.Clear();
-        this.Client1.TimeInMinutesInput.SendKeys("5");
-        this.Client1.TimeInMinutesInput.SendKeys(Keys.Tab);
+        await this.Client1.TimeInMinutesInput.ClearAsync();
+        await this.Client1.TimeInMinutesInput.FillAsync("5");
+        await this.Client1.Unfocus();
+
         Thread.Sleep(10000);
-        this.Client1.InvokeContinueWorkflow();
+        await this.Client1.InvokeContinueWorkflow();
 
         // When
         TestContext.WriteLine("Attempting to find Note Lane button after state transition");
         Thread.Sleep(10000);
-        this.Client2.WebDriver.Retry(_ => this.Client2.GetLane(KnownNoteLane.Continue).AddNoteButton.Displayed);
+        await this.Client2.GetLane(KnownNoteLane.Continue).AddNoteButton.Expected().ToBeVisibleAsync();
 
-        var writtenNoteIds = new HashSet<int>();
-        void WriteNote(RetrospectiveLobby client, KnownNoteLane laneId, string text) {
+        async Task WriteNote(RetrospectiveLobby client, KnownNoteLane laneId, string text) {
             NoteLaneComponent lane = client.GetLane(laneId);
 
-            lane.AddNoteButton.Click();
+            await lane.AddNoteButton.ClickAsync();
 
-            NoteComponent addedNote = client.WebDriver.Retry(_ => {
-                NoteComponent firstNote = lane.Notes.FirstOrDefault();
-                if (firstNote?.Input != null && writtenNoteIds.Add(firstNote.Id)) {
-                    return firstNote;
-                }
-
-                return null;
-            });
-
-            addedNote.Input.SendKeys(text);
+            await lane.NoteElements.First.Expected().ToBeVisibleAsync();
+            NoteComponent addedNote = (await lane.Notes()).First();
+            await addedNote.Input.FillAsync(text);
         }
 
-        WriteNote(this.Client2, KnownNoteLane.Continue, "Using this framework, it works very productive");
+        await WriteNote(this.Client2, KnownNoteLane.Continue, "Using this framework, it works very productive");
 
         using (IServiceScope scope = this.App.CreateTestServiceScope()) {
             await scope.TestCaseBuilder(this.RetroId).
@@ -174,19 +162,20 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
                 Build();
         }
 
-        WriteNote(this.Client1, KnownNoteLane.Start, "Daily builds should include automated smoke tests");
+        await WriteNote(this.Client1, KnownNoteLane.Start, "Daily builds should include automated smoke tests");
         this.AddLatestNoteIdToCollection(this._startAutomationGroupNoteIds);
 
-        WriteNote(this.Client1, KnownNoteLane.Start, "Client should be present in retrospective");
+        await WriteNote(this.Client1, KnownNoteLane.Start, "Client should be present in retrospective");
         this._startClientRetroPresenceNoteId = this.GetLatestNoteId();
 
-        WriteNote(this.Client2, KnownNoteLane.Continue, "Regular publish to acceptance environment");
+        await WriteNote(this.Client2, KnownNoteLane.Continue, "Regular publish to acceptance environment");
         this._continueDailyBuildNoteId = this.GetLatestNoteId();
 
-        CreateDocScreenshot(this.Client2.WebDriver, "writing");
+        await CreateDocScreenshot(this.Client2.BrowserPage, "writing");
 
         // Then
-        this.Client1.InvokeContinueWorkflow();
+        await this.Client1.InvokeContinueWorkflow();
+        this.EnsureRetrospectiveInStage(RetrospectiveStage.Discuss);
     }
 
     [Test]
@@ -195,7 +184,8 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         this.EnsureRetrospectiveInStage(RetrospectiveStage.Discuss);
 
         // Given
-        this.Client1.InvokeContinueWorkflow();
+        await this.Client1.InvokeContinueWorkflow();
+        this.EnsureRetrospectiveInStage(RetrospectiveStage.Grouping);
 
         // When
         using (IServiceScope scope = this.App.CreateTestServiceScope()) {
@@ -232,10 +222,10 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         }
 
         // Then
-        this.Client1.TimeInMinutesInput.SendKeys("\b4");
-        this.Client1.VoteCountInput.SendKeys("'\b3");
+        await this.Client1.TimeInMinutesInput.FillAsync("4");
+        await this.Client1.VoteCountInput.FillAsync("3");
 
-        CreateDocScreenshot(this.Client1.WebDriver, "grouping");
+        await CreateDocScreenshot(this.Client1.BrowserPage, "grouping");
     }
 
     [Test]
@@ -244,7 +234,8 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         this.EnsureRetrospectiveInStage(RetrospectiveStage.Grouping);
 
         // Given
-        this.Client1.InvokeContinueWorkflow();
+        await this.Client1.InvokeContinueWorkflow();
+        this.EnsureRetrospectiveInStage(RetrospectiveStage.Voting);
 
         // When
         using (IServiceScope scope = this.App.CreateTestServiceScope()) {
@@ -298,35 +289,31 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         // Then
         Thread.Sleep(500);
 
-        CreateDocScreenshot(this.Client1.WebDriver, "voting");
+        await CreateDocScreenshot(this.Client1.BrowserPage, "voting");
     }
 
     [Test]
     [Order((int)RetrospectiveStage.Finished)]
-    public void Screenshot_Finish() {
+    public async Task Screenshot_Finish() {
         this.EnsureRetrospectiveInStage(RetrospectiveStage.Voting);
 
         // Given
-        this.Client1.InvokeContinueWorkflow();
+        await this.Client1.InvokeContinueWorkflow();
 
         this.EnsureRetrospectiveInStage(RetrospectiveStage.Finished);
 
         // Then
-        CreateDocScreenshot(this.Client1.WebDriver, "finish-1");
+        await CreateDocScreenshot(this.Client1.BrowserPage, "finish-1");
 
-        this.Client1.ToggleViewButton.Click();
+        await this.Client1.ToggleViewButton.ClickAsync();
 
-        CreateDocScreenshot(this.Client1.WebDriver, "finish-2");
+        await CreateDocScreenshot(this.Client1.BrowserPage, "finish-2");
     }
 
-    private static void CreateDocScreenshot(IWebDriver webDriver, string name) {
-        if (webDriver == null) throw new ArgumentNullException(nameof(webDriver));
-
+    private static async Task CreateDocScreenshot(IPage browserPage, string name) {
         // Scroll to top, set cursor / focus to 0,0
-        Thread.Sleep(1000);
-        webDriver.ExecuteJavaScript("window.scrollTo(0, 0)");
-        new Actions(webDriver).MoveToElement(webDriver.FindElement(By.ClassName("navbar-menu")), 0, 0, MoveToElementOffsetOrigin.Center).Click().Perform();
-        Thread.Sleep(1000);
+        await browserPage.Locator(".navbar-menu").ScrollIntoViewIfNeededAsync();
+        await browserPage.Keyboard.PressAsync("Tab");
 
         // Create a path
         string docStagingDirectory = Path.Combine(Paths.TestArtifactDir, "doc-staging");
@@ -335,7 +322,12 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         string fileName = Path.Combine(docStagingDirectory, name + ".png");
 
         TestContext.WriteLine($"Creating doc screenshot: {fileName}");
-        webDriver.TakeScreenshot().SaveAsFile(fileName, ScreenshotImageFormat.Png);
+        await browserPage.ScreenshotAsync(new PageScreenshotOptions
+        {
+            Path = fileName,
+            FullPage = true,
+            Type = ScreenshotType.Png
+        });
     }
 
     private void AddLatestNoteIdToCollection(HashSet<int> idCollection) {
@@ -360,9 +352,25 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
 
     private void EnsureRetrospectiveInStage(RetrospectiveStage retrospectiveStage) {
         using IServiceScope scope = this.App.CreateTestServiceScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
-        Assume.That(() => dbContext.Retrospectives.AsNoTracking().FindByRetroId(this.RetroId, CancellationToken.None).ConfigureAwait(false).GetAwaiter().GetResult(),
-            Has.Property(nameof(Retrospective.CurrentStage)).EqualTo(retrospectiveStage).Retry(),
+        IReturnDbContext dbContext = scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
+
+        Retrospective retrospective = default;
+        const int maxAttempts = 4;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            TestContext.WriteLine($"Looking up retrospective by ID: {this.RetroId}... {i}/{maxAttempts}");
+            retrospective = dbContext.Retrospectives.AsNoTracking().
+                FindByRetroId(this.RetroId, CancellationToken.None).
+                ConfigureAwait(false).
+                GetAwaiter().
+                GetResult();
+
+            if (retrospective?.CurrentStage == retrospectiveStage) break;
+            Thread.Sleep(100);
+        }
+
+        Assume.That(retrospective?.CurrentStage,
+            Is.EqualTo(retrospectiveStage),
             $"Retrospective {this.RetroId} is not in stage {retrospectiveStage} required for this test. Are the tests running in the correct order?");
     }
 }

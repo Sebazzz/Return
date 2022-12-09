@@ -25,6 +25,7 @@ public class CreateRetrospectiveTests : PageFixture<CreateRetrospectivePage> {
         await this.Page.Submit();
 
         // Then
+        await this.Page.EnsureValidationMessages();
         string[] messages = await this.Page.GetValidationMessages();
 
         Assert.That(messages, Has.One.Contain("'Title' must not be empty"));
@@ -97,6 +98,7 @@ public sealed class CreateRetrospectivePage : PageObject {
     public Task Submit() => this.SubmitButton.ClickAsync();
     public Task ModalSubmit() => this.ModalSubmitButton.ClickAsync();
 
+    public Task EnsureValidationMessages() => this.BrowserPage.Locator(".validation-message").First.Expected().ToBeVisibleAsync();
     public async Task<string[]> GetValidationMessages()
     {
         ILocator locator = this.BrowserPage.Locator(".validation-message");

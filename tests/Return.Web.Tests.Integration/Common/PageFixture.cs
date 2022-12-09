@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Playwright.NUnit;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 [RetryTest(3)]
 public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable where TPageObject : IPageObject, new() {
@@ -25,10 +26,7 @@ public abstract class PageFixture<TPageObject> : ScopedFixture, IDisposable wher
     }
 
     [TearDown]
-    public Task CreateScreenshots() {
-        this.Page?.WebDriver?.TryCreateScreenshot("Client_AfterTest");
-        return this.Page?.BrowserPage?.TryCreateScreenshot("Client_AfterTest");
-    }
+    public Task CreateScreenshots() => this.Page?.BrowserPage?.TryCreateScreenshot("Client_AfterTest");
 
     public void Dispose() {
         this.Dispose(true);
@@ -46,10 +44,22 @@ public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDispos
         this.Client2 = await this.App.CreatePageObject<TPageObject>();
     }
 
+    [SetUp]
+    public async Task StartTracing() {
+        await this.Client1.BrowserPage.StartTrace("_Client1");
+        await this.Client2.BrowserPage.StartTrace("_Client2");
+    }
+
     [TearDown]
-    public void CreateScreenshots() {
-        this.Client1?.WebDriver?.TryCreateScreenshot("Client1_AfterTest");
-        this.Client2?.WebDriver?.TryCreateScreenshot("Client1_AfterTest");
+    public async Task StopTracing() {
+        Task t1 = this.Client1?.BrowserPage?.TryCreateScreenshot("Client1_AfterTest");
+        if (t1 is not null) await t1;
+
+        Task t2 =  this.Client2?.BrowserPage?.TryCreateScreenshot("Client1_AfterTest");
+        if (t2 is not null) await t2;
+
+        if (this.Client1 != null) await this.Client1.BrowserPage.StopTrace("_Client1");
+        if (this.Client2 != null) await this.Client2.BrowserPage.StopTrace("_Client2");
     }
 
     protected virtual void Dispose(bool disposing) {
@@ -64,11 +74,10 @@ public abstract class TwoClientPageFixture<TPageObject> : ScopedFixture, IDispos
         GC.SuppressFinalize(this);
     }
 
-    protected void MultiAssert(Action<TPageObject> action) =>
-        Task.WaitAll(
-            Task.Run(() => action.Invoke(this.Client1)),
-            Task.Run(() => action.Invoke(this.Client2))
-        );
+    protected Task MultiAssert(Func<TPageObject, Task> action) =>
+        Task.WhenAll(
+            action.Invoke(this.Client1),
+            action.Invoke(this.Client1));
 }
 
 [UseRunningApp]

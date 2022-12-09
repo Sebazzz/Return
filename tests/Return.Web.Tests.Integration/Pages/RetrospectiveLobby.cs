@@ -7,27 +7,26 @@
 
 namespace Return.Web.Tests.Integration.Pages;
 
-using System.Collections.ObjectModel;
-using System.Threading;
+using System.Threading.Tasks;
 using Common;
 using Components;
 using Domain.Entities;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public sealed class RetrospectiveLobby : PageObject {
-    public IWebElement TimeInMinutesInput => this.WebDriver.FindElementByTestElementId("time-in-minutes-input");
-    public IWebElement VoteCountInput => this.WebDriver.FindElementByTestElementId("vote-count-input");
-    public IWebElement WorkflowContinueButton => this.WebDriver.FindElementByTestElementId("workflow-continue-button");
-    public IWebElement ToggleViewButton => this.WebDriver.FindElementByTestElementId("toggle-view-button");
-    public IWebElement TimerText => this.WebDriver.FindElementByTestElementId("timer");
-    public ReadOnlyCollection<IWebElement> NoteLaneElements => this.WebDriver.FindElementsByTestElementId("note-lane");
-    public NoteLaneComponent GetLane(KnownNoteLane id) => new NoteLaneComponent(this.WebDriver.FindElementByTestElementId("note-lane", (int)id));
-    public VoteStatusPanelComponent VoteStatus => new VoteStatusPanelComponent(this.WebDriver.FindVisibleElement(By.ClassName("vote-status-panel")));
+    public ILocator TimeInMinutesInput => this.BrowserPage.FindElementByTestElementId("time-in-minutes-input");
+    public ILocator VoteCountInput => this.BrowserPage.FindElementByTestElementId("vote-count-input");
+    public ILocator WorkflowContinueButton => this.BrowserPage.FindElementByTestElementId("workflow-continue-button");
+    public ILocator ToggleViewButton => this.BrowserPage.FindElementByTestElementId("toggle-view-button");
+    public ILocator TimerText => this.BrowserPage.FindElementByTestElementId("timer");
+    public ILocator NoteLaneElements => this.BrowserPage.FindElementByTestElementId("note-lane");
+    public NoteLaneComponent GetLane(KnownNoteLane id) => new(this.BrowserPage.FindElementByTestElementId("note-lane", (int)id));
+    public VoteStatusPanelComponent VoteStatus => new(this.BrowserPage.Locator(".vote-status-panel"));
 
-    public void InvokeContinueWorkflow() {
-        this.WorkflowContinueButton.Click();
-
-        // Insert sleep for AppVeyor and slower CI
-        Thread.Sleep(1000);
+    public async Task InvokeContinueWorkflow()
+    {
+        await this.WorkflowContinueButton.Expected().ToBeVisibleAsync();
+        await this.WorkflowContinueButton.Expected().ToBeEnabledAsync();
+        await this.WorkflowContinueButton.ClickAsync();
     }
 }

@@ -26,16 +26,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using NUnit.Framework;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Edge;
-using OpenQA.Selenium.Support.Events;
 using Persistence;
 using Return.Application.App.Commands.SeedBaseData;
 using Return.Common;
-using WebDriverManager;
-using WebDriverManager.DriverConfigs.Impl;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Playwright;
@@ -75,89 +69,17 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
 
         bool debugMode = String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"));
 
+        if (!Directory.Exists(Paths.TracesDirectory)) Directory.CreateDirectory(Paths.TracesDirectory);
+
         IPlaywright playwright = await Playwright.CreateAsync();
         IBrowser browser = await playwright.Firefox.LaunchAsync(new()
         {
             Headless = !debugMode,
-            SlowMo = debugMode ? 10 : null
+            SlowMo = debugMode ? 10 : null,
+            TracesDir = Paths.TracesDirectory
         });
 
         return this._browser = browser;
-    }
-
-    public IWebDriver GetWebDriver() => this.CreateWebDriver();
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "API consistency / design")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IWebDriver is disposed by child")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and continue, we will not fail on logging")]
-    private IWebDriver CreateWebDriver() {
-        new DriverManager().SetUpDriver(new EdgeConfig(), "MatchingBrowser");
-
-        EdgeOptions webDriverOptions = new() {
-            PageLoadStrategy = PageLoadStrategy.Normal,
-            AcceptInsecureCertificates = true,
-        };
-
-        // WebDriverManager looks up Edge Dev by default
-        string binaryLocation = OperatingSystem.IsWindows() ? Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\App Paths\\msedge.exe", "", "")?.ToString() : null;
-        if (!String.IsNullOrEmpty(binaryLocation) && File.Exists(binaryLocation)) {
-            webDriverOptions.BinaryLocation = binaryLocation;
-        }
-
-        if (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("MOZ_HEADLESS"))) {
-            TestContext.WriteLine("Going to run Edge headless");
-            webDriverOptions.AddArgument("--headless");
-        }
-
-        var webDriver = new EdgeDriver(webDriverOptions);
-
-        var window = webDriver.Manage().Window;
-        try {
-            window.Size = new Size(1920, 1080);
-        }
-        catch (Exception ex) {
-            TestContext.WriteLine($"Setting driver window size not supported: {ex}");
-        }
-
-        // Overridable timeout for tests for known CI failures
-        if (!Int32.TryParse(Environment.GetEnvironmentVariable("RETURN_TEST_WAIT_TIME"), out int waitTime)) {
-            waitTime = 10;
-        }
-
-        TestContext.WriteLine($"Configuration of WebDriver using wait time: {waitTime}s");
-        ITimeouts timeouts = webDriver.Manage().Timeouts();
-        timeouts.ImplicitWait = TimeSpan.FromSeconds(waitTime);
-        timeouts.PageLoad = TimeSpan.FromSeconds(waitTime);
-
-        void WrapLoggerAction<TArgs>(TArgs args, Action act, string screenshotName = null) {
-            try {
-                if (screenshotName != null) webDriver.TryCreateScreenshot($"action-{screenshotName}");
-
-                act();
-            }
-            catch (Exception ex) {
-                TestContext.WriteLine($"Cannot log action {args.ToString()}: [{ex.GetType().FullName}] {ex.Message}");
-            }
-        }
-
-        var wrapper = new EventFiringWebDriver(webDriver);
-        wrapper.ElementClicked += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: click - {args.Element.TagName}"), "element-clicked");
-        wrapper.ElementClicking += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: clicking - {args.Element.TagName}"), "element-clicking");
-
-        wrapper.ExceptionThrown += (_, args) => {
-            TestContext.WriteLine($"WebDriver: exception - {args.ThrownException}");
-            webDriver.TryCreateScreenshot("exception-" + args.ThrownException.GetType().Name);
-            webDriver.TryLogContext();
-        };
-
-        wrapper.FindingElement += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element - {args.FindMethod}"));
-        wrapper.FindElementCompleted += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: finding element completed - {args.FindMethod}"));
-        wrapper.Navigating += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigating - {args.Url}"), "navigate");
-        wrapper.Navigated += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: navigated - {args.Url}"), "navigate");
-        wrapper.ElementValueChanging += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changing - {args.Element.TagName} [{args.Element.GetDomProperty("outerHTML")}]"));
-        wrapper.ElementValueChanged += (_, args) => WrapLoggerAction(args, () => TestContext.WriteLine($"WebDriver: element value changed - {args.Element.TagName} [{args.Element.GetDomProperty("outerHTML")}]"));
-
-        return wrapper;
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "IPageObject is disposable itself")]

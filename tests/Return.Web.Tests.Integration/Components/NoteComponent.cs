@@ -7,17 +7,26 @@
 
 namespace Return.Web.Tests.Integration.Components;
 
+using System.Threading.Tasks;
 using Common;
-using OpenQA.Selenium;
+using Microsoft.Playwright;
 
 public sealed class NoteComponent {
-    public NoteComponent(IWebElement webElement) {
-        this.WebElement = webElement;
+    private NoteComponent(ILocator locator) {
+        this.Locator = locator;
     }
 
-    public IWebElement WebElement { get; }
-    public int Id => this.WebElement.GetAttribute<int>("data-id");
-    public IWebElement Input => this.WebElement.FindElement(By.ClassName("textarea"));
-    public IWebElement Content => this.WebElement.FindElement(By.ClassName("note__content"));
-    public IWebElement DeleteButton => this.WebElement.FindElement(By.ClassName("note__delete-icon"));
+    public ILocator Locator { get; }
+
+    public static async Task<NoteComponent> Create(ILocator locator) =>
+        new(locator)
+        {
+            Id = await locator.GetAttributeAsync<int>("data-id")
+        };
+
+    public int Id { get; init; }
+
+    public ILocator Input => this.Locator.Locator(".textarea");
+    public ILocator Content => this.Locator.Locator(".note__content");
+    public ILocator DeleteButton => this.Locator.Locator(".note__delete-icon");
 }
