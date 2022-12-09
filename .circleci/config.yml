@@ -3,7 +3,7 @@ jobs:
     build:
         parallelism: 4
         docker:
-            - image: circleci/buildpack-deps:buster
+            - image: cimg/base:2022.09
         steps:
             - checkout
 
