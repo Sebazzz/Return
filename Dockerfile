@@ -14,16 +14,17 @@ COPY src/Return.Domain/*.csproj src/Return.Domain/
 COPY src/Return.Infrastructure/*.csproj src/Return.Infrastructure/
 COPY src/Return.Persistence/*.csproj src/Return.Persistence/
 COPY src/Return.Web/*.csproj src/Return.Web/
-COPY src/Common.props src/
+COPY src/*.props src/
 
 # ... tests
 COPY tests/Return.Application.Tests.Unit/*.csproj tests/Return.Application.Tests.Unit/
 COPY tests/Return.Domain.Tests.Unit/*.csproj tests/Return.Domain.Tests.Unit/
 COPY tests/Return.Web.Tests.Unit/*.csproj tests/Return.Web.Tests.Unit/
 COPY tests/Return.Web.Tests.Integration/*.csproj tests/Return.Web.Tests.Integration/
-COPY tests/Common.props tests/
+COPY tests/*.props tests/
 
 COPY *.sln .
+COPY *.props .
 COPY dotnet-tools.json .
 RUN dotnet restore
 RUN dotnet tool restore
