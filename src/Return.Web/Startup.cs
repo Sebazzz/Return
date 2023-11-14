@@ -22,7 +22,9 @@ using Microsoft.Extensions.Options;
 using Middleware;
 using Middleware.Https;
 using Persistence;
+using Serilog;
 using Services;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 [ExcludeFromCodeCoverage]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "ASP.NET Core conventions")]
@@ -89,6 +91,12 @@ public class Startup {
         else {
             app.UseExceptionHandler("/Error");
         }
+
+        app.UseSerilogRequestLogging(opts =>
+        {
+            opts.EnrichDiagnosticContext = (ctx, httpContext) =>
+                ctx.Set("RemoteAddress", httpContext.Connection.RemoteIpAddress);
+        });
 
         app.UseHttps(env);
         app.UseStaticFiles();

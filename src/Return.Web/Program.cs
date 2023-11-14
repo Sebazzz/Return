@@ -16,7 +16,6 @@ using Application.App.Commands.SeedBaseData;
 using Application.Common.Abstractions;
 using Configuration;
 using MediatR;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +24,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Persistence;
 using Services;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 [ExcludeFromCodeCoverage]
 public static class Program {
@@ -67,35 +68,14 @@ public static class Program {
                 cfg.AddOperatingSpecificConfigurationFolders();
                 cfg.AddEnvironmentVariables();
             })
-            .ConfigureLogging((wc, logging) => {
-                IHostEnvironment env = wc.HostingEnvironment;
-                IConfiguration config = wc.Configuration;
-
-                Console.WriteLine($"Current environment: {env.EnvironmentName}");
-
-                logging.AddConfiguration(config.GetSection("Logging"));
-                logging.AddConsole();
-
-                if (env.IsDevelopment()) {
-                    logging.AddDebug();
-                }
-                else {
-                    IConfigurationSection fileSection = config.GetSection("Logging").GetSection("File");
-                    string? fileName = fileSection?.GetValue<string>("Path");
-
-                    if (!String.IsNullOrEmpty(fileName)) {
-                        try {
-                            logging.AddFile(config.GetSection("Logging"));
-                        }
-                        catch (Exception ex) {
-                            Console.WriteLine($"Failed to add file log to path [{fileName}]: {ex}");
-                        }
-                    }
-                    else {
-                        Console.WriteLine("Skipping file logging...");
-                    }
-                }
-            });
+            .UseSerilog((context, svc, config) =>
+                config.ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(svc)
+                    .Enrich.FromLogContext()
+                    .Enrich.WithProperty("Application", "Return")
+                    .WriteTo.Console()
+                    .WriteTo.Debug()
+            );
 
     private static void AddOperatingSpecificConfigurationFolders([NotNull] this IConfigurationBuilder cfg) {
         if (cfg == null) throw new ArgumentNullException(nameof(cfg));

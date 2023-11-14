@@ -18,6 +18,9 @@
 
     <!--Scrutor provides decorator abilities for IServiceCollection -->
     <PackageReference Include="Scrutor" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Serilog.Sinks.Seq" />
   </ItemGroup>
 
   <ItemGroup>
