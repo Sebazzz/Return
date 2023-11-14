@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : ReturnAppFactory.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -18,6 +18,7 @@ using Application.Common.Abstractions;
 using Configuration;
 using Domain.Abstractions;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
@@ -32,10 +33,12 @@ using Return.Application.App.Commands.SeedBaseData;
 using Return.Common;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Playwright;
+using Serilog;
 
-public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
-    private IWebHost _webHost;
+public sealed class ReturnAppFactory : IDisposable {
+    private IHost _webHost;
 
     /// <summary>
     /// Sqlite in-memory databases are killed as soon as the last referencing connection is killed. Therefore we always
@@ -44,6 +47,22 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
     private SqliteConnection _sqliteConnection;
 
     private IBrowser _browser;
+
+    public IServer Server {
+        get {
+            this.EnsureHost();
+
+            return this._webHost.Services.GetRequiredService<IServer>();
+        }
+    }
+
+    public IServiceProvider Services {
+        get {
+            this.EnsureHost();
+
+            return this._webHost.Services;
+        }
+    }
 
     public ReturnAppFactory() {
         this._sqliteConnection = new SqliteConnection(this.ConnectionString);
@@ -105,7 +124,7 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
 
     public int GetLastAddedId<TEntity>() where TEntity : class, IIdPrimaryKey => this.GetId<TEntity>(dbSet => dbSet.OrderByDescending(x => x.Id).Select(x => x.Id).First());
 
-    public Uri CreateUri(string path) => new Uri(this.Server.BaseAddress, path);
+    public Uri CreateUri(string path) => new Uri(new Uri(this.Server.Features.Get<IServerAddressesFeature>().Addresses.First()), path);
 
     public IServiceScope CreateTestServiceScope() => this.Services.CreateScope();
 
@@ -117,8 +136,19 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
         DataSource = "testdb1"
     }).ToString();
 
-      [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Not necessary for tests")]
-    protected override void ConfigureWebHost(IWebHostBuilder builder) {
+    private void EnsureHost()
+    {
+        if (this._webHost is not null) return;
+
+        IHostBuilder builder = Host.CreateDefaultBuilder();
+        this.ConfigureWebHost(builder);
+
+        this._webHost = builder.Build();
+        this._webHost.Start();
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Not necessary for tests")]
+    private void ConfigureWebHost(IHostBuilder builder) {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
         // Find free TCP port to configure Kestel on
@@ -131,7 +161,6 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
 
         // Configure testing to use Kestel and test services
         builder
-            .UseStaticWebAssets()
             .ConfigureLogging(lb => {
                 lb.SetMinimumLevel(LogLevel.Trace);
                 lb.AddProvider(new TestContextLoggerProvider());
@@ -139,7 +168,8 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
                 string logFileName = (TestContext.CurrentContext?.Test.ClassName ?? "test-log") + ".log";
                 lb.AddFile(Path.Join(Paths.TestArtifactDir, logFileName));
             })
-            .ConfigureTestServices(services => {
+            .UseSerilog()
+            .ConfigureServices(services => {
                 // Add a database context using an in-memory database for testing.
                 services.RemoveAll<ReturnDbContext>();
 
@@ -159,7 +189,10 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
                     s.BaseUrl = "http://localhost:" + endPoint.Port + "/";
                 });
             })
-            .UseKestrel(k => k.Listen(endPoint))
+            .ConfigureWebHostDefaults(wb =>
+            {
+                wb.UseStaticWebAssets().UseKestrel(k => k.Listen(endPoint)).UseStartup<Startup>();
+            })
             .UseEnvironment(environment: "Test");
     }
 
@@ -187,56 +220,10 @@ public sealed class ReturnAppFactory : WebApplicationFactory<Startup> {
         }
     }
 
-    protected override TestServer CreateServer(IWebHostBuilder builder) {
-        // See: https://github.com/aspnet/AspNetCore/issues/4892
-        this._webHost = builder.Build();
-
-        var testServer = new TestServer(new PassthroughWebHostBuilder(this._webHost));
-        var address = testServer.Host.ServerFeatures.Get<IServerAddressesFeature>();
-        testServer.BaseAddress = new Uri(address.Addresses.First());
-
-        return testServer;
-    }
-
-    private sealed class PassthroughWebHostBuilder : IWebHostBuilder {
-        private readonly IWebHost _webHost;
-
-        public PassthroughWebHostBuilder(IWebHost webHost) {
-            this._webHost = webHost;
-        }
-
-        public IWebHost Build() => this._webHost;
-
-        public IWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate) {
-            TestContext.WriteLine($"Ignoring call: {typeof(PassthroughWebHostBuilder)}.{nameof(this.ConfigureAppConfiguration)}");
-            return this;
-        }
-
-        public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices) {
-            TestContext.WriteLine($"Ignoring call: {typeof(PassthroughWebHostBuilder)}.{nameof(ConfigureServices)}");
-            return this;
-        }
-
-        public IWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices) {
-            TestContext.WriteLine($"Ignoring call: {typeof(PassthroughWebHostBuilder)}.{nameof(ConfigureServices)}");
-            return this;
-        }
-
-        public string GetSetting(string key) => throw new NotImplementedException();
-
-        public IWebHostBuilder UseSetting(string key, string value) {
-            TestContext.WriteLine($"Ignoring call: {typeof(PassthroughWebHostBuilder)}.{nameof(this.UseSetting)}({key}, {value})");
-            return this;
-        }
-    }
-
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
-        if (disposing) {
-            this._webHost?.Dispose();
-            this._sqliteConnection?.Dispose();
-            this._sqliteConnection = null;
-        }
+    public void Dispose() {
+        this._webHost.StopAsync().GetAwaiter().GetResult();
+        this._webHost?.Dispose();
+        this._sqliteConnection?.Dispose();
+        this._sqliteConnection = null;
     }
 }
