@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : Program.cs
 //  Project         : Return.Web
 // ******************************************************************************
@@ -30,7 +30,7 @@ using Services;
 public static class Program {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "<Pending>")]
     public static async Task Main(string[] args) {
-        IWebHost host = CreateWebHostBuilder(args: args).Build();
+        IHost host = CreateHostBuilder(args: args).Build();
 
         using (IServiceScope scope = host.Services.CreateScope()) {
             IServiceProvider services = scope.ServiceProvider;
@@ -47,7 +47,7 @@ public static class Program {
             }
             catch (Exception ex) {
                 ILogger logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(Program));
-                logger.LogError(ex, "An error occurred while migrating or initializing the database.");
+                logger.LogError(ex, "An error occurred while migrating or initializing the database");
             }
         }
 
@@ -56,9 +56,9 @@ public static class Program {
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We log and exit instead of crash")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Global for testing")]
-    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-        WebHost.CreateDefaultBuilder(args: args)
-            .ConfigureServices(ConfigureServerOptions)
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args: args)
+            .ConfigureWebHostDefaults(wc => wc.ConfigureServices(ConfigureServerOptions).UseStartup<Startup>())
             .ConfigureAppConfiguration(cfg => {
                 if (Environment.GetEnvironmentVariable("ASPNETCORE_FORCE_USERSECRETS") == "True") {
                     cfg.AddUserSecrets(typeof(Program).Assembly);
@@ -68,7 +68,7 @@ public static class Program {
                 cfg.AddEnvironmentVariables();
             })
             .ConfigureLogging((wc, logging) => {
-                IWebHostEnvironment env = wc.HostingEnvironment;
+                IHostEnvironment env = wc.HostingEnvironment;
                 IConfiguration config = wc.Configuration;
 
                 Console.WriteLine($"Current environment: {env.EnvironmentName}");
@@ -95,8 +95,7 @@ public static class Program {
                         Console.WriteLine("Skipping file logging...");
                     }
                 }
-            })
-            .UseStartup<Startup>();
+            });
 
     private static void AddOperatingSpecificConfigurationFolders([NotNull] this IConfigurationBuilder cfg) {
         if (cfg == null) throw new ArgumentNullException(nameof(cfg));
