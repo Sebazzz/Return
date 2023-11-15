@@ -22,10 +22,10 @@ jobs:
               with:
                   node-version: '14.x'
 
-            - name: Install .NET 7.x SDK for build
+            - name: Install .NET 8.x SDK for build
               uses: actions/setup-dotnet@v2
               with:
-                  dotnet-version: '7.0.100'
+                  dotnet-version: '8.0.100'
 
             - name: Restore .NET Core tools
               run: dotnet tool restore

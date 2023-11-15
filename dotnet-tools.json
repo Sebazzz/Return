@@ -2,12 +2,8 @@
     "isRoot": true,
     "tools": {
         "dotnet-ef": {
-            "version": "7.0.0",
+            "version": "8.0.0",
             "commands": ["dotnet-ef"]
-        },
-        "dotnet-format": {
-            "version": "5.1.250801",
-            "commands": ["dotnet-format"]
         },
         "nbgv": {
             "version": "3.5.119",
