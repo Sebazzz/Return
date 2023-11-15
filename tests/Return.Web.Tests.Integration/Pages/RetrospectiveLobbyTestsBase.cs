@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  ©  Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : RetrospectiveLobbyTestsBase.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -67,9 +67,9 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
 
     protected Task WaitNavigatedToLobby() => Task.WhenAll(WaitNavigatedToLobby(this.Client1), WaitNavigatedToLobby(this.Client2));
 
-    protected Task SetRetrospective(Action<Retrospective> action) {
+    protected async Task SetRetrospective(Action<Retrospective> action) {
         using IServiceScope scope = this.App.CreateTestServiceScope();
-        return scope.SetRetrospective(this.RetroId, action);
+        await scope.SetRetrospective(this.RetroId, action);
     }
 
     private static async Task WaitNavigatedToLobby(RetrospectiveLobby pageObject) {

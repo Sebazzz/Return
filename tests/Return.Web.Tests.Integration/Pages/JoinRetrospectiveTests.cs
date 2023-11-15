@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : JoinRetrospectiveTests.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -181,9 +181,9 @@ public sealed class JoinRetrospectiveTests : PageFixture<JoinRetrospectivePage> 
         Assert.That(() => secondInstance.OnlineList.OnlineListItems.AllInnerTextsAsync().GetAwaiter().GetResult(), Has.One.Contains(myName));
     }
 
-    private Task SetRetrospective(string retroId, Action<Retrospective> action) {
+    private async Task SetRetrospective(string retroId, Action<Retrospective> action) {
         using IServiceScope scope = this.App.CreateTestServiceScope();
-        return scope.SetRetrospective(retroId, action);
+        await scope.SetRetrospective(retroId, action);
     }
 
     private async Task<string> CreateRetrospective(string facilitatorPassword, string password) {
