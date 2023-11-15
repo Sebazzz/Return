@@ -73,6 +73,7 @@ public static class Program {
                     .ReadFrom.Services(svc)
                     .Enrich.FromLogContext()
                     .Enrich.WithProperty("Application", "Return")
+                    .Enrich.WithProperty("ApplicationVersion", ThisAssembly.AssemblyInformationalVersion)
                     .WriteTo.Console()
                     .WriteTo.Debug()
             );
