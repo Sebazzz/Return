@@ -169,6 +169,10 @@ public sealed class ReturnAppFactory : IDisposable {
                 lb.AddFile(Path.Join(Paths.TestArtifactDir, logFileName));
             })
             .UseSerilog()
+            .ConfigureWebHostDefaults(wb =>
+            {
+                wb.UseStaticWebAssets().UseKestrel(k => k.Listen(endPoint)).UseStartup<Startup>();
+            })
             .ConfigureServices(services => {
                 // Add a database context using an in-memory database for testing.
                 services.RemoveAll<ReturnDbContext>();
@@ -188,10 +192,6 @@ public sealed class ReturnAppFactory : IDisposable {
                 services.Configure<ServerOptions>(s => {
                     s.BaseUrl = "http://localhost:" + endPoint.Port + "/";
                 });
-            })
-            .ConfigureWebHostDefaults(wb =>
-            {
-                wb.UseStaticWebAssets().UseKestrel(k => k.Listen(endPoint)).UseStartup<Startup>();
             })
             .UseEnvironment(environment: "Test");
     }
