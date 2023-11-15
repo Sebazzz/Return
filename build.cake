@@ -424,6 +424,9 @@ void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	}
 }
 
+Task("Test-CS")
+    .Description("Test backend-end compiled code");
+
 TestTask("Unit-Application", $"{baseName}.Application.Tests.Unit");
 TestTask("Unit-Domain", $"{baseName}.Domain.Tests.Unit");
 TestTask("Unit-Web", $"{baseName}.Web.Tests.Unit");
@@ -443,9 +446,6 @@ Task("Test-PreReq-Playwright-Browser")
 	.Does(() => {
 	DotNetTool(".", "playwright", "install firefox chromium");
 });
-
-Task("Test-CS")
-    .Description("Test backend-end compiled code");
 
 Task("Test")
     .IsDependentOn("Test-CS")
