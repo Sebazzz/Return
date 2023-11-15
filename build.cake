@@ -284,7 +284,12 @@ string GetVersionString() {
 	return version.SemVer1;
 }
 
-var windowsAllPublishTask = Task("Publish-Windows");
+Task("Publish-Windows");
+Task("Publish-Linux");
+Task("Publish")
+    .IsDependentOn("Publish-Windows")
+    .IsDependentOn("Publish-Linux");
+
 
 void WindowsPublishTask(string taskId, string versionId, string description) {
 	string internalTaskName = $"Publish-Windows-Core-{taskId}";
@@ -298,22 +303,19 @@ void WindowsPublishTask(string taskId, string versionId, string description) {
 	var output = publishDir + File($"return-web-{versionId}-{GetVersionString()}.zip");
 	Task(taskName)
 		.IsDependentOn(internalTaskName)
+		.IsDependeeOf("Publish-Windows")
 		.Description($"Publish for {description}, output to {output}")
 		.Does(() => {
 		   if (!skipCompression) ZipCompress(publishDir + Directory($"{versionId}/"), output);
 		});
-	
-	windowsAllPublishTask.IsDependentOn(taskName);
 }
 
-WindowsPublishTask("10-x64", "win10-x64", "Windows 10 / Windows Server 2016 64-bit");
-WindowsPublishTask("8-x64", "win81-x64", "Windows 8.1 / Windows Server 2012 R2 64-bit");
+WindowsPublishTask("x64", "win-x64", "Windows / Windows Server 64-bit");
 
-var ubuntuAllPublishTask = Task("Publish-Ubuntu");
 
-void UbuntuPublishTask(string taskId, string versionId, string description) {
-	string internalTaskName = $"Publish-Ubuntu-Core-{taskId}";
-	string taskName = $"Publish-Ubuntu-{taskId}";
+void LinuxPublishTask(string taskId, string versionId, string description) {
+	string internalTaskName = $"Publish-Linux-Core-{taskId}";
+	string taskName = $"Publish-Linux-{taskId}";
 
 	Task(internalTaskName)
 		.Description("Internal task - do not use")
@@ -323,22 +325,18 @@ void UbuntuPublishTask(string taskId, string versionId, string description) {
 	var output = publishDir + File($"return-web-{versionId}-{GetVersionString()}.tar.gz");
 	Task(taskName)
 		.IsDependentOn(internalTaskName)
+		.IsDependeeOf("Publish-Linux")
 		.Description($"Publish for {description}, output to {output}")
 		.Does(() => {
-		   CopyFile(File("./distscripts/ubuntu/launch"), publishDir + File($"{versionId}/launch"));
-		   CopyFile(File("./distscripts/ubuntu/launch.conf"), publishDir + File($"{versionId}/launch.conf.example"));
+		   CopyFile(File("./distscripts/linux/launch"), publishDir + File($"{versionId}/launch"));
+		   CopyFile(File("./distscripts/linux/launch.conf"), publishDir + File($"{versionId}/launch.conf.example"));
 		   if (!skipCompression) GZipCompress(publishDir + Directory($"{versionId}/"), output);
 		});
-	
-	ubuntuAllPublishTask.IsDependentOn(taskName);
 }
 
-UbuntuPublishTask("22.04-x64", "ubuntu.22.04-x64", "Ubuntu 22.04 64-bit");
+LinuxPublishTask("x64", "linux-x64", "Linux 64-bit");
 
-Task("Publish")
-    .IsDependentOn("Publish-Windows")
-    .IsDependentOn("Publish-Ubuntu");
-	
+// ----------- TESTS
 List<string> codeCoveragePaths = null;
 void TestTask(string name, string projectName, Func<bool> criteria = null) {
 	CreateDirectory(testResultsDir);
