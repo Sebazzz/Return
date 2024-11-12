@@ -37,7 +37,7 @@ jobs:
               run: ${{ matrix.script_name }} --target=Publish --verbosity=verbose
 
             - name: Upload built packages
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v4
               continue-on-error: true
               with:
                   name: installation packages
