@@ -1,23 +1,11 @@
 $DotNetInstallerUri = 'https://dot.net/v1/dotnet-install.ps1';
 $DotNetUnixInstallerUri = 'https://dot.net/v1/dotnet-install.sh'
 $DotNetChannel = 'LTS'
-$PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 
-[string] $CakeVersion = ''
-[string] $DotNetVersion= ''
-foreach($line in Get-Content "$PSScriptRoot\build.config")
-{
-  if ($line -like 'CAKE_VERSION=*') {
-      $CakeVersion = $line.SubString(13)
-  }
-  elseif ($line -like 'DOTNET_VERSION=*') {
-      $DotNetVersion =$line.SubString(15)
-  }
-}
+$DotNetVersion = Get-Content -Path .\global.json | ConvertFrom-Json | Select-Object -ExpandProperty sdk | Select-Object -ExpandProperty version
 
-
-if ([string]::IsNullOrEmpty($CakeVersion) -or [string]::IsNullOrEmpty($DotNetVersion)) {
-    'Failed to parse Cake / .NET Core SDK Version'
+if ([string]::IsNullOrEmpty($DotNetVersion)) {
+    'Failed to pars .NET SDK Version'
     exit 1
 }
 
@@ -113,43 +101,11 @@ $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE=1
 dotnet tool restore
 
 ###########################################################################
-# INSTALL CAKE
-###########################################################################
-
-# Make sure Cake has been installed.
-[string] $CakeExePath = ''
-[string] $CakeInstalledVersion = Get-Command dotnet-cake -ErrorAction SilentlyContinue  | % {&$_.Source --version}
-
-if ($CakeInstalledVersion -eq $CakeVersion) {
-    # Cake found locally
-    $CakeExePath = (Get-Command dotnet-cake).Source
-}
-else {
-    $CakePath = Join-Path $ToolPath ".store\cake.tool\$CakeVersion"
-    $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
-
-    if ((!(Test-Path -Path $CakePath -PathType Container)) -or (!(Test-Path $CakeExePath -PathType Leaf))) {
-
-        if ((![string]::IsNullOrEmpty($CakeExePath)) -and (Test-Path $CakeExePath -PathType Leaf))
-        {
-            & dotnet tool uninstall --tool-path $ToolPath Cake.Tool
-        }
-
-        & dotnet tool install --tool-path $ToolPath --version $CakeVersion Cake.Tool
-        if ($LASTEXITCODE -ne 0)
-        {
-            'Failed to install cake'
-            exit 1
-        }
-        $CakeExePath = (Get-ChildItem -Path $ToolPath -Filter "dotnet-cake*" -File| ForEach-Object FullName | Select-Object -First 1)
-    }
-}
-
-###########################################################################
 # RUN BUILD SCRIPT
 ###########################################################################
-& "$CakeExePath" ./build.cake --bootstrap
+
+& dotnet tool run dotnet-cake ./build.cake --bootstrap
 if ($LASTEXITCODE -eq 0){
-    & "$CakeExePath" ./build.cake $args
+    & dotnet tool run dotnet-cake ./build.cake $args
 }
 exit $LASTEXITCODE

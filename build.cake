@@ -436,7 +436,7 @@ Task("Test-PreReq-Playwright-Browser-Deps")
     .Description("Prepare playwright")
 	.IsDependentOn("Build")
 	.Does(() => {
-	DotNetTool(".", "playwright", "install-deps firefox chromium");
+	RunCmd("pwsh -NoProfile build/net8.0/playwright.ps1 install-deps firefox chromium");
 });
 
 Task("Test-PreReq-Playwright-Browser")
@@ -444,7 +444,7 @@ Task("Test-PreReq-Playwright-Browser")
 	.IsDependentOn("Test-PreReq-Playwright-Browser-Deps")
 	.IsDependeeOf("Test-CS-Integration-Web")
 	.Does(() => {
-	DotNetTool(".", "playwright", "install firefox chromium");
+	RunCmd("pwsh -NoProfile build/net8.0/playwright.ps1 install firefox chromium");
 });
 
 Task("Test")
