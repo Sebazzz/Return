@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2020 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : TemporarySettingsScope.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -36,13 +36,13 @@ public sealed class TemporarySettingsScope<T> where T : class, new() {
 
         this._savedSettings = this._mapper.Map<T>(settingsAccessor.Value);
 
-        TestContext.WriteLine($"Entering temporary settings scope for {typeof(T)}");
+        TestContext.Progress.WriteLine($"Entering temporary settings scope for {typeof(T)}");
 
         callback.Invoke(settingsAccessor.Value);
     }
 
     public void RestoreSettings() {
-        TestContext.WriteLine($"Exiting temporary settings scope for {typeof(T)}");
+        TestContext.Progress.WriteLine($"Exiting temporary settings scope for {typeof(T)}");
 
         if (this._savedSettings == null) {
             throw new InvalidOperationException($"{this.GetType().FullName}: Unable to restore settings, settings not set");
@@ -52,6 +52,6 @@ public sealed class TemporarySettingsScope<T> where T : class, new() {
         this._mapper.Map(this._savedSettings, settingsAccessor.Value);
 
         this._savedSettings = null;
-        TestContext.WriteLine($"Exited temporary settings scope for {typeof(T)}");
+        TestContext.Progress.WriteLine($"Exited temporary settings scope for {typeof(T)}");
     }
 }

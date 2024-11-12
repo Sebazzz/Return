@@ -38,11 +38,11 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
 
         if (!alreadyJoined) {
             if (colorName != null) {
-                TestContext.WriteLine($"Selecting dropdown option: {colorName}");
+                TestContext.Progress.WriteLine($"Selecting dropdown option: {colorName}");
                 await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Label = colorName /*Partial match?*/});
             }
             else {
-                TestContext.WriteLine($"Selecting dropdown index: {this._colorIndex}");
+                TestContext.Progress.WriteLine($"Selecting dropdown index: {this._colorIndex}");
                 await joinPage.ColorSelect.SelectOptionAsync(new SelectOptionValue { Index = this._colorIndex++ });
             }
         }
@@ -80,7 +80,7 @@ public class RetrospectiveLobbyTestsBase : TwoClientPageFixture<RetrospectiveLob
         await pageObject.BrowserPage.FindElementByTestElementId("main-board").Expected().ToBeVisibleAsync(); // If this fails: The retrospective board does not load
 
         sw.Stop();
-        TestContext.WriteLine($"Navigated to lobby in {sw.Elapsed}");
+        TestContext.Progress.WriteLine($"Navigated to lobby in {sw.Elapsed}");
 
         await Task.Delay(500);
     }

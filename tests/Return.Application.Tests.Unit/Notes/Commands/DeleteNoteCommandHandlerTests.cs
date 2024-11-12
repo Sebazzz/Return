@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : DeleteNoteCommandHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
@@ -109,7 +109,7 @@ public sealed class DeleteNoteCommandHandlerTests : QueryTestBase {
             Text = "Derp"
         };
 
-        TestContext.WriteLine(note.Retrospective.UrlId);
+        TestContext.Progress.WriteLine(note.Retrospective.UrlId);
         this.Context.Notes.Add(note);
         await this.Context.SaveChangesAsync();
 

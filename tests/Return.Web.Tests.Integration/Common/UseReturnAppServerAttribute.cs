@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  ©  Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : UseReturnAppServerAttribute.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -19,14 +19,14 @@ using NUnit.Framework.Interfaces;
 [AttributeUsage(AttributeTargets.Assembly)]
 public sealed class UseReturnAppServerAttribute : Attribute, ITestAction {
     public void BeforeTest(ITest test) {
-        TestContext.WriteLine("Setting up server and initial webdriver");
+        TestContext.Progress.WriteLine("Setting up server and initial webdriver");
 
         ServerInstance = new ReturnAppFactory();
         ServerInstance.InitializeBaseData();
     }
 
     public void AfterTest(ITest test) {
-        TestContext.WriteLine("Tearing down server and core webdriver");
+        TestContext.Progress.WriteLine("Tearing down server and core webdriver");
 
         ServerInstance?.Dispose();
         ServerInstance = null;

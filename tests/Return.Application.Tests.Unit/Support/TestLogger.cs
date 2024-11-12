@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : TestLogger.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
@@ -22,7 +22,7 @@ internal sealed class TestLogger<T> : ILogger<T> {
     public bool IsEnabled(LogLevel logLevel) => true;
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) {
-        TestContext.WriteLine(
+        TestContext.Progress.WriteLine(
             $"[{typeof(T).Name}]: {logLevel} {eventId} {state}: {formatter(state, exception)} \r\n{exception}"
         );
     }

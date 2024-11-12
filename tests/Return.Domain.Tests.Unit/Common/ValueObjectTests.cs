@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : ValueObjectTests.cs
 //  Project         : Return.Domain.Tests.Unit
 // ******************************************************************************
@@ -42,7 +42,7 @@ public class ValueObjectTests
         var point1 = new Point(x: 1, y: 2);
         var point2 = new Point(x: 2, y: 1);
 
-        Assert.False(point1.Equals(obj: point2));
+        Assert.That(point1, Is.Not.EqualTo(point2));
     }
 
     [Test]
@@ -51,6 +51,6 @@ public class ValueObjectTests
         var point1 = new Point(x: 1, y: 2);
         var point2 = new Point(x: 1, y: 2);
 
-        Assert.True(point1.Equals(obj: point2));
+        Assert.That(point1, Is.EqualTo(point2));
     }
 }

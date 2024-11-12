@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : TestCaseBuilder.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -51,7 +51,7 @@ public sealed class TestCaseBuilder {
 
     public TestCaseBuilder HasExistingParticipant(string participantName) {
         this._actions.Enqueue(async () => {
-            TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] attempting to record presence of existing participant [{participantName}]");
+            TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] attempting to record presence of existing participant [{participantName}]");
 
             var dbContext = this._scope.ServiceProvider.GetRequiredService<IReturnDbContext>();
             Participant participant = await dbContext.Participants.FirstAsync(x => x.Name == participantName && x.Retrospective.UrlId.StringId == this._retrospectiveId);
@@ -63,7 +63,7 @@ public sealed class TestCaseBuilder {
                 IsFacilitator = participant.IsFacilitator
             });
 
-            TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] recorded presence of existing participant [{participantName}] with ID #{participant.Id}");
+            TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] recorded presence of existing participant [{participantName}] with ID #{participant.Id}");
         });
         return this;
     }
@@ -138,7 +138,7 @@ public sealed class TestCaseBuilder {
                 throw new InvalidOperationException("A call to OutputId should follow a call to an entity creating action");
             }
 
-            TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Outputting last added item {this._lastAddedItem.Type} with ID #{this._lastAddedItem.Id} to callback ({callback.GetMethodInfo().Name})");
+            TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] Outputting last added item {this._lastAddedItem.Type} with ID #{this._lastAddedItem.Id} to callback ({callback.GetMethodInfo().Name})");
             callback.Invoke(this._lastAddedItem.Id);
 
             return Task.CompletedTask;
@@ -236,7 +236,7 @@ public sealed class TestCaseBuilder {
     }
 
     private void RecordAddedId<T>(int id) {
-        TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Recording last added item: [{typeof(T)}] with ID #{id}");
+        TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] Recording last added item: [{typeof(T)}] with ID #{id}");
         this._lastAddedItem = (typeof(T), id);
     }
 
@@ -253,12 +253,12 @@ public sealed class TestCaseBuilder {
             IRequest<TResponse> request = requestFunc();
 
             if (participantName == null) {
-                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with no participant");
+                TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with no participant");
 
                 this._scope.SetNoAuthenticationInfo();
             }
             else {
-                TestContext.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with participant {participantName}");
+                TestContext.Progress.WriteLine($"[{nameof(TestCaseBuilder)}] Executing request [{request}] with participant {participantName}");
 
                 ParticipantInfo participantInfo = this.GetParticipatorInfo(participantName);
                 this._scope.SetAuthenticationInfo(new CurrentParticipantModel(participantInfo.Id, participantInfo.Name, participantInfo.IsFacilitator));

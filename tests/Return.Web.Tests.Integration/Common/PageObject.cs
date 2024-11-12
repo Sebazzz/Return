@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : PageObject.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -29,7 +29,7 @@ public abstract class PageObject : IPageObject {
     }
 
     public Task Unfocus() {
-        TestContext.WriteLine("Unfocus by sending tab");
+        TestContext.Progress.WriteLine("Unfocus by sending tab");
         return this.BrowserPage.Keyboard.PressAsync("Tab");
     }
 

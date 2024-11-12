@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : RetroIdentifierTests.cs
 //  Project         : Return.Domain.Tests.Unit
 // ******************************************************************************
@@ -40,7 +40,7 @@ public sealed class RetroIdentifierTests {
         bool isValid = this._retroIdentifierService.IsValid(retroIdentifier.StringId);
 
         // Then
-        Assert.IsTrue(isValid, $"Id {retroIdentifier} is not valid");
+        Assert.That(isValid, $"Id {retroIdentifier} is not valid");
     }
 
 

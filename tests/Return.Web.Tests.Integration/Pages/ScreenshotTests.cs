@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : ScreenshotTests.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -25,7 +25,7 @@ using NUnit.Framework;
 
 /// <summary>
 /// Not really a real test, but more because I'm tired of creating screenshots. Note these tests don't really
-/// run independently, and they are ordered by the [Order] attribute. 
+/// run independently, and they are ordered by the [Order] attribute.
 /// </summary>
 /// <remarks>
 /// Client1: Roger (facilitator)
@@ -106,7 +106,7 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         await this.Client1.InvokeContinueWorkflow();
 
         // When
-        TestContext.WriteLine("Attempting to find Note Lane button after state transition");
+        TestContext.Progress.WriteLine("Attempting to find Note Lane button after state transition");
         Thread.Sleep(10000);
         await this.Client2.GetLane(KnownNoteLane.Continue).AddNoteButton.Expected().ToBeVisibleAsync();
 
@@ -321,7 +321,7 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
 
         string fileName = Path.Combine(docStagingDirectory, name + ".png");
 
-        TestContext.WriteLine($"Creating doc screenshot: {fileName}");
+        TestContext.Progress.WriteLine($"Creating doc screenshot: {fileName}");
         await browserPage.ScreenshotAsync(new PageScreenshotOptions
         {
             Path = fileName,
@@ -358,7 +358,7 @@ public sealed class ScreenshotTests : RetrospectiveLobbyTestsBase {
         const int maxAttempts = 4;
         for (int i = 0; i < maxAttempts; i++)
         {
-            TestContext.WriteLine($"Looking up retrospective by ID: {this.RetroId}... {i}/{maxAttempts}");
+            TestContext.Progress.WriteLine($"Looking up retrospective by ID: {this.RetroId}... {i}/{maxAttempts}");
             retrospective = dbContext.Retrospectives.AsNoTracking().
                 FindByRetroId(this.RetroId, CancellationToken.None).
                 ConfigureAwait(false).

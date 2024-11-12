@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : ExecuteMediatorCommand.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -21,7 +21,7 @@ using Services;
 
 public static class TestServiceScopeUtilities {
     public static void SetAuthenticationInfo(this IServiceScope serviceScope, CurrentParticipantModel currentParticipant) {
-        TestContext.WriteLine($"[{nameof(TestServiceScopeUtilities)}] {nameof(IServiceScope)} - setting authentication with participant {currentParticipant}");
+        TestContext.Progress.WriteLine($"[{nameof(TestServiceScopeUtilities)}] {nameof(IServiceScope)} - setting authentication with participant {currentParticipant}");
 
         var currentParticipantService = (CurrentParticipantService)
             serviceScope.ServiceProvider.GetRequiredService<ICurrentParticipantService>();
@@ -34,7 +34,7 @@ public static class TestServiceScopeUtilities {
     }
 
     public static void SetNoAuthenticationInfo(this IServiceScope serviceScope) {
-        TestContext.WriteLine($"[{nameof(TestServiceScopeUtilities)}] {nameof(IServiceScope)} - setting no authentication");
+        TestContext.Progress.WriteLine($"[{nameof(TestServiceScopeUtilities)}] {nameof(IServiceScope)} - setting no authentication");
 
         var currentParticipantService = (CurrentParticipantService)
             serviceScope.ServiceProvider.GetRequiredService<ICurrentParticipantService>();
@@ -46,7 +46,7 @@ public static class TestServiceScopeUtilities {
         IRequest<TResponse> request,
         CancellationToken cancellationToken = default
     ) {
-        TestContext.WriteLine($"[{nameof(TestServiceScopeUtilities)}] Sending Mediator request [{request}]");
+        TestContext.Progress.WriteLine($"[{nameof(TestServiceScopeUtilities)}] Sending Mediator request [{request}]");
 
         IServiceProvider sp = serviceScope.ServiceProvider;
         return sp.Send(request, cancellationToken);
@@ -57,7 +57,7 @@ public static class TestServiceScopeUtilities {
         IRequest<TResponse> request,
         CancellationToken cancellationToken = default
     ) {
-        TestContext.WriteLine($"[{nameof(TestServiceScopeUtilities)}] Sending Mediator request [{request}]");
+        TestContext.Progress.WriteLine($"[{nameof(TestServiceScopeUtilities)}] Sending Mediator request [{request}]");
 
         var mediator = serviceProvider.GetRequiredService<IMediator>();
         return mediator.Send(request, cancellationToken);

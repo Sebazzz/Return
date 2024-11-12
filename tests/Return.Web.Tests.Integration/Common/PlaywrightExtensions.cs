@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2022 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : PlaywrightExtensions.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -100,8 +100,8 @@ internal static class PlaywrightExtensions
         if (!Debugger.IsAttached) return Task.CompletedTask;
 
         string fileName = Path.Combine(Paths.TracesDirectory, TestContext.CurrentContext.Test.Name + suffix + ".zip");
-        TestContext.WriteLine("Saving trace. Use command to view:");
-        TestContext.WriteLine($"\tplaywright show-trace \"{fileName}\"");
+        TestContext.Progress.WriteLine("Saving trace. Use command to view:");
+        TestContext.Progress.WriteLine($"\tplaywright show-trace \"{fileName}\"");
         return page.Context.Tracing.StopAsync(new() { Path = fileName });
     }
 
@@ -112,7 +112,7 @@ internal static class PlaywrightExtensions
         string screenshotPath = Path.Join(Paths.TestArtifactDir, screenshotName);
 
         try {
-            TestContext.WriteLine($"Creating screenshot: {screenshotPath}");
+            TestContext.Progress.WriteLine($"Creating screenshot: {screenshotPath}");
             await browserPage.ScreenshotAsync(new()
             {
                 FullPage = true,
@@ -121,7 +121,7 @@ internal static class PlaywrightExtensions
             });
         }
         catch (Exception ex) {
-            TestContext.WriteLine($"--> Unable to create screenshot: {ex}");
+            TestContext.Progress.WriteLine($"--> Unable to create screenshot: {ex}");
         }
     }
 

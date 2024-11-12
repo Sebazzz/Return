@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : VoteChangeCommandHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
@@ -181,7 +181,7 @@ public sealed class CastVoteCommandHandlerTests : QueryTestBase {
         await handler.Handle(command, CancellationToken.None);
 
         // Then
-        TestContext.WriteLine(securityValidator.ReceivedCalls().Select(x => x.GetMethodInfo().Name).FirstOrDefault());
+        TestContext.Progress.WriteLine(securityValidator.ReceivedCalls().Select(x => x.GetMethodInfo().Name).FirstOrDefault());
         await securityValidator.Received().
             EnsureOperation(Arg.Any<Retrospective>(), SecurityOperation.Delete, Arg.Any<NoteVote>());
 
@@ -211,7 +211,7 @@ public sealed class CastVoteCommandHandlerTests : QueryTestBase {
         this.Context.Retrospectives.Add(retro);
         await this.Context.SaveChangesAsync();
 
-        TestContext.WriteLine(retroId);
+        TestContext.Progress.WriteLine(retroId);
         return retro;
     }
 
@@ -267,7 +267,7 @@ public sealed class CastVoteCommandHandlerTests : QueryTestBase {
         this.Context.Retrospectives.Add(retro);
         await this.Context.SaveChangesAsync();
 
-        TestContext.WriteLine(retroId);
+        TestContext.Progress.WriteLine(retroId);
         return retro;
     }
 

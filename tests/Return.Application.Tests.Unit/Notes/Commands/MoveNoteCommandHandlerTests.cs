@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : MoveNoteCommandHandlerTests.cs
 //  Project         : Return.Application.Tests.Unit
 // ******************************************************************************
@@ -51,7 +51,7 @@ public sealed class MoveNoteCommandHandlerTests : CommandTestBase {
             Text = "Derp"
         };
 
-        TestContext.WriteLine(note.Retrospective.UrlId);
+        TestContext.Progress.WriteLine(note.Retrospective.UrlId);
         this.Context.Notes.Add(note);
         await this.Context.SaveChangesAsync();
 
@@ -86,7 +86,7 @@ public sealed class MoveNoteCommandHandlerTests : CommandTestBase {
             Title = "G1"
         };
 
-        TestContext.WriteLine(note.Retrospective.UrlId);
+        TestContext.Progress.WriteLine(note.Retrospective.UrlId);
         this.Context.Notes.Add(note);
         this.Context.NoteGroups.Add(noteGroup);
         await this.Context.SaveChangesAsync();
@@ -130,7 +130,7 @@ public sealed class MoveNoteCommandHandlerTests : CommandTestBase {
         };
         note.Group = noteGroup;
 
-        TestContext.WriteLine(note.Retrospective.UrlId);
+        TestContext.Progress.WriteLine(note.Retrospective.UrlId);
         this.Context.Notes.Add(note);
         this.Context.NoteGroups.Add(noteGroup);
         await this.Context.SaveChangesAsync();

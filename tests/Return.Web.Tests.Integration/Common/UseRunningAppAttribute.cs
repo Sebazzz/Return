@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  ©  Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : UseRunningAppAttribute.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -16,7 +16,7 @@ public sealed class UseRunningAppAttribute : Attribute, ITestAction {
     public void BeforeTest(ITest test) {
         if (test == null) throw new ArgumentNullException(nameof(test));
         if (!(test.Fixture is IAppFixture appFixture)) {
-            TestContext.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.BeforeTest)}: {test.ClassName} is not {typeof(IAppFixture)}");
+            TestContext.Progress.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.BeforeTest)}: {test.ClassName} is not {typeof(IAppFixture)}");
 
             return;
         }
@@ -28,7 +28,7 @@ public sealed class UseRunningAppAttribute : Attribute, ITestAction {
             appFixture.OnInitialized().ConfigureAwait(false).GetAwaiter().GetResult();
         }
         catch (Exception ex) {
-            TestContext.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.BeforeTest)}: {ex}");
+            TestContext.Progress.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.BeforeTest)}: {ex}");
 
             throw;
         }
@@ -43,7 +43,7 @@ public sealed class UseRunningAppAttribute : Attribute, ITestAction {
             }
         }
         catch (Exception ex) {
-            TestContext.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.AfterTest)}: {ex}");
+            TestContext.Progress.WriteLine($"{nameof(UseRunningAppAttribute)}.{nameof(this.AfterTest)}: {ex}");
 
             throw;
         }

@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : RetryConstraint.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -152,14 +152,14 @@ public static class RetryConstraint {
                 try {
                     result = resultFactory();
                     if (result.IsSuccess) {
-                        TestContext.WriteLine($"Constraint {result.Status}: {result.Name} {result.Description} - Success");
+                        TestContext.Progress.WriteLine($"Constraint {result.Status}: {result.Name} {result.Description} - Success");
                         return result;
                     }
 
-                    TestContext.WriteLine($"Constraint {result.Status}: {result.Name} {result.Description} - Retrying");
+                    TestContext.Progress.WriteLine($"Constraint {result.Status}: {result.Name} {result.Description} - Retrying");
                 }
                 catch (Exception ex) {
-                    TestContext.WriteLine($"Constraint exception: {ex} - Retrying");
+                    TestContext.Progress.WriteLine($"Constraint exception: {ex} - Retrying");
                 }
 
                 Thread.Sleep(this._retrySettings.TimeGap);

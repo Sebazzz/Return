@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : CleanupObjects.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -26,12 +26,12 @@ public static class Disposables {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We shouldn't fail the test if something cannot be disposed")]
     private static void DisposeList(List<IDisposable> list) {
         foreach (IDisposable disposable in list) {
-            TestContext.WriteLine($"Disposing: {disposable}");
+            TestContext.Progress.WriteLine($"Disposing: {disposable}");
             try {
                 disposable?.Dispose();
             }
             catch (Exception ex) {
-                TestContext.WriteLine($"Disposing failed {disposable}: {ex}");
+                TestContext.Progress.WriteLine($"Disposing failed {disposable}: {ex}");
             }
         }
 

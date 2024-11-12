@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : TestContextLogger.cs
 //  Project         : Return.Web.Tests.Integration
 // ******************************************************************************
@@ -13,7 +13,7 @@ using NUnit.Framework;
 
 public sealed class TestContextLoggerProvider : ILoggerProvider {
     public void Dispose() {
-        TestContext.WriteLine($"{typeof(TestContextLogger)}: Dispose");
+        TestContext.Progress.WriteLine($"{typeof(TestContextLogger)}: Dispose");
     }
 
     public ILogger CreateLogger(string categoryName) => new TestContextLogger(categoryName);
@@ -44,7 +44,7 @@ internal sealed class TestContextLogger : ILogger {
         string preamble =
             $"[{this._categoryName}] {(!String.IsNullOrEmpty(this._scopeName) ? (this._scopeName + " -> ") : "")}";
 
-        TestContext.WriteLine($"{preamble} {eventId} {formatter(state, exception)} [{exception}]");
+        TestContext.Progress.WriteLine($"{preamble} {eventId} {formatter(state, exception)} [{exception}]");
     }
 
     private sealed class LoggingScope : IDisposable {
