@@ -1,5 +1,5 @@
 ### BUILD
-FROM mcr.microsoft.com/dotnet/sdk:7.0.100 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /source
 
 # Prerequisites
@@ -56,7 +56,7 @@ COPY . .
 RUN ./build.sh --target=Publish-Ubuntu-22.04-x64 --publish-dir=publish --verbosity=verbose --skip-compression=true
 
 ### RUNTIME IMAGE
-FROM mcr.microsoft.com/dotnet/runtime-deps:7.0
+FROM mcr.microsoft.com/dotnet/runtime-deps:8.0
 WORKDIR /app
 
 # ... Run libgdi install
