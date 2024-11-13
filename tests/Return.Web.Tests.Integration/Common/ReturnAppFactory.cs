@@ -161,14 +161,17 @@ public sealed class ReturnAppFactory : IDisposable {
 
         // Configure testing to use Kestel and test services
         builder
-            .ConfigureLogging(lb => {
-                lb.SetMinimumLevel(LogLevel.Trace);
-                lb.AddProvider(new TestContextLoggerProvider());
-
-                string logFileName = (TestContext.CurrentContext?.Test.ClassName ?? "test-log") + ".log";
-                lb.AddFile(Path.Join(Paths.TestArtifactDir, logFileName));
-            })
-            .UseSerilog()
+            .UseSerilog(
+                (ctx, loggerConfig) =>
+                {
+                    loggerConfig.WriteTo.File(
+                        path:Path.Join(Paths.TestArtifactDir, $"test-log-{DateTime.Now.Ticks}.log"),
+                        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}",
+                        shared: true
+                    );
+                    loggerConfig.WriteTo.Sink(new TestContextLoggerProvider());
+                }
+            )
             .ConfigureWebHostDefaults(wb =>
             {
                 wb.UseStaticWebAssets().UseKestrel(k => k.Listen(endPoint)).UseStartup<Startup>();

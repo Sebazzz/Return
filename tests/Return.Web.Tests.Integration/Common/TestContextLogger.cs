@@ -10,13 +10,18 @@ namespace Return.Web.Tests.Integration.Common;
 using System;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Serilog.Core;
+using Serilog.Events;
 
-public sealed class TestContextLoggerProvider : ILoggerProvider {
+public sealed class TestContextLoggerProvider : ILoggerProvider, ILogEventSink
+{
     public void Dispose() {
         TestContext.Progress.WriteLine($"{typeof(TestContextLogger)}: Dispose");
     }
 
     public ILogger CreateLogger(string categoryName) => new TestContextLogger(categoryName);
+
+    public void Emit(LogEvent logEvent) => logEvent.RenderMessage(TestContext.Progress);
 }
 
 internal sealed class TestContextLogger : ILogger {
