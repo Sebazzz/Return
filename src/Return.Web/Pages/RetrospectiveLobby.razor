@@ -26,6 +26,11 @@
                         {
                             <Showcase />
                         }
+                        
+                        @if (this.RetrospectiveStatus is { IsSummarizingAllowed: true })
+                        {
+                            <RetrospectiveSummarizer/>
+                        }
                     </div>
 
                     <div class="column">

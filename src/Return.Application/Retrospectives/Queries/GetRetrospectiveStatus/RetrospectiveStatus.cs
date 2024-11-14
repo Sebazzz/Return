@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  ©  Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : RetrospectiveStatus.cs
 //  Project         : Return.Application
 // ******************************************************************************
@@ -21,6 +21,7 @@ public sealed class RetrospectiveStatus {
     public bool IsVotingAllowed => this.Stage == RetrospectiveStage.Voting;
     public bool IsEditingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
     public bool IsDeletingNotesAllowed => this.Stage == RetrospectiveStage.Writing;
+    public bool IsSummarizingAllowed => this.Stage == RetrospectiveStage.Finished;
     public bool IsGroupingAllowed(bool isFacilitator) => this.Stage == RetrospectiveStage.Grouping && isFacilitator;
 
     public RetrospectiveWorkflowStatus WorkflowStatus { get; }

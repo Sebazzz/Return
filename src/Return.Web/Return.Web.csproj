@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" />
+    <PackageReference Include="Markdown" />
+    <PackageReference Include="Microsoft.Extensions.AI.Ollama" />
 
     <PackageReference Include="NReco.Logging.File" />
     <PackageReference Include="FluentValidation.AspNetCore" />

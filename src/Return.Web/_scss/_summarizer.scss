@@ -1,0 +1,28 @@
+﻿.summarizer {
+    margin: 2em 0;
+    padding: 1em;
+    border: 1px dashed #ccc;
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-weight: bold;
+    }
+
+    h1 {
+        font-size: 140%;
+    }
+
+    h2 {
+        font-size: 130%;
+    }
+
+    h3 {
+        font-size: 120%;
+    }
+
+    h4 {
+        font-size: 110%;
+    }
+}

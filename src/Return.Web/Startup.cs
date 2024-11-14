@@ -17,6 +17,7 @@ using Domain;
 using FluentValidation;
 using Infrastructure;
 using MediatR;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Middleware;
@@ -62,11 +63,23 @@ public class Startup {
 
         services.Configure<SecuritySettings>(this.Configuration.GetSection("Security"));
 
+        services.Configure<AISettings>(this.Configuration.GetSection("AI"));
+
         // Framework
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddValidatorsFromAssembly(typeof(IUrlGenerator).Assembly, ServiceLifetime.Scoped);
         services.AddDataProtection();
+
+        services.AddScoped<IChatClient>(static sp =>
+        {
+            IOptionsSnapshot<AISettings> aiSettings = sp.GetRequiredService<IOptionsSnapshot<AISettings>>();
+
+            return new OllamaChatClient(
+                aiSettings.Value.Url,
+                aiSettings.Value.Model
+            );
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory) {
