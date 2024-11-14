@@ -107,6 +107,16 @@
                 </p>
             </div>
         }
+        
+        @if (IsGroupingAllowed() && this.Contents is { Notes.Count: > 0 })
+        {
+            <p>
+                <button class="button is-link is-outlined @(IsAutoGrouping ? "is-loading" : "")" @onclick="@AutoGroupNotes">
+                    <i class="fa-solid fa-quote-left"></i>
+                    Automatically group notes
+                </button>
+            </p>
+        }
 
 
     </CascadingValue>

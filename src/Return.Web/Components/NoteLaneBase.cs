@@ -10,7 +10,11 @@ namespace Return.Web.Components;
 #nullable disable
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Application.Common.Models;
 using Application.NoteGroups.Commands;
@@ -255,6 +259,133 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
             this.ShowErrorMessage = true;
 
             this.Logger.LogError(ex, $"Unable to add note group for {this.RetroId} in lane {this.Lane?.Id}");
+        }
+    }
+
+    protected bool IsAutoGrouping { get; set; } = false;
+
+    protected async Task AutoGroupNotes()
+    {
+        IsAutoGrouping = true;
+        this.StateHasChanged();
+
+        ChatOptions chatOptions = new()
+        {
+            Tools = [
+                AIFunctionFactory.Create(
+                    this.MakeNoteGroup,
+                    new AIFunctionFactoryCreateOptions
+                    {
+                        Name = "Create note group",
+                        Description = "Makes a group with a specified title and IDs of the relevant notes.",
+                        Parameters = [
+                            new("title") { Description = "The name of the group to create", IsRequired = true, ParameterType = typeof(string)},
+                            new("noteIds") { Description = "An array of note IDs of the notes to put into this group", IsRequired = true, ParameterType = typeof(int[])},
+                        ],
+                        ReturnParameter = new()
+                        {
+                            Description = "Indication of the note group created",
+                        }
+                    }
+                )
+            ],
+            ToolMode = ChatToolMode.RequireSpecific("Create note group"),
+            TopP = 1.2f,
+            TopK = 25
+        };
+
+        List<ChatMessage> chatMessages =
+        [
+            new(
+                ChatRole.System,
+                $@"Please group similar notes together using the following constraints:
+1. Only group notes that fit in a group.
+2. If a note cannot be grouped together with multiple other notes, then ignore.
+3. Only group notes with the same subject.
+4. To group notes, invoke the ""Create note group"" tool.
+5. Do not to put a single note in multiple groups.
+6. Give each group a title of 5 words maximum that summarizes the notes in the group.
+
+What now follows is a list of notes to divide into groups. Do not response with a summary, please invoke the tool.
+Each note is starts with [NOTE ID]. Each note ends with [END NOTE].
+
+Example note with ID 123:
+[NOTE 123] Some text here [END NOTE]"
+            )
+        ];
+
+        StringBuilder stringBuilder = new();
+
+        foreach (RetrospectiveNote note in this.Contents.Notes)
+        {
+            stringBuilder.AppendLine($"[NOTE {note.Id}] {note.Text} [END NOTE]");
+        }
+
+        chatMessages.Add(new ChatMessage(ChatRole.User, stringBuilder.ToString()));
+
+        long startTime = Stopwatch.GetTimestamp();
+
+        IChatClient client = new ChatClientBuilder()
+            .UseFunctionInvocation(f =>
+            {
+                f.RetryOnError = true;
+            })
+            .UseLogging(this.Logger)
+            .Use(this.ChatClient);
+
+        Logger.LogDebug("Invoking AI with {Count} messages", chatMessages.Count);
+        try
+        {
+            ChatCompletion response = await client.CompleteAsync(chatMessages, chatOptions);
+
+            Logger.LogTrace("AI response: {@RawResponse}", response);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error invoking AI");
+        }
+        finally
+        {
+            IsAutoGrouping = false;
+        }
+
+        Logger.LogDebug("Completed AI invocation in {Elapsed}", Stopwatch.GetElapsedTime(startTime));
+    }
+
+
+    private async Task<string> MakeNoteGroup(string title, int[] noteIds)
+    {
+        try
+        {
+            Logger.LogInformation("AI tool callback: Make note group with title {Title} and ids {@NoteIds}",
+                title,
+                noteIds);
+
+            IEnumerable<string> notes = this.Contents.Notes.Where(x => noteIds.Contains(x.Id)).Select(x => x.Text);
+            foreach (string note in notes) {
+                Logger.LogDebug("Note selected for group {Title}: {NoteText}", title, note);
+            }
+
+            RetrospectiveNoteGroup result = await this.Mediator.Send(new AddNoteGroupCommand(this.RetroId.StringId, this.Lane.Id));
+            result.Title = title;
+
+            this.Contents.Groups.Add(result);
+            await this.Mediator.Send(new UpdateNoteGroupCommand(this.RetroId.StringId, result.Id, title));
+
+            foreach (int noteId in noteIds)
+            {
+                if (this.ExecuteNoteMove(noteId, result.Id))
+                {
+                    await this.Mediator.Send(new MoveNoteCommand(noteId, result.Id));
+                }
+            }
+
+            return $"Created note group \"{title}\" and with notes: {String.Join(",", noteIds)}";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error processing AI invocation");
+            return $"An error occured making group {title}";
         }
     }
 
