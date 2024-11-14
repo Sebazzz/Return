@@ -68,36 +68,41 @@ else
             ResponseFormat = ChatResponseFormat.Text,
         };
 
-        string laneNames = String.Join("/", this.Data.Items.Select(x => x.Lane.Name).Distinct());
-        List<ChatMessage> chatMessages =
-        [
-            new(
-                ChatRole.System,
-                $@"A retrospective has been performed. Summarize the following messages, prefixed with categories '{laneNames}', in a maximum of 60 words per category. Spend more words on highly voted notes and less on lower voted notes.
-Don't call out individual notes, just summarize the general sentiment. Limit making up additional context or words, keep it to the given messages. Use markdown syntax for headings, subheadings and lists.
-"
-            )
-        ];
+        string rawSummary = String.Empty;
         
-        Logger.LogInformation("Compose system message: {Msg}", chatMessages[0].Text);
-
         var byLane =
-            from item in this.Data.Items
+            (from item in this.Data.Items
             group item by item.Lane.Name into g
-            select new { Lane = g.Key, Notes = g.OrderByDescending(x => x.Votes.Count) };
+            select new { Lane = g.Key, Notes = g.OrderByDescending(x => x.Votes.Count).ToList() }).ToList();
+        
+        Logger.LogDebug("Summarizing {Count} lanes", byLane.Count);
 
         StringBuilder msgBuilder = new();
         foreach (var group in byLane)
         {
+            if (group.Notes.Count is 0) continue;
+            
+            List<ChatMessage> chatMessages =
+            [
+                new(
+                    ChatRole.System,
+                    $@"A retrospective has been performed. Summarize the following '{group.Lane}' lane notes, in a maximum of 60 words. 
+Don't call out individual notes, just summarize the general sentiment of the most highly voted notes in a concise summary. Do not mention the amount of votes.
+Limit making up additional context or words, keep it to the given messages. If items are grouped together, then summarize the group.
+Use markdown syntax for lists. Use no headings.
+"
+                )
+            ];
+
+            rawSummary += $"## Lane \"{group.Lane}\"{Environment.NewLine}";
+            
             foreach (var item in group.Notes)
             {
                 msgBuilder.Clear();
 
-                msgBuilder.Append($"Category \"{item.Lane.Name}\" ");
-                
                 if (item is { NoteGroup: { } ng })
                 {
-                    msgBuilder.AppendLine($" - multiple items grouped \"{item.NoteGroup.Title}\" (voted {item.Votes.Count} times): ");
+                    msgBuilder.AppendLine($"Multiple items grouped \"{item.NoteGroup.Title}\" (voted {item.Votes.Count} times): ");
                     foreach (RetrospectiveNote note in ng.Notes)
                     {
                         msgBuilder.Append($"- {note.Text}");
@@ -106,9 +111,11 @@ Don't call out individual notes, just summarize the general sentiment. Limit mak
 
                 if (item is { Note: { } n })
                 {
-                    msgBuilder.AppendLine($"- voted {item.Votes.Count} times: ");
+                    msgBuilder.AppendLine($"Voted {item.Votes.Count} times: ");
                     msgBuilder.AppendLine(n.Text);
                 }
+        
+                Logger.LogInformation("Compose system message: {Msg}", chatMessages[0].Text);
             
                 chatMessages.Add(
                     new(
@@ -116,44 +123,48 @@ Don't call out individual notes, just summarize the general sentiment. Limit mak
                         msgBuilder.ToString()
                     )
                 );
-
+                
                 Logger.LogDebug("Composed sub-chatmessage: {Msg}", msgBuilder.ToString());
             }
-        }
-
-        long startTime = Stopwatch.GetTimestamp();
-        
-        Logger.LogDebug("Invoking AI with {Count} messages", chatMessages.Count);
-        try
-        {
-            Summary = null;
-
-            Markdown markdown = new();
-            string rawSummary = String.Empty;
             
-            await foreach (StreamingChatCompletionUpdate subText in this.ChatClient.CompleteStreamingAsync(chatMessages, chatOptions))
+            long startTime = Stopwatch.GetTimestamp();
+            
+            Logger.LogDebug("Invoking AI with {Count} messages", chatMessages.Count);
+            try
             {
-                //Logger.LogTrace("Streamed sub text: {@Update}", subText.Text);
-                
-                if (subText is { Text: { } text })
-                {
-                    rawSummary += text;
-                    this.Summary = markdown.Transform(rawSummary);
-                    
-                    StateHasChanged();
-                }
-            }
+                Summary = null;
+
+                Markdown markdown = new();
             
-            this.Summary = markdown.Transform(rawSummary);
-            Logger.LogTrace("Total generated summary: {RawSummary}", rawSummary);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "Error invoking AI");
-            Summary = ex.ToString();
-        }
+                await foreach (StreamingChatCompletionUpdate subText in this.ChatClient.CompleteStreamingAsync(chatMessages, chatOptions))
+                {
+                    //Logger.LogTrace("Streamed sub text: {@Update}", subText.Text);
+                
+                    if (subText is { Text: { } text })
+                    {
+                        rawSummary += text;
+                        this.Summary = markdown.Transform(rawSummary);
+                    
+                        StateHasChanged();
+                    }
+                }
+            
+                this.Summary = markdown.Transform(rawSummary);
+                Logger.LogTrace("Total generated summary: {RawSummary}", rawSummary);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error invoking AI");
+                Summary = ex.ToString();
+            }
         
-        Logger.LogDebug("Completed AI invocation in {Elapsed}", Stopwatch.GetElapsedTime(startTime));
+            Logger.LogDebug("Completed AI invocation in {Elapsed}", Stopwatch.GetElapsedTime(startTime));
+                
+            rawSummary += Environment.NewLine;
+            rawSummary += Environment.NewLine;
+        }
+
+    
         IsLoadingSummary = false;
     }
 
