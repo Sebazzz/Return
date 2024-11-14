@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : NoteGroupBase.cs
 //  Project         : Return.Web
 // ******************************************************************************
@@ -8,13 +8,16 @@
 namespace Return.Web.Components;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Application.Common.Models;
 using Application.NoteGroups.Commands;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 
 #nullable disable
@@ -26,6 +29,9 @@ using Microsoft.Extensions.Logging;
 public class NoteGroupBase : MediatorComponent {
     [Inject]
     public ILogger<NoteGroup> Logger { get; set; }
+
+    [Inject]
+    public IChatClient ChatClient { get; set; }
 
     [Parameter]
     public RetrospectiveNoteGroup Data { get; set; } = new RetrospectiveNoteGroup();
@@ -65,6 +71,47 @@ public class NoteGroupBase : MediatorComponent {
             this.Logger.LogError(ex, "Unable to save note group title of #" + this.Data.Id);
             this.ShowError = true;
         }
+    }
+
+    protected async Task AutoSummarizeNoteGroupTitle()
+    {
+        ChatOptions chatOptions = new()
+        {
+            Temperature = 0.2f,
+            ResponseFormat = ChatResponseFormat.Text,
+        };
+
+        List<ChatMessage> chatMessages =
+        [
+            new(
+                ChatRole.System,
+                $@"A retrospective has been performed. Summarize the sentiment following notes grouped in the '{this.Container.Lane.Name}' lane. Use a maximum of 5 words. Don't prefix anything.
+Only write a 5 word summary of the notes group. Do not use punctuations. Do not mention 'Notes' - only give a short 5 word title for these notes."
+            )
+        ];
+
+        foreach (RetrospectiveNote note in this.Data.Notes)
+        {
+            chatMessages.Add(new(ChatRole.User, $"Note: {note.Text}"));
+        }
+
+        long startTime = Stopwatch.GetTimestamp();
+
+        Logger.LogDebug("Invoking AI with {Count} messages", chatMessages.Count);
+        try
+        {
+            ChatCompletion response = await this.ChatClient.CompleteAsync(chatMessages, chatOptions);
+            this.Data.Title = response.ToString();
+            Logger.LogTrace("Total generated summary: {RawSummary}", this.Data.Title);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error invoking AI");
+        }
+
+        Logger.LogDebug("Completed AI invocation in {Elapsed}", Stopwatch.GetElapsedTime(startTime));
+
+        await this.UpdateTitle();
     }
 
     protected async Task DeleteNoteGroup() {

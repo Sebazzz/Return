@@ -1,6 +1,6 @@
 ﻿// ******************************************************************************
 //  © 2019 Sebastiaan Dammann | damsteen.nl
-// 
+//
 //  File:           : NoteLaneBase.cs
 //  Project         : Return.Web
 // ******************************************************************************
@@ -25,6 +25,7 @@ using Application.RetrospectiveLanes.Queries;
 using Application.Retrospectives.Queries.GetRetrospectiveStatus;
 using Domain.ValueObjects;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Services;
 
@@ -44,6 +45,9 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
 
     [Inject]
     public INotificationSubscription<INoteDeletedSubscriber> NoteDeletedSubscription { get; set; }
+
+    [Inject]
+    public IChatClient ChatClient { get; set; }
 
     [Inject]
     public ILogger<NoteLane> Logger { get; set; }
@@ -300,6 +304,8 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
 
         return Task.CompletedTask;
     }
+
+
 
     protected override void OnAfterRender(bool firstRender) {
         // Reset last added note - this prevents refocus if someone else adds a new note in a different lane even

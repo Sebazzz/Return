@@ -21,6 +21,11 @@
                        @bind="@this.DataTitle" />
             </div>
             <div class="control">
+                <button class="button is-link is-outlined" @onclick="@AutoSummarizeNoteGroupTitle">
+                    <i class="fa-solid fa-quote-left"></i>
+                </button>
+            </div>
+            <div class="control">
                 <button class="button is-danger is-outlined" @onclick="@DeleteNoteGroup">
                     <i class="fas fa-trash is-danger"></i>
                 </button>
