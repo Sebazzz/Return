@@ -276,18 +276,29 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
                     this.MakeNoteGroup,
                     new AIFunctionFactoryCreateOptions
                     {
-                        Name = "Create note group",
-                        Description = "Makes a group with a specified title and IDs of the relevant notes.",
+                        Name = "Create group",
                         Parameters = [
                             new("title") { Description = "The name of the group to create", IsRequired = true, ParameterType = typeof(string)},
-                            new("noteIds") { Description = "An array of note IDs of the notes to put into this group", IsRequired = true, ParameterType = typeof(int[])},
-                        ],
-                        ReturnParameter = null
-
+                        ]
                     }
-                )
+                ),
+                AIFunctionFactory.Create(
+                    this.AddNoteToGroup,
+                    new AIFunctionFactoryCreateOptions
+                    {
+                        Name = "Assign note to group",
+                        Parameters = [
+                            new("noteGroup") { Description = "Title of the group created with the \"Create note group\" tool", IsRequired = true, ParameterType = typeof(int)},
+                            new("noteId") { Description = "Integer ID of the note to move to the group", IsRequired = true, ParameterType = typeof(int)},
+                        ],
+                        ReturnParameter = new() {
+                            Description = "Returns if the move was successful",
+                            ParameterType = typeof(string)
+                        }
+                    }
+                ),
             ],
-            ToolMode = ChatToolMode.RequireSpecific("Create note group"),
+            ToolMode = ChatToolMode.RequireAny,
             TopP = 0.9f,
             Temperature = 0.2f,
             TopK = 10
@@ -303,7 +314,10 @@ Your task is to group notes by subject and create groups with the following rule
 - Ignore any note that does not fit into a group.
 - Do not include the same note in more than one group.
 - Assign each group a concise title (maximum of 5 words) summarizing its content.
-- Use the ""Create note group"" tool to make the groups.
+
+Workflow:
+1. Create group with a title
+2. For each note belonging to the group: invoke the ""add note to group"" tool
 
 What now follows is a list of notes to divide into groups. Do not response with a summary, invoke the tool.
 Each note is starts with [NOTE ID]. Each note ends with [END NOTE].
@@ -352,39 +366,56 @@ Example note with ID 123:
     }
 
 
-    private async Task MakeNoteGroup(string title, int[] noteIds)
+    private async Task MakeNoteGroup(string title)
     {
         try
         {
-            Logger.LogInformation("AI tool callback: Make note group with title {Title} and ids {@NoteIds}",
-                title,
-                noteIds);
-
-            IEnumerable<string> notes = this.Contents.Notes.Where(x => noteIds.Contains(x.Id)).Select(x => x.Text);
-            foreach (string note in notes) {
-                Logger.LogDebug("Note selected for group {Title}: {NoteText}", title, note);
-            }
+            Logger.LogInformation("AI tool callback: Make note group with title {Title}", title);
 
             RetrospectiveNoteGroup result = await this.Mediator.Send(new AddNoteGroupCommand(this.RetroId.StringId, this.Lane.Id));
-            result.Title = title;
 
             this.Contents.Groups.Add(result);
             await this.Mediator.Send(new UpdateNoteGroupCommand(this.RetroId.StringId, result.Id, title));
 
-            foreach (int noteId in noteIds)
-            {
-                if (this.ExecuteNoteMove(noteId, result.Id))
-                {
-                    await this.Mediator.Send(new MoveNoteCommand(noteId, result.Id));
-                }
-            }
-
+            result = this.Contents.Groups.FirstOrDefault(x => x.Id == result.Id) ?? result;
+            result.Title = title;
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error processing AI invocation");
             throw;
         }
+    }
+
+    private async Task<string> AddNoteToGroup(string noteGroup, int noteId)
+    {
+        try
+        {
+            Logger.LogInformation("AI tool callback: Move note {NoteId} to group {GroupTitle}",
+                noteId,
+                noteGroup);
+
+            RetrospectiveNoteGroup noteGroupInstance = this.Contents.Groups.FirstOrDefault(x => String.Equals(noteGroup.Trim(), x.Title.Trim(), StringComparison.OrdinalIgnoreCase));
+            if (noteGroupInstance is null) return $"Note group \"{noteGroup}\" does not exist";
+
+            IEnumerable<string> notes = this.Contents.Notes.Where(x => x.Id == noteId).Select(x => x.Text);
+            foreach (string note in notes) {
+                Logger.LogDebug("Note selected for group {Title}: {NoteText}", noteGroupInstance.Title, note);
+            }
+
+            if (this.ExecuteNoteMove(noteId, noteGroupInstance.Id))
+            {
+                await this.Mediator.Send(new MoveNoteCommand(noteId, noteGroupInstance.Id));
+                return "Success";
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error processing AI invocation");
+            throw;
+        }
+
+        return "Invalid move";
     }
 
     public Task OnNoteAdded(NoteAddedNotification notification) {
