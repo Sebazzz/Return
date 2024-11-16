@@ -290,23 +290,24 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
                 )
             ],
             ToolMode = ChatToolMode.RequireSpecific("Create note group"),
-            TopP = 1.2f,
-            TopK = 25
+            TopP = 0.9f,
+            Temperature = 0.2f,
+            TopK = 10
         };
 
         List<ChatMessage> chatMessages =
         [
             new(
                 ChatRole.System,
-                $@"Please group similar notes together using the following constraints:
-1. Only group notes that fit in a group.
-2. If a note cannot be grouped together with multiple other notes, then ignore.
-3. Only group notes with the same subject.
-4. To group notes, invoke the ""Create note group"" tool.
-5. Do not to put a single note in multiple groups.
-6. Give each group a title of 5 words maximum that summarizes the notes in the group.
+                $@"
+Your task is to group notes by subject and create groups with the following rules:
+- Only group notes that clearly belong together by subject.
+- Ignore any note that does not fit into a group.
+- Do not include the same note in more than one group.
+- Assign each group a concise title (maximum of 5 words) summarizing its content.
+- Use the ""Create note group"" tool to make the groups.
 
-What now follows is a list of notes to divide into groups. Do not response with a summary, please invoke the tool.
+What now follows is a list of notes to divide into groups. Do not response with a summary, invoke the tool.
 Each note is starts with [NOTE ID]. Each note ends with [END NOTE].
 
 Example note with ID 123:
