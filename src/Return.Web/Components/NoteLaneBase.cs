@@ -282,10 +282,8 @@ public abstract class NoteLaneBase : MediatorComponent, IDisposable, INoteAddedS
                             new("title") { Description = "The name of the group to create", IsRequired = true, ParameterType = typeof(string)},
                             new("noteIds") { Description = "An array of note IDs of the notes to put into this group", IsRequired = true, ParameterType = typeof(int[])},
                         ],
-                        ReturnParameter = new()
-                        {
-                            Description = "Indication of the note group created",
-                        }
+                        ReturnParameter = null
+
                     }
                 )
             ],
@@ -354,7 +352,7 @@ Example note with ID 123:
     }
 
 
-    private async Task<string> MakeNoteGroup(string title, int[] noteIds)
+    private async Task MakeNoteGroup(string title, int[] noteIds)
     {
         try
         {
@@ -381,12 +379,11 @@ Example note with ID 123:
                 }
             }
 
-            return $"Created note group \"{title}\" and with notes: {String.Join(",", noteIds)}";
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error processing AI invocation");
-            return $"An error occured making group {title}";
+            throw;
         }
     }
 
